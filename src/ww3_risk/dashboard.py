@@ -301,7 +301,7 @@ def generate_dashboard_data(
         "metadata": {
             "title": "WW3 結構風險預警儀表板",
             "title_en": "WW3 Structural Risk Early Warning Dashboard",
-            "model_version": "0.1.0-alpha",
+            "model_version": "0.2.0",
             "generated_at": "2026-10-20",
             "active_scenario_id": main_scenario.id,
             "active_scenario_title": main_scenario.title,
