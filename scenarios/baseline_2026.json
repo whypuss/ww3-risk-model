@@ -1,0 +1,425 @@
+{
+  "id": "baseline_2026",
+  "title": "2026 全球結構風險基準情境",
+  "title_en": "2026 Global Structural Risk Baseline",
+  "year": 2026,
+  "description": "當前多極化過渡期、AI技術震盪及地緣陣營重組之全球結構性風險基準評估（數值標註 illustrative 示範性估算）",
+  "layers": {
+    "L1": {
+      "id": "L1",
+      "name": "生存／資源稀缺",
+      "name_en": "Survival / Resource Scarcity",
+      "weight": 1.0,
+      "indicators": [
+        {
+          "id": "l1_food_security",
+          "name": "全球糧食儲備與主糧庫存消費比",
+          "name_en": "Global Grain Stock-to-Use & Food Insecurity",
+          "value": 52.0,
+          "weight": 1.0,
+          "evidence_level": "illustrative",
+          "source": "FAO Cereal Supply and Demand Brief 2025/2026 (illustrative baseline)",
+          "year": 2026,
+          "note": "極端氣候引致多國小麥、水稻產區減產，主糧儲備低於十年均線"
+        },
+        {
+          "id": "l1_water_stress",
+          "name": "跨界流域水資源壓力與枯竭指數",
+          "name_en": "Transboundary Freshwater Stress & Depletion",
+          "value": 58.0,
+          "weight": 1.0,
+          "evidence_level": "illustrative",
+          "source": "WRI Aqueduct Water Risk Atlas (illustrative baseline)",
+          "year": 2026,
+          "note": "中東、南亞及中亞跨界水壩與冰川消融加劇上下游地緣緊張"
+        },
+        {
+          "id": "l1_energy_vulnerability",
+          "name": "化石能源與電網供應鏈脆弱性",
+          "name_en": "Energy Supply Vulnerability & Grid Stress",
+          "value": 60.0,
+          "weight": 1.2,
+          "evidence_level": "illustrative",
+          "source": "IEA World Energy Outlook 2025 (illustrative baseline)",
+          "year": 2026,
+          "note": "烏克蘭與中東戰事外溢致航道運費波動，電網面臨AI算力用電暴增之負荷"
+        },
+        {
+          "id": "l1_critical_minerals",
+          "name": "關鍵礦物與稀土出口管制集中度",
+          "name_en": "Critical Minerals & Rare Earth Export Restrictions",
+          "value": 72.0,
+          "weight": 1.3,
+          "evidence_level": "illustrative",
+          "source": "USGS Mineral Commodity Summaries (illustrative baseline)",
+          "year": 2026,
+          "note": "鎵、鍺、銻、鋰、鈷受出口許可證與關稅圍堵，供應鏈替代週期長達數年"
+        },
+        {
+          "id": "l1_climate_impact",
+          "name": "氣候極端衝擊對核心農業基礎設施破壞",
+          "name_en": "Extreme Climate Shocks to Agricultural Infrastructure",
+          "value": 65.0,
+          "weight": 1.0,
+          "evidence_level": "illustrative",
+          "source": "WMO State of the Global Climate (illustrative baseline)",
+          "year": 2026,
+          "note": "厄爾尼諾/拉尼娜震盪推高旱澇頻次，港口與農地受損加劇"
+        },
+        {
+          "id": "l1_maritime_chokepoints",
+          "name": "全球戰略咽喉海運水道通行風險",
+          "name_en": "Maritime Chokepoint Disruption (Red Sea, Hormuz, Malacca)",
+          "value": 68.0,
+          "weight": 1.2,
+          "evidence_level": "illustrative",
+          "source": "UNCTAD Maritime Transport Review (illustrative baseline)",
+          "year": 2026,
+          "note": "紅海襲擊持續、霍爾木茲與馬六甲海峽受無人機與水雷非對稱威脅"
+        }
+      ]
+    },
+    "L2": {
+      "id": "L2",
+      "name": "分配失衡",
+      "name_en": "Inequality & Distribution",
+      "weight": 1.0,
+      "indicators": [
+        {
+          "id": "l2_wealth_gini",
+          "name": "全球前 1% 財富佔有率與階層差距",
+          "name_en": "Top 1% Wealth Share & Economic Inequality",
+          "value": 74.0,
+          "weight": 1.2,
+          "evidence_level": "illustrative",
+          "source": "World Inequality Report 2026 (illustrative baseline)",
+          "year": 2026,
+          "note": "資產升值大幅超越勞動報酬，主要大國基尼係數維持歷史高位"
+        },
+        {
+          "id": "l2_compute_monopoly",
+          "name": "前沿 AI 算力與先進晶圓代工極端壟斷",
+          "name_en": "Frontier AI Compute & Foundry Monopolization",
+          "value": 82.0,
+          "weight": 1.4,
+          "evidence_level": "illustrative",
+          "source": "SemiAnalysis / Epoch AI hardware tracker (illustrative baseline)",
+          "year": 2026,
+          "note": "頂級訓練叢集高度集中於少數跨國巨頭與單一島嶼先進製程，國家間差距急速拉大"
+        },
+        {
+          "id": "l2_land_housing_concentration",
+          "name": "土地與關鍵民生資本壟斷化指數",
+          "name_en": "Land & Essential Living Capital Concentration",
+          "value": 68.0,
+          "weight": 1.0,
+          "evidence_level": "illustrative",
+          "source": "OECD Housing Indicators (illustrative baseline)",
+          "year": 2026,
+          "note": "跨國機構與富裕階層吸納都會區優質資產，普通家庭資本積累阻斷"
+        },
+        {
+          "id": "l2_social_mobility",
+          "name": "代際社會流動停滯與向下沉淪感知",
+          "name_en": "Intergenerational Mobility Stagnation & Despair",
+          "value": 70.0,
+          "weight": 1.1,
+          "evidence_level": "illustrative",
+          "source": "World Economic Forum Social Mobility Index (illustrative baseline)",
+          "year": 2026,
+          "note": "教育投資回報率下滑，年輕一代深感生活水準難以超越父輩"
+        },
+        {
+          "id": "l2_institutional_fairness",
+          "name": "制度公平感衰落與建制派信任赤字",
+          "name_en": "Erosion of Perceived Institutional Fairness",
+          "value": 66.0,
+          "weight": 1.0,
+          "evidence_level": "illustrative",
+          "source": "Edelman Trust Barometer (illustrative baseline)",
+          "year": 2026,
+          "note": "司法、稅收與公營制度偏袒精英階層的社會民怨普遍深化"
+        },
+        {
+          "id": "l2_peaceful_redistribution",
+          "name": "和平再分配機制失靈與政治極化",
+          "name_en": "Breakdown of Peaceful Redistribution Mechanisms",
+          "value": 64.0,
+          "weight": 1.1,
+          "evidence_level": "illustrative",
+          "source": "V-Dem Electoral Democracy & Polarization Index (illustrative baseline)",
+          "year": 2026,
+          "note": "議會財稅改革癱瘓，各政黨訴諸民粹與保護主義轉移分配矛盾"
+        }
+      ]
+    },
+    "L3": {
+      "id": "L3",
+      "name": "工作／生計／AI取代",
+      "name_en": "Labor, Livelihood & AI Displacement",
+      "weight": 1.1,
+      "indicators": [
+        {
+          "id": "l3_unemployment_underemployment",
+          "name": "整體非充分就業與隱性失業壓力",
+          "name_en": "Overall Underemployment & Hidden Joblessness",
+          "value": 56.0,
+          "weight": 1.0,
+          "evidence_level": "illustrative",
+          "source": "ILO World Employment and Social Outlook 2026 (illustrative baseline)",
+          "year": 2026,
+          "note": "零工經濟氾濫，名義失業率低掩蓋了實質工作時間與福利萎縮"
+        },
+        {
+          "id": "l3_youth_unemployment",
+          "name": "青年失業率與啃老躺平比例",
+          "name_en": "Youth Unemployment & NEET Rate",
+          "value": 68.0,
+          "weight": 1.2,
+          "evidence_level": "illustrative",
+          "source": "OECD / National Bureaus of Statistics (illustrative baseline)",
+          "year": 2026,
+          "note": "多國青年失業居高不下，大學畢業生就業結構性脫節"
+        },
+        {
+          "id": "l3_wage_vs_living_cost",
+          "name": "實質工資停滯 vs 核心生活通脹夾擊",
+          "name_en": "Real Wage Squeeze vs Core Cost of Living",
+          "value": 65.0,
+          "weight": 1.1,
+          "evidence_level": "illustrative",
+          "source": "IMF World Economic Outlook (illustrative baseline)",
+          "year": 2026,
+          "note": "食物、能源、醫療長期通脹蚕食可支配收入"
+        },
+        {
+          "id": "l3_housing_affordability",
+          "name": "房價/租金所得比高企壓力",
+          "name_en": "Housing Price-to-Income / Rent Burden Index",
+          "value": 75.0,
+          "weight": 1.0,
+          "evidence_level": "illustrative",
+          "source": "Numbeo Property Price Index 2026 (illustrative baseline)",
+          "year": 2026,
+          "note": "核心都市住宅負擔遠超普通家庭承載能力，壓抑生育與創業"
+        },
+        {
+          "id": "l3_ai_displacement_rate",
+          "name": "前瞻重點：AI 認知與知識勞動取代率",
+          "name_en": "AI Cognitive & Knowledge Work Displacement Shock",
+          "value": 62.0,
+          "weight": 1.5,
+          "evidence_level": "illustrative",
+          "source": "Stanford HAI AI Index / Goldman Sachs Automation Forecast (illustrative baseline)",
+          "year": 2026,
+          "note": "自研程式、客服、初級分析、外語翻譯與內容創作受端側與雲端Agent實質取代"
+        },
+        {
+          "id": "l3_effort_reward_breakdown",
+          "name": "努力回報預期崩塌與社會習得性無助",
+          "name_en": "Collapse of Effort-Reward Ratio & Resignation",
+          "value": 64.0,
+          "weight": 1.0,
+          "evidence_level": "illustrative",
+          "source": "Gallup State of the Global Workplace (illustrative baseline)",
+          "year": 2026,
+          "note": "勤奮無法換取體面生活的信念蔓延，削弱社會凝聚力與政治穩定"
+        }
+      ]
+    },
+    "L4": {
+      "id": "L4",
+      "name": "權力／安全困境",
+      "name_en": "Power & Security Dilemma",
+      "weight": 1.2,
+      "indicators": [
+        {
+          "id": "l4_military_expenditure_growth",
+          "name": "全球軍費加速擴張與防衛預算GDP佔比",
+          "name_en": "Military Spending Growth & Global Armament Surge",
+          "value": 72.0,
+          "weight": 1.2,
+          "evidence_level": "illustrative",
+          "source": "SIPRI Military Expenditure Database (illustrative baseline)",
+          "year": 2026,
+          "note": "北約、中俄、日韓台及中東軍費全面超過冷戰結束後峰值"
+        },
+        {
+          "id": "l4_arms_race_hypersonic",
+          "name": "高超音速、無人蜂群與太空反衛星軍備競賽",
+          "name_en": "Hypersonic, Drone Swarm & Counter-Space Arms Race",
+          "value": 75.0,
+          "weight": 1.2,
+          "evidence_level": "illustrative",
+          "source": "IISS Military Balance 2026 (illustrative baseline)",
+          "year": 2026,
+          "note": "攻防非對稱武器削弱傳統預警防禦窗口，戰略突襲誘惑增加"
+        },
+        {
+          "id": "l4_bloc_polarization",
+          "name": "全球地緣政治陣營極化與同盟剛性",
+          "name_en": "Geopolitical Bloc Polarization & Alliance Rigidity",
+          "value": 78.0,
+          "weight": 1.3,
+          "evidence_level": "illustrative",
+          "source": "Munich Security Report 2026 (illustrative baseline)",
+          "year": 2026,
+          "note": "美歐日韓 vs 俄中伊朝陣營壁壘分明，小國戰略自主中立空間收窄"
+        },
+        {
+          "id": "l4_weaponized_interdependence",
+          "name": "經貿金融相互依賴武器化與關鍵禁運",
+          "name_en": "Weaponized Economic Interdependence & Financial Sanctions",
+          "value": 76.0,
+          "weight": 1.2,
+          "evidence_level": "illustrative",
+          "source": "Atlantic Council Geoeconomics Center (illustrative baseline)",
+          "year": 2026,
+          "note": "SWIFT制裁、半導體長臂管制、出口許可全面泛安全化"
+        },
+        {
+          "id": "l4_nuclear_breakout",
+          "name": "核擴散門檻降低與戰術核武使用禁忌鬆動",
+          "name_en": "Nuclear Proliferation & Erosion of Taboo",
+          "value": 66.0,
+          "weight": 1.4,
+          "evidence_level": "illustrative",
+          "source": "Bulletin of the Atomic Scientists (illustrative baseline)",
+          "year": 2026,
+          "note": "戰略核條約終止、伊朗濃縮接近突破、戰術核演習常態化"
+        },
+        {
+          "id": "l4_territorial_flashpoints",
+          "name": "高危熱點主權與領土引信點摩擦頻度",
+          "name_en": "Active Territorial & Sovereign Flashpoint Heat (Taiwan, SCS, Ukraine, ME)",
+          "value": 80.0,
+          "weight": 1.4,
+          "evidence_level": "illustrative",
+          "source": "Crisis Group CrisisWatch (illustrative baseline)",
+          "year": 2026,
+          "note": "台海、南海、烏克蘭前線、中東紅海多線並行處於高觸發態勢"
+        }
+      ]
+    },
+    "L5": {
+      "id": "L5",
+      "name": "對未來的恐懼／預防邏輯",
+      "name_en": "Fear of Future & Preventive Logic",
+      "weight": 1.1,
+      "indicators": [
+        {
+          "id": "l5_relative_decline_anxiety",
+          "name": "霸權相對衰落焦慮與修昔底德權力轉移壓力",
+          "name_en": "Hegemonic Decline Anxiety & Thucydides Friction",
+          "value": 76.0,
+          "weight": 1.3,
+          "evidence_level": "illustrative",
+          "source": "Graham Allison Thucydides Trap Case Index (illustrative baseline)",
+          "year": 2026,
+          "note": "既有大國對實力被超越之恐懼，與新興大國對被打斷崛起之警惕共存"
+        },
+        {
+          "id": "l5_demographic_cliff",
+          "name": "人口老齡斷崖與戰略機會之窗即將關閉恐慌",
+          "name_en": "Demographic Aging Cliff & Closing Window Syndrome",
+          "value": 70.0,
+          "weight": 1.1,
+          "evidence_level": "illustrative",
+          "source": "UN World Population Prospects (illustrative baseline)",
+          "year": 2026,
+          "note": "主要強權勞動力與兵源見頂，激起『此時不解決日後更難』的冒險心態"
+        },
+        {
+          "id": "l5_economic_stagnation",
+          "name": "長期生產力停滯與債務懸崖悲觀預期",
+          "name_en": "Secular Stagnation & Sovereign Debt Wall Fears",
+          "value": 64.0,
+          "weight": 1.0,
+          "evidence_level": "illustrative",
+          "source": "World Bank Global Economic Prospects (illustrative baseline)",
+          "year": 2026,
+          "note": "全球債務佔GDP攀升至極限，和平時期的增量博弈轉化為存量零和撕裂"
+        },
+        {
+          "id": "l5_tech_supremacy_fear",
+          "name": "未來十年內喪失戰略技術霸權之預防性開戰邏輯",
+          "name_en": "Fear of Losing 10-Year Strategic Tech Dominance (Preventive Logic)",
+          "value": 78.0,
+          "weight": 1.4,
+          "evidence_level": "illustrative",
+          "source": "Special Competitive Studies Project (SCSP) (illustrative baseline)",
+          "year": 2026,
+          "note": "若相信對手即將取得 AGI 或顛覆性軍事技術，將大幅刺激當下發動先發打擊"
+        },
+        {
+          "id": "l5_miscalculation_risk",
+          "name": "即時資訊作戰與危機反應窗口極度壓縮之誤判風險",
+          "name_en": "Compressed Decision Windows & Miscalculation Escalation",
+          "value": 72.0,
+          "weight": 1.2,
+          "evidence_level": "illustrative",
+          "source": "RAND Strategic Miscalculation Studies (illustrative baseline)",
+          "year": 2026,
+          "note": "自主武器與網軍偵察反應以分秒計，政治領導人缺乏冷靜核實時間"
+        },
+        {
+          "id": "l5_leadership_time_horizon",
+          "name": "政治週期短視與政權合法性焦慮",
+          "name_en": "Leadership Short Time Horizon & Regime Survival Anxiety",
+          "value": 68.0,
+          "weight": 1.0,
+          "evidence_level": "illustrative",
+          "source": "Freedom House / EIU Democracy Index (illustrative baseline)",
+          "year": 2026,
+          "note": "內政困局推動領導層對外展現強硬以凝聚民意，妥協代價遠高於冒險"
+        }
+      ]
+    }
+  },
+  "gate_buffers": [
+    {
+      "id": "gate_diplomatic_trust",
+      "name": "大國元首戰略熱線與外交互信管道",
+      "name_en": "High-Level Diplomatic Hotlines & Strategic Trust",
+      "value": 36.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "Chatham House Diplomatic Relations Monitor (illustrative baseline)",
+      "year": 2026,
+      "note": "高層偶有通話但戰略互信跌入冰點，事務性外交降格為互念宣傳稿"
+    },
+    {
+      "id": "gate_trade_interdependence",
+      "name": "全球深度經貿相互依賴與脫鉤沉沒成本",
+      "name_en": "Economic Interdependence & Decoupling Sunk Costs",
+      "value": 48.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "WTO World Trade Statistical Review (illustrative baseline)",
+      "year": 2026,
+      "note": "雖有友岸外包與脫鉤，跨國投資與供應鏈網絡仍構成實質制衡阻力"
+    },
+    {
+      "id": "gate_international_institutions",
+      "name": "聯合國與國際法多邊仲裁機制之執行力",
+      "name_en": "Multilateral International Law & UN Efficacy",
+      "value": 28.0,
+      "weight": 1.0,
+      "evidence_level": "illustrative",
+      "source": "International Crisis Group UN Watch (illustrative baseline)",
+      "year": 2026,
+      "note": "安理會常任理事國否決權癱瘓，國際法院決議難以在強權間落實"
+    },
+    {
+      "id": "gate_nuclear_deterrence_stability",
+      "name": "核恐怖平衡相互保證毀滅 (MAD) 與防誤擊架構",
+      "name_en": "Strategic MAD Nuclear Deterrence & Fail-Safe Protocols",
+      "value": 62.0,
+      "weight": 1.4,
+      "evidence_level": "illustrative",
+      "source": "SIPRI Nuclear Forces Overview 2026 (illustrative baseline)",
+      "year": 2026,
+      "note": "核武庫存足以確保毀滅，但常規打擊與戰術核界線模糊化構成侵蝕"
+    }
+  ]
+}

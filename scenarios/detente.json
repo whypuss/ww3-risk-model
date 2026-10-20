@@ -1,0 +1,125 @@
+{
+  "id": "detente",
+  "title": "情境：大國緩和、經貿互賴重建與軍控協定",
+  "title_en": "Scenario: Great Power Détente & Rebuilt Interdependence",
+  "year": 2026,
+  "description": "主要強權達成戰略護欄與新軍控協議，重啟高層外交與兩軍熱線，撤銷懲罰性關稅與限制，建立全球AI安全與關鍵礦產共享對話機制",
+  "layers": {
+    "L1": {
+      "id": "L1",
+      "name": "生存／資源稀缺",
+      "name_en": "Survival / Resource Scarcity",
+      "weight": 1.0,
+      "indicators": [
+        {"id": "l1_food_security", "name": "全球糧食綠色通道與主糧期貨平抑協定", "name_en": "Global Food Green Corridors & Grain Price Stabilization", "value": 35.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "多國簽署糧食自由出口與緊急人道豁免協議，全球庫存回升"},
+        {"id": "l1_water_stress", "name": "跨界河流多邊流域管理委員會與水資源共享", "name_en": "Transboundary Basin Co-Management & Desalination", "value": 40.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "世界銀行資助跨界海水淡化與聯合水文監測"},
+        {"id": "l1_energy_vulnerability", "name": "全球清潔能源轉型合作與跨國電網互聯", "name_en": "Clean Energy Partnership & Stabilized Oil Markets", "value": 38.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "光伏與電池供應鏈去政治化，能源價格維持低位平穩"},
+        {"id": "l1_critical_minerals", "name": "關鍵礦物多邊市場准入與負責任供應鏈協定", "name_en": "Multilateral Critical Minerals Access Treaty", "value": 42.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "取消單邊出口禁令，建立共同戰略儲備與環保回收標準"},
+        {"id": "l1_climate_impact", "name": "全球氣候適應基金 (Loss & Damage) 全面注資運作", "name_en": "Global Climate Adaptation Fund Operationalization", "value": 45.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "農業抗旱品種與防災基礎設施獲得實質國際資金支持"},
+        {"id": "l1_maritime_chokepoints", "name": "主要咽喉航道多國聯合非侵略巡邏與安全互信", "name_en": "Joint Maritime Freedom of Navigation Protocols", "value": 36.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "紅海、霍爾木茲與馬六甲恢復安全通行，航運保費大幅下降"}
+      ]
+    },
+    "L2": {
+      "id": "L2",
+      "name": "分配失衡",
+      "name_en": "Inequality & Distribution",
+      "weight": 1.0,
+      "indicators": [
+        {"id": "l2_wealth_gini", "name": "全球最低企業稅率落實與跨境避稅協同治理", "name_en": "Global Minimum Corporate Tax Implementation", "value": 52.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "富豪海外資產藏匿受有效監管，財政再分配能力提升"},
+        {"id": "l2_compute_monopoly", "name": "前沿算力普惠共享倡議與開源模型國際基金", "name_en": "Inclusive Global Compute Sharing Initiative", "value": 55.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "中小國家與研究機構獲得聯合國算力配額，打破極端壟斷"},
+        {"id": "l2_land_housing_concentration", "name": "公共住宅大規模興建與民生資產租稅改革", "name_en": "Affordable Public Housing & Land Reform", "value": 50.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "壓抑投機炒作，青年階層獲得合理安居起點"},
+        {"id": "l2_social_mobility", "name": "教育與技能培訓均等化專案推進", "name_en": "Equitable Education & Reskilling Programs", "value": 48.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "基層家庭獲得實質跨階層就業管道，社會流動性重啟"},
+        {"id": "l2_institutional_fairness", "name": "反腐敗透明度提升與多黨民主協商包容性", "name_en": "Anti-Corruption Transparency & Democratic Reform", "value": 45.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "法治公正感改善，極端民粹主義支持度顯著回落"},
+        {"id": "l2_peaceful_redistribution", "name": "健全的議會財政辯論與社會契約再平衡", "name_en": "Rebalanced Social Contract & Fiscal Consensus", "value": 44.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "勞資政三方對話機制發揮作用，有效避免街頭對抗"}
+      ]
+    },
+    "L3": {
+      "id": "L3",
+      "name": "工作／生計／AI取代",
+      "name_en": "Labor, Livelihood & AI Transition",
+      "weight": 1.0,
+      "indicators": [
+        {"id": "l3_unemployment_underemployment", "name": "新綠色基建與服務業創造大量體面就業", "name_en": "Green Infrastructure & Care Economy Employment", "value": 42.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "就業市場多樣化，隱性失業率受政策引導有效下降"},
+        {"id": "l3_youth_unemployment", "name": "青年創業基金與高科技學徒制普及", "name_en": "Youth Innovation Grants & Tech Apprenticeships", "value": 46.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "青年畢業生就業銜接順暢，躺平焦慮得到舒緩"},
+        {"id": "l3_wage_vs_living_cost", "name": "通脹回落至2%目標區間與實質薪資溫和增長", "name_en": "Inflation Normalization & Real Wage Growth", "value": 40.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "物價回穩，一般家庭生活成本壓力大幅減輕"},
+        {"id": "l3_housing_affordability", "name": "房價所得比回歸長期合理均線", "name_en": "Housing Affordability Normalization", "value": 52.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "房市軟著陸，剛需家庭購房負擔減輕"},
+        {"id": "l3_ai_displacement_rate", "name": "AI 轉型補貼、人機協同勞動法規健全", "name_en": "Responsible AI Transition & Worker Protection Compact", "value": 45.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "實施嚴格AI裁員提前通報、過渡期補償與國家再培訓專項"},
+        {"id": "l3_effort_reward_breakdown", "name": "社會各階層努力付出可獲正向回報預期修復", "name_en": "Restoration of Effort-Reward Optimism", "value": 42.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "奮鬥敘事重新獲得青年認同，社會心理健康改善"}
+      ]
+    },
+    "L4": {
+      "id": "L4",
+      "name": "權力／安全困境",
+      "name_en": "Power & Security Dilemma",
+      "weight": 1.1,
+      "indicators": [
+        {"id": "l4_military_expenditure_growth", "name": "國防預算增速封頂與雙邊透明核查通報", "name_en": "Military Spending Caps & Mutual Audit Mechanisms", "value": 40.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "大國簽署十年防衛開支上限透明度備忘錄，避免盲目軍備攀比"},
+        {"id": "l4_arms_race_hypersonic", "name": "高超音速與外太空非軍事化條約啟動談判", "name_en": "Hypersonic Arms Control & Space Demilitarization", "value": 42.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "禁止在低軌部署攻擊性反衛星武器與天基動能打擊系統"},
+        {"id": "l4_bloc_polarization", "name": "陣營壁壘融解與開放包容的多邊經濟圈", "name_en": "Bloc De-escalation & Inclusive Regionalism", "value": 44.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "小國不必在大國間被迫選邊站隊，戰略中立空間恢復"},
+        {"id": "l4_weaponized_interdependence", "name": "非歧視性經貿互惠協定與撤銷長臂出口管制", "name_en": "Reciprocal Non-Discriminatory Trade Agreements", "value": 38.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "剔除泛安全化制裁清單，聚焦真正的雙用途清單狹義管理"},
+        {"id": "l4_nuclear_breakout", "name": "重啟中導條約 (INF) 與戰略武器削減談判 (START)", "name_en": "Renewal of INF & Strategic Arms Reductions", "value": 42.0, "weight": 1.4, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "伊朗核協議重獲突破，全球防擴散機制得到鞏固"},
+        {"id": "l4_territorial_flashpoints", "name": "熱點地區（台海、南海、烏克蘭）達成降溫護欄", "name_en": "De-escalation Guardrails in Key Flashpoints", "value": 45.0, "weight": 1.4, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "烏克蘭達成停火架構，台海建立空中防相撞行為準則"}
+      ]
+    },
+    "L5": {
+      "id": "L5",
+      "name": "對未來的恐懼／預防邏輯",
+      "name_en": "Fear of Future & Preventive Logic",
+      "weight": 1.0,
+      "indicators": [
+        {"id": "l5_relative_decline_anxiety", "name": "修昔底德陷阱共管與權力和平分享共識", "name_en": "Thucydides Trap Co-Management & Strategic Empathy", "value": 42.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "既有大國與新興大國確認『地球足夠大，容得下共同發展』理念"},
+        {"id": "l5_demographic_cliff", "name": "以跨國移民協定與智慧養老舒緩老齡窗口恐慌", "name_en": "Demographic Adaptation & Cross-Border Migration Accords", "value": 48.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "擺脫『窗口即將關閉』的冒險狂躁，注重長期制度韌性"},
+        {"id": "l5_economic_stagnation", "name": "科技開放創新引發新一輪全要素生產率增長", "name_en": "Open Tech Innovation & Productivity Revival", "value": 38.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "AI賦能生物醫療、清潔能源與材料科學，做大全球經濟增量蛋糕"},
+        {"id": "l5_tech_supremacy_fear", "name": "前沿技術軍備先發打擊邏輯被透明核查化解", "name_en": "Dissipation of Preemptive Tech Strike Fears", "value": 35.0, "weight": 1.4, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "大國共同建立聯合AI安全研究所，共享對齊數據消除被突襲疑慮"},
+        {"id": "l5_miscalculation_risk", "name": "全天候戰略溝通熱線與軍事演習提前互相通報", "name_en": "24/7 Strategic Crisis Hotlines & Advance Exercise Notification", "value": 32.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "雷達與衛星情報定期交流，徹底消除假警報引發的意外交火"},
+        {"id": "l5_leadership_time_horizon", "name": "領導人時間視野轉向人類共同命運與可持續遺產", "name_en": "Long-Term Statesmanship & Sustainable Legacies", "value": 36.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "跨國合作成果顯著提升內政聲望，排斥對外冒險以固權之短視行徑"}
+      ]
+    }
+  },
+  "gate_buffers": [
+    {
+      "id": "gate_diplomatic_trust",
+      "name": "大國元首戰略熱線與定期峰會互信",
+      "name_en": "High-Level Diplomatic Hotlines & Summit Trust",
+      "value": 80.0,
+      "weight": 1.3,
+      "evidence_level": "illustrative",
+      "source": "Scenario Simulation",
+      "year": 2026,
+      "note": "戰略熱線運轉順暢，各層級官員建立起深厚個人與工作聯繫"
+    },
+    {
+      "id": "gate_trade_interdependence",
+      "name": "深度雙向經貿互賴與跨國共同市場深化",
+      "name_en": "Deep Two-Way Economic Interdependence",
+      "value": 78.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "Scenario Simulation",
+      "year": 2026,
+      "note": "相互依賴被重新視為避戰壓艙石而非武器化弱點"
+    },
+    {
+      "id": "gate_international_institutions",
+      "name": "聯合國安理會與多邊仲裁機制之實質威信與效力",
+      "name_en": "Reformed UN Security Council & Multilateral Efficacy",
+      "value": 72.0,
+      "weight": 1.1,
+      "evidence_level": "illustrative",
+      "source": "Scenario Simulation",
+      "year": 2026,
+      "note": "常任理事國推動否決權自我約束公約，國際法院仲裁獲普遍尊重"
+    },
+    {
+      "id": "gate_nuclear_deterrence_stability",
+      "name": "核恐怖平衡相互保證毀滅 (MAD) 與防誤擊架構",
+      "name_en": "Strategic Nuclear Deterrence Stability & Arms Reductions",
+      "value": 85.0,
+      "weight": 1.4,
+      "evidence_level": "illustrative",
+      "source": "Scenario Simulation",
+      "year": 2026,
+      "note": "實施嚴密戰略預警核查，承諾不首先使用核武器政策"
+    }
+  ]
+}

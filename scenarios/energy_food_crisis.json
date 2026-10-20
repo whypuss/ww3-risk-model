@@ -1,0 +1,125 @@
+{
+  "id": "energy_food_crisis",
+  "title": "情境：全球能源與糧食供應鏈崩潰危機",
+  "title_en": "Scenario: Global Energy & Food Supply Chain Collapse",
+  "year": 2026,
+  "description": "氣候複合災害疊加戰略咽喉（紅海、霍爾木茲、黑海）全面封鎖，主要產油國與糧食大國實施絕對出口禁令，全球陷入生存資源極端短缺與搶奪",
+  "layers": {
+    "L1": {
+      "id": "L1",
+      "name": "生存／資源稀缺",
+      "name_en": "Survival / Resource Scarcity",
+      "weight": 1.3,
+      "indicators": [
+        {"id": "l1_food_security", "name": "全球糧食儲備耗竭與主糧配給危機", "name_en": "Global Food Stock Exhaustion & Rationing Crisis", "value": 90.0, "weight": 1.4, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "多個小麥與大米主要出口國全面禁止糧食出境，全球庫存跌至30年最低"},
+        {"id": "l1_water_stress", "name": "跨界流域大壩斷流與水權武裝衝突", "name_en": "Transboundary Dam Cutoffs & Armed Water Clashes", "value": 82.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "上游國家築壩截水引發下游國家軍事轟炸威脅"},
+        {"id": "l1_energy_vulnerability", "name": "原油每桶突破150美元與主要天然氣管道切斷", "name_en": "Oil Exceeding $150/bbl & Pipeline Sabotage", "value": 94.0, "weight": 1.4, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "海灣重要輸油終端遭襲，歐洲與亞洲面臨冬季強制停電配給"},
+        {"id": "l1_critical_minerals", "name": "戰略礦產、化肥原料（鉀/磷/氮）全球斷供", "name_en": "Fertilizer (Potash/Nitrogen) & Critical Minerals Embargo", "value": 92.0, "weight": 1.3, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "化肥斷供直接導致下一季農作物產量預期暴跌 30%"},
+        {"id": "l1_climate_impact", "name": "全球北半球同期罕見特大旱災與野火狂飆", "name_en": "Synchronous Megadrought & Agricultural Collapse", "value": 88.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "北美、歐亞與南亞三大產糧帶同時遭遇百年一遇酷暑絕收"},
+        {"id": "l1_maritime_chokepoints", "name": "霍爾木茲與紅海雙重封鎖海運窒息", "name_en": "Hormuz & Bab el-Mandeb Synchronous Blockade", "value": 94.0, "weight": 1.4, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "水雷與遠程反艦無人機封鎖主要海峽，油輪與貨輪保險費飆升至天文數字"}
+      ]
+    },
+    "L2": {
+      "id": "L2",
+      "name": "分配失衡",
+      "name_en": "Inequality & Distribution",
+      "weight": 1.1,
+      "indicators": [
+        {"id": "l2_wealth_gini", "name": "資源投機財閥暴利與底層赤貧分化", "name_en": "Resource Commodity Speculation & Extreme Inequality", "value": 84.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "大宗商品交易巨頭在糧食危機中獲取歷史級暴利，基層民眾面臨飢餓"},
+        {"id": "l2_compute_monopoly", "name": "前沿 AI 算力與先進晶圓代工極端壟斷", "name_en": "Frontier AI Compute Concentration", "value": 80.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "算力被優先調配用於資源勘探與軍工模擬"},
+        {"id": "l2_land_housing_concentration", "name": "良田、深水井與糧倉所有權極端集中", "name_en": "Arable Land & Water Wells Monopoly", "value": 86.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "生存必需物資成為超級富豪囤積對沖通膨之硬通貨"},
+        {"id": "l2_social_mobility", "name": "生存危機下階層徹底固化與向下沉淪", "name_en": "Total Freezing of Social Mobility Under Survival Crisis", "value": 82.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "教育與就業停滯，社會精力完全被生存爭奪耗盡"},
+        {"id": "l2_institutional_fairness", "name": "黑市橫行、物資倒賣與政府配給制公信力崩塌", "name_en": "Black Market Corruption & Rationing Injustice", "value": 85.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "官員勾結寡頭囤積居奇，公眾對國家法制徹底絕望"},
+        {"id": "l2_peaceful_redistribution", "name": "麵包騷動、罷工暴動與再分配談判破裂", "name_en": "Bread Riots & Total Breakdown of Redistribution", "value": 84.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "發展中國家爆發大規模搶糧暴動，軍警開槍引致政權動盪"}
+      ]
+    },
+    "L3": {
+      "id": "L3",
+      "name": "工作／生計／AI取代",
+      "name_en": "Labor, Livelihood & Cost of Living Collapse",
+      "weight": 1.1,
+      "indicators": [
+        {"id": "l3_unemployment_underemployment", "name": "能源斷供致製造業工廠廣泛停工歇業", "name_en": "Energy-Induced Industrial Shutdowns & Layoffs", "value": 75.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "化工、鋼鐵、汽車製造因缺電缺氣紛紛削減班次"},
+        {"id": "l3_youth_unemployment", "name": "青年失業潮與加入民兵武裝謀生化", "name_en": "Youth Despair & Militant Conscription Pressure", "value": 78.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "無業青年為獲取口糧配給大量投身正規軍或僱傭兵組織"},
+        {"id": "l3_wage_vs_living_cost", "name": "惡性滯脹：食品能源支出佔家庭所得80%以上", "name_en": "Hyper-Stagflation: Food & Fuel Squeeze", "value": 92.0, "weight": 1.5, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "實質購買力腰斬，中產階級資產儲蓄被通膨迅速蒸發"},
+        {"id": "l3_housing_affordability", "name": "冬季採暖用電帳單超過房租之生存困境", "name_en": "Heating Utility Crisis Outpacing Rent", "value": 82.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "低溫凍死風險迫使民眾砍伐林木自救"},
+        {"id": "l3_ai_displacement_rate", "name": "AI 取代與自動化持續推進", "name_en": "AI Workplace Automation Progression", "value": 65.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "企業在滯脹壓力下更加速以AI降低人力成本"},
+        {"id": "l3_effort_reward_breakdown", "name": "日常勞動所得無法換取一日三餐之生存崩潰", "name_en": "Labor Income Incapable of Sustaining Caloric Intake", "value": 88.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "工作無用感演化為破壞現有秩序的社會動能"}
+      ]
+    },
+    "L4": {
+      "id": "L4",
+      "name": "權力／安全困境",
+      "name_en": "Power & Security Dilemma",
+      "weight": 1.2,
+      "indicators": [
+        {"id": "l4_military_expenditure_growth", "name": "爭奪海外能源與水糧命脈的遠洋海軍狂熱擴張", "name_en": "Naval Expansion to Secure Strategic Resource Lifelines", "value": 84.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "各強權全面實施遠洋護航與海外戰略樞紐基地駐軍"},
+        {"id": "l4_arms_race_hypersonic", "name": "破壞能源管道與海上油輪之非對稱精確打擊", "name_en": "Asymmetric Strike on Energy Pipelines & Tankers", "value": 85.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "水下無人航行器與巡弋導彈頻繁以對手能源管線為打擊目標"},
+        {"id": "l4_bloc_polarization", "name": "資源富集國與資源匱乏國之地緣陣營對決", "name_en": "Resource-Have vs Have-Not Geopolitical Blocs", "value": 85.0, "weight": 1.3, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "形成以能源自給自足為核心的排他性排外軍事聯盟"},
+        {"id": "l4_weaponized_interdependence", "name": "糧食武器化、能源完全斷供與港口全域禁運", "name_en": "Total Weaponization of Food & Energy Lifelines", "value": 95.0, "weight": 1.5, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "以斷糧斷油逼迫對手接受無條件停火或割讓領土"},
+        {"id": "l4_nuclear_breakout", "name": "無核資源小國為防掠奪加速研發髒彈與核武", "name_en": "Nuclear Latency Pursuit for Regime Survival", "value": 75.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "防範強權因資源爭奪發動特別軍事行動而尋求核庇護"},
+        {"id": "l4_territorial_flashpoints", "name": "海上專屬經濟區 (EEZ)、油氣田與產糧走廊熱戰", "name_en": "Offshore Oilfield & Agricultural Corridor Hot Spots", "value": 86.0, "weight": 1.3, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "南海油氣爭議區、地中海東部及北極航道摩擦全面常態化"}
+      ]
+    },
+    "L5": {
+      "id": "L5",
+      "name": "對未來的恐懼／預防邏輯",
+      "name_en": "Fear of Future & Preventive Logic",
+      "weight": 1.2,
+      "indicators": [
+        {"id": "l5_relative_decline_anxiety", "name": "缺乏資源自給能力的強權對去工業化之恐慌", "name_en": "Industrial De-Growth Panic of Resource-Deficient Powers", "value": 85.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "若無海外資源注入，現代化國家將倒退回農業社會的終極焦慮"},
+        {"id": "l5_demographic_cliff", "name": "飢荒、人口外逃與國族衰亡焦慮", "name_en": "Malnutrition, Outmigration & Demographic Collapse Panic", "value": 78.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "大量難民潮衝擊邊界，加劇民族主義排外軍事化"},
+        {"id": "l5_economic_stagnation", "name": "全球惡性滯脹與現代主權信用體系瓦解", "name_en": "Sovereign Debt Default & Hyperinflation Spiral", "value": 85.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "貨幣喪失信用，以物易物與實物掠奪取代國際清算"},
+        {"id": "l5_tech_supremacy_fear", "name": "十年內被對手藉資源卡死徹底喪失反抗能力", "name_en": "Fear of Irreversible Asymmetric Strangling", "value": 86.0, "weight": 1.3, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "『若現在不動手奪取油田，五年後我們將無油開動坦克戰機』"},
+        {"id": "l5_miscalculation_risk", "name": "護航艦隊在狹窄水域遭遇不明無人水雷的誤判", "name_en": "Naval Chokepoint Miscalculation & Clashes", "value": 85.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "公海護航艦隊被誤判為發動兩棲登陸，引發報復性飽和打擊"},
+        {"id": "l5_leadership_time_horizon", "name": "國內大規模飢餓抗議迫使領導層訴諸境外開戰", "name_en": "Regime Survival War of Diversion", "value": 88.0, "weight": 1.3, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "面臨即刻被推翻的內政危機，對外開戰成為轉移民怨唯一稻草"}
+      ]
+    }
+  },
+  "gate_buffers": [
+    {
+      "id": "gate_diplomatic_trust",
+      "name": "外交談判信譽（受禁運與物資扣押踐踏）",
+      "name_en": "Diplomatic Trust Shattered by Resource Seizures",
+      "value": 20.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "Scenario Simulation",
+      "year": 2026,
+      "note": "跨國扣押過境油輪與沒收海外糧倉儲備，外交底線蕩然無存"
+    },
+    {
+      "id": "gate_trade_interdependence",
+      "name": "全球多邊自由貿易互賴（因保護主義禁運名存實亡）",
+      "name_en": "Disintegration of Multilateral Free Trade",
+      "value": 24.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "Scenario Simulation",
+      "year": 2026,
+      "note": "全球自由貿易鏈條碎裂為零和自給圈，經貿避戰約束瓦解"
+    },
+    {
+      "id": "gate_international_institutions",
+      "name": "世界糧食計劃署 (WFP) 與聯合國人道協調能力",
+      "name_en": "WFP & UN Humanitarian Coordination Failure",
+      "value": 22.0,
+      "weight": 1.0,
+      "evidence_level": "illustrative",
+      "source": "Scenario Simulation",
+      "year": 2026,
+      "note": "資金耗盡且救援船隊在爭端海域遭遇無人機襲擊，人道走廊癱瘓"
+    },
+    {
+      "id": "gate_nuclear_deterrence_stability",
+      "name": "大國間戰略核嚇阻有效性（常規打擊逼近核心能源設施）",
+      "name_en": "Nuclear Deterrence Strained by Energy Infrastructure Strikes",
+      "value": 55.0,
+      "weight": 1.4,
+      "evidence_level": "illustrative",
+      "source": "Scenario Simulation",
+      "year": 2026,
+      "note": "核電站與電網成為打擊目標，引發核洩漏恐慌與報復邊緣"
+    }
+  ]
+}

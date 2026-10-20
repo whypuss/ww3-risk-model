@@ -1,0 +1,598 @@
+[
+  {
+    "id": "hist_1913",
+    "title": "1913年 一戰前夕（帝國爭霸與同盟剛性）",
+    "title_en": "1913 Eve of WWI: Imperial Rivalry & Alliance Rigidity",
+    "year": 1913,
+    "description": "巴爾幹危機、英德無畏艦造艦競賽、施里芬計劃動員倒計時，以及德國對俄國軍事現代化於1917年完成之預防性開戰恐懼",
+    "layers": {
+      "L1": {
+        "id": "L1",
+        "name": "生存／資源稀缺",
+        "name_en": "Survival / Resource Scarcity",
+        "weight": 1.0,
+        "indicators": [
+          {"id": "l1_colonial_raw_materials", "name": "殖民地原料與海路補給線爭奪", "name_en": "Colonial Raw Materials & Coaling Stations", "value": 72.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis (Clark, The Sleepwalkers)", "year": 1913, "note": "德奧對英國全球殖民地資源與海上封鎖極度擔憂"},
+          {"id": "l1_agricultural_vulnerability", "name": "糧食進口依賴與俄羅斯黑海出口受阻", "name_en": "Agricultural Imports & Black Sea Access", "value": 65.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "中歐國家對戰時糧食自給率存在高度焦慮"},
+          {"id": "l1_coal_iron_chokepoints", "name": "煤鐵重工業命脈邊界爭奪（阿爾薩斯-洛林）", "name_en": "Alsace-Lorraine Coal & Iron Chokepoint", "value": 74.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "德法重工業資源帶重疊引致長期邊界緊張"},
+          {"id": "l1_balkan_railway_corridors", "name": "柏林-巴格達鐵路與巴爾幹咽喉走廊", "name_en": "Berlin-Baghdad Railway Corridor Friction", "value": 76.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "威脅英國蘇伊士運河與俄國博斯普魯斯海峽利益"},
+          {"id": "l1_financial_capital_scramble", "name": "奧斯曼帝國與外圍殖民市場資本瓜分危機", "name_en": "Capital Scramble in Ottoman Periphery", "value": 68.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "列強為鐵路與國債特許權多次瀕臨外交破裂"}
+        ]
+      },
+      "L2": {
+        "id": "L2",
+        "name": "分配失衡",
+        "name_en": "Inequality & Distribution",
+        "weight": 1.0,
+        "indicators": [
+          {"id": "l2_gilded_age_inequality", "name": "鍍金時代末期極端貧富差距與土地集中", "name_en": "Gilded Age Wealth & Land Inequality", "value": 78.0, "weight": 1.0, "evidence_level": "inference", "source": "Piketty Capital in the 21st Century", "year": 1913, "note": "歐洲前 1% 財富集中度達歷史頂峰（約 65-70%）"},
+          {"id": "l2_aristocratic_monopoly", "name": "容克地主與軍事貴族壟斷國家權力", "name_en": "Junker & Aristocratic Monopolization", "value": 75.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "封建土地精英掌握軍權，排斥市民階層和平分享權力"},
+          {"id": "l2_socialist_suppression", "name": "第二國際工人運動受壓制與合法再分配阻斷", "name_en": "Suppression of Labor Redistribution", "value": 70.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "社會主義政黨被定性為帝國內部叛徒"},
+          {"id": "l2_ethnic_inequality_austro_hungary", "name": "奧匈帝國多民族二元分配嚴重失衡", "name_en": "Austro-Hungarian Dualist Inequality", "value": 82.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "斯拉夫族群權利與土地遭受德裔匈裔雙重壓制"},
+          {"id": "l2_imperial_tariff_walls", "name": "關稅壁壘與帝國特惠制排他性", "name_en": "Imperial Preferential Tariff Walls", "value": 64.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "保護主義關稅切斷德奧新興工業品外銷增量空間"}
+        ]
+      },
+      "L3": {
+        "id": "L3",
+        "name": "工作／生計／AI取代",
+        "name_en": "Labor, Livelihood & Industrial Displacement",
+        "weight": 1.0,
+        "indicators": [
+          {"id": "l3_factory_sweatshop_hardship", "name": "工業化早期嚴酷工時與生計赤貧", "name_en": "Early Industrial Sweating & Poverty", "value": 66.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Labor Statistics", "year": 1913, "note": "大量工人居住於貧民窟，醫療與退休保障近乎為零"},
+          {"id": "l3_youth_radicalization", "name": "青年人口激增與民族主義激進化（黑手社等）", "name_en": "Youth Bulge & Militant Radicalization", "value": 74.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "巴爾幹青年激進學生投身暗殺與秘密恐怖會社"},
+          {"id": "l3_real_wage_stagnation", "name": "1910-1913 歐洲生活成本急升與實質薪資停滯", "name_en": "1910-1913 Real Wage Squeeze & Bread Strikes", "value": 62.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "英國愛德華時代大罷工浪潮與俄國勒拿河屠殺"},
+          {"id": "l3_rural_flight_slums", "name": "農村破產流民湧入城市棚戶區", "name_en": "Rural Dislocation & Urban Slum Misery", "value": 65.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "土地兼併推動數百萬人跨洋外流或陷入都會底層"},
+          {"id": "l3_tech_mechanization_fear", "name": "化學與重機普及對手工業者之衝擊", "name_en": "Artisan Displacement by Chemical & Steel Trusts", "value": 50.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "早期工業替代手工匠人（非當代AI，但具顛覆性）"}
+        ]
+      },
+      "L4": {
+        "id": "L4",
+        "name": "權力／安全困境",
+        "name_en": "Power & Security Dilemma",
+        "weight": 1.2,
+        "indicators": [
+          {"id": "l4_dreadnought_naval_race", "name": "英德無畏艦造艦狂潮與海權生死博弈", "name_en": "Anglo-German Dreadnought Arms Race", "value": 88.0, "weight": 1.2, "evidence_level": "inference", "source": "Massie, Dreadnought", "year": 1913, "note": "英國兩強標準與德國公海艦隊法案推高不可逆之對抗"},
+          {"id": "l4_rigid_alliance_blocks", "name": "同盟國與協約國雙極鎖定與自動捲入條款", "name_en": "Rigid Dual-Alliance Blocks & Mobilization Timetables", "value": 90.0, "weight": 1.4, "evidence_level": "inference", "source": "Taylor, The Struggle for Mastery in Europe", "year": 1913, "note": "鐵路動員時刻表嚴格不可逆，外交被軍事調度綁架"},
+          {"id": "l4_balkan_powder_keg", "name": "巴爾幹兩次戰爭後領土重組與塞爾維亞擴張", "name_en": "Balkan Powder Keg & Pan-Slavism", "value": 86.0, "weight": 1.2, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "奧匈帝國視塞爾維亞為生死存亡之致命威脅"},
+          {"id": "l4_military_staff_domination", "name": "總參謀部軍事自主權凌駕於文官外交之上", "name_en": "General Staff Hegemony over Diplomacy", "value": 84.0, "weight": 1.1, "evidence_level": "inference", "source": "Historical Analysis (Moltke, Conrad)", "year": 1913, "note": "小毛奇與康拉德等將領積極尋求在有利時機先發制人"},
+          {"id": "l4_colonial_crisis_recurrence", "name": "摩洛哥危機與波士尼亞吞併危機之仇恨積累", "name_en": "Cumulative Crises (Morocco, Bosnia)", "value": 82.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "連續兩次近失危機消耗了妥協意願，各方決心下次絕不後退"}
+        ]
+      },
+      "L5": {
+        "id": "L5",
+        "name": "對未來的恐懼／預防邏輯",
+        "name_en": "Fear of Future & Preventive Logic",
+        "weight": 1.2,
+        "indicators": [
+          {"id": "l5_german_encirclement_panic", "name": "德國對協約國地緣包圍圈合攏之致命恐慌", "name_en": "German Einkreisung (Encirclement) Panic", "value": 88.0, "weight": 1.3, "evidence_level": "inference", "source": "Fischer, Germany's Aims in the First World War", "year": 1913, "note": "深信英法俄已完成地緣合圍，時間完全不在柏林一方"},
+          {"id": "l5_russian_modernization_deadline", "name": "預防性開戰邏輯：俄國軍備大綱1917年完成前打擊", "name_en": "Preventive War Window: Russian Great Program 1917", "value": 92.0, "weight": 1.5, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "毛奇直言『越早開戰對我們越有利，1917年後我們將無勝算』"},
+          {"id": "l5_austro_hungarian_decline_terror", "name": "奧匈帝國對皇朝解體與民族自決之末日恐懼", "name_en": "Habsburg Existential Terror of Dissolution", "value": 86.0, "weight": 1.2, "evidence_level": "inference", "source": "Historical Analysis", "year": 1913, "note": "若不能壓服塞爾維亞，帝國境內南斯拉夫人勢必分崩離析"},
+          {"id": "l5_social_darwinist_fatalism", "name": "社會達爾文主義宿命論：戰爭為民族生存之必然篩選", "name_en": "Social Darwinist Fatalism & Cleansing War Myth", "value": 84.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Cultural Analysis", "year": 1913, "note": "知識分子與將領廣泛相信『戰爭如放血療法，能重塑國族活力』"},
+          {"id": "l5_hegemonic_window_closing", "name": "大英帝國對工業霸權被美德超越之防禦性焦慮", "name_en": "Pax Britannica Relative Decline Anxiety", "value": 78.0, "weight": 1.0, "evidence_level": "inference", "source": "Kennedy, Rise and Fall of the Great Powers", "year": 1913, "note": "英國全球維持孤立成本驟增，不得不與法俄結盟自保"}
+        ]
+      }
+    },
+    "gate_buffers": [
+      {
+        "id": "gate_diplomatic_trust",
+        "name": "歐洲協調 (Concert of Europe) 大使會議殘存管道",
+        "name_en": "Residual Concert of Europe Ambassadors Channels",
+        "value": 32.0,
+        "weight": 1.0,
+        "evidence_level": "inference",
+        "source": "Historical Diplomatic Records",
+        "year": 1913,
+        "note": "1912-13 倫敦大使會議尚能調停巴爾幹，但大國互信極薄"
+      },
+      {
+        "id": "gate_trade_interdependence",
+        "name": "第一次全球化高峰期之跨境金融與貿易互賴",
+        "name_en": "First Globalization Trade & Financial Interdependence",
+        "value": 52.0,
+        "weight": 1.2,
+        "evidence_level": "inference",
+        "source": "Norman Angell The Great Illusion (1910)",
+        "year": 1913,
+        "note": "英德互為主要貿易夥伴，當時普遍認為大國開戰將導致共同破產"
+      },
+      {
+        "id": "gate_international_institutions",
+        "name": "海牙和平會議與國際常設仲裁法院執行力",
+        "name_en": "Hague Peace Conferences & Arbitration Court",
+        "value": 24.0,
+        "weight": 1.0,
+        "evidence_level": "inference",
+        "source": "Historical Analysis",
+        "year": 1913,
+        "note": "無強制執法武力，各國拒絕將核心榮譽與領土交由仲裁"
+      },
+      {
+        "id": "gate_nuclear_deterrence_stability",
+        "name": "戰略核嚇阻（一戰前核武器尚未發明，數值為零）",
+        "name_en": "Strategic Nuclear Deterrence (Non-existent pre-atomic era)",
+        "value": 0.0,
+        "weight": 1.5,
+        "evidence_level": "verified",
+        "source": "Historical Fact",
+        "year": 1913,
+        "note": "缺乏終極毀滅武器之威懾，各方誤以為戰爭將在聖誕節前以短期勝利結束"
+      }
+    ]
+  },
+  {
+    "id": "hist_1938",
+    "title": "1938年 二戰前夕（大蕭條潰敗、法西斯擴張與國聯崩塌）",
+    "title_en": "1938 Eve of WWII: Munich Crisis & Total Revisionism",
+    "year": 1938,
+    "description": "慕尼黑協定、德奧合併、日本全面侵華、大蕭條後全球貿易自給自足塊狀化、國聯徹底癱瘓，法西斯極權之生存空間意識形態全面抬頭",
+    "layers": {
+      "L1": {
+        "id": "L1",
+        "name": "生存／資源稀缺",
+        "name_en": "Survival / Resource Scarcity",
+        "weight": 1.0,
+        "indicators": [
+          {"id": "l1_lebensraum_hunger", "name": "納粹生存空間 (Lebensraum) 糧食與土地狂熱", "name_en": "Nazi Lebensraum & Food Autarky Obsession", "value": 85.0, "weight": 1.2, "evidence_level": "inference", "source": "Tooze, Wages of Destruction", "year": 1938, "note": "深信德國如果不掠奪烏克蘭糧倉與東歐黑土，日耳曼民族將餓死或窒息"},
+          {"id": "l1_oil_rubber_starvation", "name": "軸心國石油、鐵礦與橡膠致命物資瓶頸", "name_en": "Axis Oil, Iron Ore & Strategic Raw Material Deficit", "value": 88.0, "weight": 1.3, "evidence_level": "inference", "source": "Tooze, Wages of Destruction", "year": 1938, "note": "德國人造石油成本高昂，急欲獲取羅馬尼亞普洛耶什蒂油田與瑞典鐵礦"},
+          {"id": "l1_japanese_raw_material_embargo_panic", "name": "日本對英美荷廢鐵、橡膠與石油封鎖之恐慌", "name_en": "Japanese Resource Desperation in East Asia", "value": 86.0, "weight": 1.2, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "侵華戰事泥潭導致外匯見底，急欲南進奪取荷屬東印度油田"},
+          {"id": "l1_autarky_bloc_fragmentation", "name": "全球自給自足經濟圈割裂與資源排他封鎖", "name_en": "Autarkic Economic Bloc Fracturing", "value": 80.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "英鎊區、美洲美元區與德國馬克結算區壁壘森嚴"},
+          {"id": "l1_scarcity_driven_expansion", "name": "掠奪周邊國家外匯儲備與工業設備以維繫財政", "name_en": "Foreign Exchange & Industrial Looting Imperative", "value": 82.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "吞併奧地利與捷克蘇台德後立即沒收其央行黃金與斯柯達軍工廠"}
+        ]
+      },
+      "L2": {
+        "id": "L2",
+        "name": "分配失衡",
+        "name_en": "Inequality & Distribution",
+        "weight": 1.0,
+        "indicators": [
+          {"id": "l2_depression_devastation", "name": "大蕭條遺留之破滅性財富集中與社會破產", "name_en": "Post-Depression Ruin & Oligarchic Cartelization", "value": 84.0, "weight": 1.1, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "中產階級破產淪為赤貧，IG法本、克虜伯等巨型卡特爾獨霸經濟命脈"},
+          {"id": "l2_racial_dispossession", "name": "體制化種族掠奪（雅利安化與沒收少數族裔資產）", "name_en": "Institutionalized Racial Asset Dispossession", "value": 90.0, "weight": 1.3, "evidence_level": "inference", "source": "Historical Analysis (Kristallnacht 1938)", "year": 1938, "note": "水晶之夜後公開沒收猶太人資產填補國家赤字"},
+          {"id": "l2_totalitarian_wealth_redistribution", "name": "極權統制經濟對勞工結社與自主工會之剝奪", "name_en": "Totalitarian Command Economy & Labor Subjugation", "value": 86.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "取締獨立工會，勞工被強制編入德意志勞工陣線 (DAF)"},
+          {"id": "l2_have_not_nations_resentment", "name": "『無產階級國家』對英法美既得利益霸權之仇恨", "name_en": "Have-Not Nations Resentment Against Colonial Powers", "value": 88.0, "weight": 1.2, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "德意日官方宣傳將凡爾賽體系斥為富裕殖民強權對弱者的永久奴役"},
+          {"id": "l2_complete_channel_blockage", "name": "多邊與國內和平糾偏管道徹底斷絕", "name_en": "Complete Blockage of Peaceful Redress Channels", "value": 88.0, "weight": 1.1, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "法西斯體制內無反對黨，國際上全面退出國聯拒絕談判"}
+        ]
+      },
+      "L3": {
+        "id": "L3",
+        "name": "工作／生計／AI取代",
+        "name_en": "Labor, Livelihood & Militarized Mobilization",
+        "weight": 1.1,
+        "indicators": [
+          {"id": "l3_militarized_work_conscription", "name": "軍事化全民強制勞動體制與薪資凍結", "name_en": "Militarized Forced Labor & Compulsory Service", "value": 82.0, "weight": 1.1, "evidence_level": "inference", "source": "Tooze, Wages of Destruction", "year": 1938, "note": "表面上消滅了失業率，實質以築路、兵役與軍火奴工換取微薄口糧配給"},
+          {"id": "l3_youth_fanaticization", "name": "希特勒青年團與皇道派青年軍事狂熱化", "name_en": "Youth Indoctrination & Suicidal Militarism", "value": 92.0, "weight": 1.4, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "整整一代青年被系統性灌輸為元首與帝國獻身之聖戰意識形態"},
+          {"id": "l3_civilian_rationing_collapse", "name": "大蕭條後生活水平殘破與大炮代替黃油", "name_en": "Civilian Standard of Living Depressed by Guns-over-Butter", "value": 78.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "戈林名言『大炮會使我們強大，黃油只會使我們肥胖』，民生消費品嚴重短缺"},
+          {"id": "l3_despair_to_aggression", "name": "社會長期創傷絕望轉化為對外征服狂躁", "name_en": "Transforming Societal Trauma into External Aggression", "value": 88.0, "weight": 1.2, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "1923年惡性通膨與1929年崩潰造就破釜沉舟之社會侵略心理"},
+          {"id": "l3_structural_unemployment_hangover", "name": "英美民主國家高失業持續與內政分心", "name_en": "Persistent High Unemployment in Western Democracies", "value": 70.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "英美失業率仍高達 10-15%，政界被內政拖累無力強力遏止法西斯"}
+        ]
+      },
+      "L4": {
+        "id": "L4",
+        "name": "權力／安全困境",
+        "name_en": "Power & Security Dilemma",
+        "weight": 1.2,
+        "indicators": [
+          {"id": "l4_massive_rearmament", "name": "納粹德國狂暴重整軍備與空軍陸軍突飛猛進", "name_en": "Massive Nazi Rearmament & Luftwaffe Dominance", "value": 95.0, "weight": 1.4, "evidence_level": "inference", "source": "Overy, War and Economy in the Third Reich", "year": 1938, "note": "軍費佔德國國民所得突破 20-25%，全面建成閃電戰軍事機器"},
+          {"id": "l4_appeasement_failure", "name": "綏靖政策徹底破產與慕尼黑協定踐踏主權", "name_en": "Total Failure of Appeasement & Munich Capitulation", "value": 94.0, "weight": 1.3, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "英法出賣捷克蘇台德區，向侵略者證明武力勒索完全有效"},
+          {"id": "l4_axis_alliance_pact", "name": "柏林-羅馬-東京反共產國際協定軸心合流", "name_en": "Anti-Comintern Pact & Axis Aggressive Alignment", "value": 90.0, "weight": 1.2, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "侵略性極權陣營跨歐亞協同形成"},
+          {"id": "l4_shattered_security_architecture", "name": "凡爾賽與洛迦諾集體安全條約體系化為廢紙", "name_en": "Collapse of Locarno & Versailles Security Architecture", "value": 92.0, "weight": 1.2, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "德國進軍萊茵非軍事區、德奧合併均未受任何實質反擊"},
+          {"id": "l4_active_warfare_ongoing", "name": "歐亞多點實質戰爭已全面燃燒（西班牙內戰、日本侵華）", "name_en": "Hot Proxy & Regional Wars (Spain, China, Ethiopia)", "value": 88.0, "weight": 1.1, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "西班牙內戰淪為軸心國轟炸試驗場，淞滬與南京會戰爆發"}
+        ]
+      },
+      "L5": {
+        "id": "L5",
+        "name": "對未來的恐懼／預防邏輯",
+        "name_en": "Fear of Future & Preventive Logic",
+        "weight": 1.2,
+        "indicators": [
+          {"id": "l5_hitler_biological_timetable", "name": "希特勒個人生理年齡倒計時與預防性決戰狂妄", "name_en": "Hitler Biological Clock & Urgency to Strike Before Western Rearmament", "value": 96.0, "weight": 1.5, "evidence_level": "inference", "source": "Kershaw, Hitler Hubris & Nemesis", "year": 1938, "note": "霍斯巴赫備忘錄明確指出：1943年英法軍工動員將完成，德國必須在1938-40年先發制人"},
+          {"id": "l5_soviet_industrialization_terror", "name": "對蘇聯五年計劃重工軍事潛力之恐慌", "name_en": "Terror of Soviet Industrial & Manpower Potential", "value": 90.0, "weight": 1.2, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "德國將領深信若不及早摧毀布爾什維克，斯拉夫巨浪將淹沒歐洲"},
+          {"id": "l5_economic_overheating_collapse_clock", "name": "梅福券 (MEFO) 債務暴雷與國庫破產迫在眉睫", "name_en": "MEFO Bill Ponzi & Imminent Sovereign Bankruptcy", "value": 92.0, "weight": 1.3, "evidence_level": "inference", "source": "Tooze, Wages of Destruction", "year": 1938, "note": "沙赫特警告軍備膨脹已耗盡外匯，不靠發動戰爭掠奪鄰國財富政權即刻破產"},
+          {"id": "l5_japan_closing_window", "name": "日本對美海軍造艦條約廢除後實力對比惡化之恐懼", "name_en": "Japanese Vinson Naval Expansion Window Panic", "value": 88.0, "weight": 1.1, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "美國兩洋艦隊法案啟動，日本深信再不開戰優勢將永久喪失"},
+          {"id": "l5_total_war_messianic_fatalism", "name": "千禧年帝國救贖宿命論與毀滅性末日心態", "name_en": "Apocalyptic Millennial Expansionism", "value": 90.0, "weight": 1.1, "evidence_level": "inference", "source": "Historical Analysis", "year": 1938, "note": "將全面戰爭視為不可避免的國運豪賭，沒有任何避戰轉圜餘地"}
+        ]
+      }
+    },
+    "gate_buffers": [
+      {
+        "id": "gate_diplomatic_trust",
+        "name": "外交談判信譽（慕尼黑協定證明條約承諾毫無價值）",
+        "name_en": "Diplomatic Trust & Treaty Credibility (Shattered by Munich)",
+        "value": 10.0,
+        "weight": 1.2,
+        "evidence_level": "inference",
+        "source": "Historical Analysis",
+        "year": 1938,
+        "note": "希特勒踐踏協定不到半年即進佔整個捷克，外交承諾完全破產"
+      },
+      {
+        "id": "gate_trade_interdependence",
+        "name": "跨國貿易相互依賴（早已被清算協定與大蕭條封閉摧毀）",
+        "name_en": "International Trade Interdependence (Severed by Autarky)",
+        "value": 15.0,
+        "weight": 1.2,
+        "evidence_level": "inference",
+        "source": "League of Nations World Trade Reports",
+        "year": 1938,
+        "note": "各國實施高關稅，主要陣營間經貿幾乎清零，開戰毫無經濟互賴顧慮"
+      },
+      {
+        "id": "gate_international_institutions",
+        "name": "國際聯盟 (League of Nations) 有效性與威信",
+        "name_en": "League of Nations Authority & Peace Enforcement",
+        "value": 8.0,
+        "weight": 1.2,
+        "evidence_level": "inference",
+        "source": "Historical Analysis",
+        "year": 1938,
+        "note": "面對九一八、侵略衣索比亞及西班牙內戰束手無策，名存實亡"
+      },
+      {
+        "id": "gate_nuclear_deterrence_stability",
+        "name": "戰略核嚇阻（二戰前無核武器制約）",
+        "name_en": "Strategic Nuclear Deterrence (None)",
+        "value": 0.0,
+        "weight": 1.5,
+        "evidence_level": "verified",
+        "source": "Historical Fact",
+        "year": 1938,
+        "note": "沒有相互保證毀滅機制，參戰強權均妄想透過閃電戰奪取決定性勝利"
+      }
+    ]
+  },
+  {
+    "id": "hist_1962",
+    "title": "1962年 古巴導彈危機（核邊緣政策與近失案例）",
+    "title_en": "1962 Cuban Missile Crisis: Nuclear Brinkmanship & Near Miss",
+    "year": 1962,
+    "description": "蘇聯秘密向古巴部署MRBM/IRBM核導彈、美軍實施海上隔離檢疫、U-2偵察機被擊落、B-59潛艇差點發射核魚雷；但最終憑藉秘密外交管道與核末日畏懼避免全面毀滅",
+    "layers": {
+      "L1": {
+        "id": "L1",
+        "name": "生存／資源稀缺",
+        "name_en": "Survival / Resource Scarcity",
+        "weight": 1.0,
+        "indicators": [
+          {"id": "l1_cold_war_raw_materials", "name": "冷戰地緣戰略礦物與基地准入競爭", "name_en": "Cold War Strategic Minerals & Bases Access", "value": 52.0, "weight": 1.0, "evidence_level": "inference", "source": "Cold War Historical Studies", "year": 1962, "note": "美蘇各自控制穩定資源圈，但亞非拉獨立浪潮引發陣營博弈"},
+          {"id": "l1_cuba_sugar_oil_blockade", "name": "古巴蔗糖與石油禁運經濟窒息危機", "name_en": "Cuban Economic Embargo & Soviet Oil Lifeline", "value": 65.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1962, "note": "美國全面封鎖逼迫卡斯楚徹底倒向莫斯科謀求核傘保護"},
+          {"id": "l1_energy_security_postwar", "name": "戰後全球石油美元與中東油田控制格局", "name_en": "Middle East Oil Concessions Security", "value": 45.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1962, "note": "英美控制主要產油區，資源短缺非主要矛盾"},
+          {"id": "l1_food_supply_soviet_drought", "name": "蘇聯處女地運動挫折與糧食進口隱憂", "name_en": "Soviet Virgin Lands Setback & Food Strains", "value": 48.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1962, "note": "赫魯雪夫農業改革受挫，面臨國內供應壓力"},
+          {"id": "l1_berlin_access_chokepoint", "name": "西柏林陸路空中走廊咽喉受阻危機", "name_en": "West Berlin Access Chokepoint (1961 Wall)", "value": 72.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1962, "note": "柏林牆建立後，蘇聯多次威脅切斷西柏林通行權"}
+        ]
+      },
+      "L2": {
+        "id": "L2",
+        "name": "分配失衡",
+        "name_en": "Inequality & Distribution",
+        "weight": 1.0,
+        "indicators": [
+          {"id": "l2_cold_war_bipolar_inequality", "name": "第一世界與第三世界南北貧富鴻溝", "name_en": "North-South Structural Inequality & Decolonization", "value": 60.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1962, "note": "非殖民化浪潮中新興國家貧困引發共產主義游擊運動"},
+          {"id": "l2_us_postwar_affluence", "name": "戰後美國中產階級繁榮與平權運動萌芽", "name_en": "US Postwar Affluent Society & Civil Rights Friction", "value": 45.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1962, "note": "美國國內階層流動相對充沛，但種族不平等持續"},
+          {"id": "l2_soviet_nomenklatura_privilege", "name": "蘇聯官僚特權階層與消費品匱乏", "name_en": "Soviet Nomenklatura Privileges vs Shortages", "value": 52.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1962, "note": "重工業優先壓抑民生分配"},
+          {"id": "l2_ideological_redistribution_appeal", "name": "共產主義全球再分配意識形態吸引力", "name_en": "Appeal of Revolutionary Redistribution in Latin America", "value": 68.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1962, "note": "古巴革命震撼美洲，美國發起『爭取進步聯盟』抗衡"},
+          {"id": "l2_multilateral_development_aid", "name": "美蘇競爭性對外援助機制", "name_en": "Competitive Foreign Aid as Cold War Weapon", "value": 50.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1962, "note": "大國透過經濟援助爭奪第三世界效忠"}
+        ]
+      },
+      "L3": {
+        "id": "L3",
+        "name": "工作／生計／AI取代",
+        "name_en": "Labor, Livelihood & Postwar Growth",
+        "weight": 1.0,
+        "indicators": [
+          {"id": "l3_postwar_golden_age_jobs", "name": "資本主義黃金三十年 (Trente Glorieuses) 充分就業", "name_en": "Golden Age of Capitalism High Employment", "value": 28.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Labor Statistics", "year": 1962, "note": "戰後製造業與消費繁榮，就業充沛、生活水平迅速提高"},
+          {"id": "l3_youth_baby_boom_education", "name": "嬰兒潮一代教育普及與向上流動樂觀", "name_en": "Baby Boom Generation Social Mobility & Optimism", "value": 30.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1962, "note": "高等教育門檻大幅降低，青年對未來抱持強烈希望"},
+          {"id": "l3_soviet_guaranteed_employment", "name": "蘇聯憲法保障全民就業與免費住房醫療體制", "name_en": "Soviet Guaranteed Full Employment System", "value": 32.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1962, "note": "計畫經濟下無公開失業，基層生計安全感極高"},
+          {"id": "l3_technological_optimism_space_age", "name": "太空時代 (Space Age) 科學崇拜與進步樂觀主義", "name_en": "Space Race & Tech Optimism (Gagarin, Apollo)", "value": 25.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1962, "note": "社會普遍相信科技進步將帶來豐裕未來"},
+          {"id": "l3_civilian_civil_defense_anxiety", "name": "核陰影下防空洞與防核演習之民間焦慮", "name_en": "Civil Defense Anxiety & Duck-and-Cover Drills", "value": 65.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1962, "note": "小學防核掩蔽演習與私人防空洞營造出持續的恐懼底色"}
+        ]
+      },
+      "L4": {
+        "id": "L4",
+        "name": "權力／安全困境",
+        "name_en": "Power & Security Dilemma",
+        "weight": 1.3,
+        "indicators": [
+          {"id": "l4_cuban_missile_forward_deployment", "name": "核彈道導彈前沿部署（美部署土耳其，蘇部署古巴）", "name_en": "Forward Nuclear Missile Deployment (Jupiter & R-12/R-14)", "value": 96.0, "weight": 1.5, "evidence_level": "inference", "source": "Allison & Zelikow, Essence of Decision", "year": 1962, "note": "蘇聯導彈距離美本土僅 90 哩，飛行預警時間壓縮至不到 5 分鐘"},
+          {"id": "l4_naval_quarantine_blockade", "name": "美軍海上封鎖檢疫與公海軍事攔截邊緣", "name_en": "US Naval Quarantine & High Seas Interdiction", "value": 94.0, "weight": 1.3, "evidence_level": "inference", "source": "Historical Records (ExComm)", "year": 1962, "note": "甘迺迪下令海軍封鎖，蘇聯貨輪與護航核潛艇直逼隔離線"},
+          {"id": "l4_u2_shootdown_escalation", "name": "U-2偵察機古巴上空被擊落與防空部隊自主交火", "name_en": "U-2 Shootdown over Cuba & Unauthorized Escalation", "value": 92.0, "weight": 1.3, "evidence_level": "inference", "source": "Historical Analysis", "year": 1962, "note": "蘇聯駐軍防空將軍在未獲莫斯科准許下擅自擊落美軍安德森少校座機"},
+          {"id": "l4_defcon_2_highest_alert", "name": "美國戰略空軍司令部首次進入 DEFCON 2 最高戒備", "name_en": "US SAC Alert DEFCON 2 & ICBM Readiness", "value": 95.0, "weight": 1.4, "evidence_level": "inference", "source": "Historical Military Archives", "year": 1962, "note": "B-52轟炸機全天候攜核彈升空巡航，民兵洲際導彈全部注油待發"},
+          {"id": "l4_b59_nuclear_torpedo_crisis", "name": "B-59潛艇受深水炸彈迫降差點發射核魚雷", "name_en": "Soviet B-59 Submarine Nuclear Torpedo Close Call", "value": 95.0, "weight": 1.4, "evidence_level": "inference", "source": "National Security Archive (Arkhipov veto)", "year": 1962, "note": "因大副阿爾希波夫 (Vasili Arkhipov) 一票否決，避免了核大戰爆發"}
+        ]
+      },
+      "L5": {
+        "id": "L5",
+        "name": "對未來的恐懼／預防邏輯",
+        "name_en": "Fear of Future & Preventive Logic",
+        "weight": 1.2,
+        "indicators": [
+          {"id": "l5_missile_gap_humiliation", "name": "赫魯雪夫對美蘇戰略核打擊能力差距之恐懼", "name_en": "Khrushchev Fear of Strategic Imbalance (17:1 US Advantage)", "value": 90.0, "weight": 1.4, "evidence_level": "inference", "source": "Zubok, A Failed Empire", "year": 1962, "note": "美國在洲際核力量享有壓倒優勢，蘇聯企圖藉古巴捷徑一舉扳平"},
+          {"id": "l5_first_strike_preemption_fears", "name": "先發制人核突襲與斬首打擊之極端偏執", "name_en": "First-Strike Preemption Paranoia & Disarming Strike", "value": 92.0, "weight": 1.4, "evidence_level": "inference", "source": "ExComm Transcripts", "year": 1962, "note": "美軍鷹派（李梅等人）極力主張立即對古巴導彈陣地實施全面空襲"},
+          {"id": "l5_cuba_invasion_paranoia", "name": "豬玀灣事件後古巴對美軍直接登陸之絕望恐慌", "name_en": "Cuban Existential Panic Post-Bay of Pigs", "value": 85.0, "weight": 1.1, "evidence_level": "inference", "source": "Historical Records", "year": 1962, "note": "卡斯楚甚至致信莫斯科建議若美軍登陸則對美實施先發核打擊"},
+          {"id": "l5_superpower_prestige_collapse", "name": "超級大國退縮即招致同盟解體之威信焦慮", "name_en": "Superpower Credibility & Domino Collapse Anxiety", "value": 84.0, "weight": 1.1, "evidence_level": "inference", "source": "Historical Analysis", "year": 1962, "note": "甘迺迪若退讓將面臨彈劾，赫魯雪夫若認輸將遭黨內清算"},
+          {"id": "l5_nuclear_doomsday_clarity", "name": "對全球文明滅絕後果之清醒認識（雙刃劍制約）", "name_en": "Shared Fear of Mutual Thermonuclear Annihilation", "value": 75.0, "weight": 1.2, "evidence_level": "inference", "source": "Kennedy-Khrushchev Correspondence", "year": 1962, "note": "兩國元首均深知幾百萬甚至上億人將在數小時內喪生"}
+        ]
+      }
+    },
+    "gate_buffers": [
+      {
+        "id": "gate_diplomatic_trust",
+        "name": "秘密外交後門管道（甘迺迪-多勃雷寧／羅伯特·甘迺迪）",
+        "name_en": "Secret Backchannel Diplomacy (RFK - Dobrynin, Scali - Fomin)",
+        "value": 46.0,
+        "weight": 1.3,
+        "evidence_level": "inference",
+        "source": "Allison & Zelikow, Essence of Decision",
+        "year": 1962,
+        "note": "雖無常規互信，但秘密非正式通道極其高效，達成了拆除土耳其導彈之秘密交易"
+      },
+      {
+        "id": "gate_trade_interdependence",
+        "name": "冷戰兩大陣營經貿互賴（鐵幕阻隔，貿易極低）",
+        "name_en": "Trade Interdependence (Minimal East-West Trade)",
+        "value": 18.0,
+        "weight": 1.0,
+        "evidence_level": "inference",
+        "source": "Historical Trade Data",
+        "year": 1962,
+        "note": "鐵幕兩側經濟幾近完全脫鉤，經濟制衡作用微弱"
+      },
+      {
+        "id": "gate_international_institutions",
+        "name": "聯合國秘書長吳丹斡旋與安理會公開辯論",
+        "name_en": "UN Secretary-General U Thant Mediation & Security Council",
+        "value": 45.0,
+        "weight": 1.0,
+        "evidence_level": "inference",
+        "source": "UN Archives",
+        "year": 1962,
+        "note": "史蒂文森在安理會展示偵察照片奪取道德制高點，吳丹提供冷卻期緩衝"
+      },
+      {
+        "id": "gate_nuclear_deterrence_stability",
+        "name": "相互保證毀滅 (MAD) 之清醒震懾效應",
+        "name_en": "Sobering Effect of Mutually Assured Destruction (MAD)",
+        "value": 78.0,
+        "weight": 1.5,
+        "evidence_level": "inference",
+        "source": "Historical Analysis",
+        "year": 1962,
+        "note": "正是因為擁有熱核武器帶來的絕對毀滅恐懼，最終迫使兩國領導人各退一步"
+      }
+    ]
+  },
+  {
+    "id": "hist_1990",
+    "title": "1990年 冷戰終結（柏林牆倒塌、大和解與新世界秩序）",
+    "title_en": "1990 End of Cold War: German Reunification & Great Détente",
+    "year": 1990,
+    "description": "東歐劇變、兩德統一、美蘇簽署削減戰略武器條約 (START)、巴黎新歐洲憲章、波灣危機多邊安理會聯合授權，全球和平機制處於歷史峰值",
+    "layers": {
+      "L1": {
+        "id": "L1",
+        "name": "生存／資源稀缺",
+        "name_en": "Survival / Resource Scarcity",
+        "weight": 1.0,
+        "indicators": [
+          {"id": "l1_oil_counter_shock", "name": "逆油價衝擊與全球能源低位充沛", "name_en": "Oil Counter-Shock & Abundant Energy", "value": 32.0, "weight": 1.0, "evidence_level": "inference", "source": "IEA Historical Data", "year": 1990, "note": "1986年油價崩潰後能源成本低廉，雖有波灣危機但沙烏地迅速增產平抑"},
+          {"id": "l1_global_grain_abundance", "name": "全球糧食增產與綠色革命紅利", "name_en": "Green Revolution Agricultural Abundance", "value": 30.0, "weight": 1.0, "evidence_level": "inference", "source": "FAO Historical Data", "year": 1990, "note": "主糧供應充足，跨國食品貿易暢通"},
+          {"id": "l1_open_sea_lanes", "name": "美國海軍全球公海巡航維護航行自由", "name_en": "Global Freedom of Navigation & Uncontested Sea Lanes", "value": 25.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1990, "note": "戰略海峽暢通無阻，無大國海權競爭對手"},
+          {"id": "l1_soviet_economic_exhaustion", "name": "蘇聯民生消費物資匱乏（但主要依賴西方貸款救助）", "name_en": "Soviet Economic Strains (Countered by Western Aid)", "value": 55.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1990, "note": "戈巴契夫積極尋求西方十億馬克貸款與糧食援助，非尋求軍事擴張"},
+          {"id": "l1_resource_interdependence_growth", "name": "全球資源市場化配置與跨國勘探繁榮", "name_en": "Global Market Resource Integration", "value": 28.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1990, "note": "跨國礦業公司全球投資，資源民族主義處於低谷"}
+        ]
+      },
+      "L2": {
+        "id": "L2",
+        "name": "分配失衡",
+        "name_en": "Inequality & Distribution",
+        "weight": 1.0,
+        "indicators": [
+          {"id": "l2_postwar_welfare_state_residual", "name": "西方福利國家制度健全與基尼係數溫和", "name_en": "Welfare State Maturity & Moderate Gini", "value": 40.0, "weight": 1.0, "evidence_level": "inference", "source": "OECD Historical Data", "year": 1990, "note": "歐洲社會民主主義與美國中產階級仍佔社會主體"},
+          {"id": "l2_democratic_transition_hope", "name": "第三波民主化浪潮與政治包容度躍升", "name_en": "Third Wave of Democratization & Hope", "value": 32.0, "weight": 1.0, "evidence_level": "inference", "source": "Huntington, Third Wave", "year": 1990, "note": "東歐、拉美、東亞多國轉向民主，制度信任度極高"},
+          {"id": "l2_market_economy_integration", "name": "市場化改革打破鐵飯碗與特權壟斷", "name_en": "Market Transition Opening Economic Opportunities", "value": 38.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1990, "note": "新興民營企業與外資帶來廣泛致富機會"},
+          {"id": "l2_global_poverty_reduction_onset", "name": "全球化初期貧困率開始實質下降", "name_en": "Beginning of Global Poverty Reduction Wave", "value": 45.0, "weight": 1.0, "evidence_level": "inference", "source": "World Bank Historical Data", "year": 1990, "note": "亞洲四小龍崛起與中國改革開放提供階層流動楷模"},
+          {"id": "l2_peaceful_redistribution_channels", "name": "成熟的議會民主制與司法仲裁威信", "name_en": "Functional Democratic Parliamentary Channels", "value": 30.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1990, "note": "和平抗議與選舉成為改變政策之主流共識"}
+        ]
+      },
+      "L3": {
+        "id": "L3",
+        "name": "工作／生計／AI取代",
+        "name_en": "Labor, Livelihood & Peace Dividend",
+        "weight": 1.0,
+        "indicators": [
+          {"id": "l3_peace_dividend_prosperity", "name": "和平紅利 (Peace Dividend) 轉化為民生與基建投資", "name_en": "Peace Dividend & Commercial Tech Boom", "value": 35.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Economic Data", "year": 1990, "note": "冷戰軍費削減釋放大量研發與資本轉向民間經濟"},
+          {"id": "l3_low_unemployment_expansion", "name": "服務業與全球貿易創造龐大新就業", "name_en": "Service Sector & Trade Employment Expansion", "value": 38.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Labor Data", "year": 1990, "note": "經濟週期雖然面臨短暫衰退，但就業基本面健康"},
+          {"id": "l3_home_ownership_attainable", "name": "房價所得比處於合理健康水準", "name_en": "Attainable Housing & Family Formation", "value": 36.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Real Estate Data", "year": 1990, "note": "戰後郊區住宅建設充沛，年輕人購房成家難度低"},
+          {"id": "l3_youth_cultural_optimism", "name": "柏林牆倒塌引發青年一代狂熱的全球主義樂觀", "name_en": "Fall of Wall & Youth Globalist Optimism", "value": 22.0, "weight": 1.0, "evidence_level": "inference", "source": "Cultural History", "year": 1990, "note": "音樂節、跨國交流消除隔閡，歷史終結論廣為流傳"},
+          {"id": "l3_pc_revolution_empowerment", "name": "個人電腦 (PC) 與早期資訊化賦能勞動者", "name_en": "PC Revolution & Productivity Empowerment", "value": 26.0, "weight": 1.0, "evidence_level": "inference", "source": "Tech History", "year": 1990, "note": "科技被視為創造就業而非剝奪生計之正向引擎"}
+        ]
+      },
+      "L4": {
+        "id": "L4",
+        "name": "權力／安全困境",
+        "name_en": "Power & Security Dilemma",
+        "weight": 1.1,
+        "indicators": [
+          {"id": "l4_massive_disarmament_treaties", "name": "歐洲常規武裝力量條約 (CFE) 與 INF 歷史性裁軍", "name_en": "CFE, INF & START Historic Disarmament Treaties", "value": 25.0, "weight": 1.3, "evidence_level": "inference", "source": "SIPRI Yearbook 1991", "year": 1990, "note": "數萬輛坦克裝甲車公開拆解銷毀，駐歐蘇軍分階段和平撤軍"},
+          {"id": "l4_multilateral_consensus_gulf", "name": "聯合國安理會五常空前一致通過 678 號決議（反對薩達姆侵略）", "name_en": "UNSC Permanent Five Historic Consensus (Res 678)", "value": 28.0, "weight": 1.2, "evidence_level": "inference", "source": "UN Records", "year": 1990, "note": "美蘇首次並肩作戰反對地區侵略，確立集體安全範式"},
+          {"id": "l4_dissolution_warsaw_pact", "name": "華沙條約組織實質解體與非軍事化", "name_en": "Peaceful Unraveling of Warsaw Pact", "value": 24.0, "weight": 1.2, "evidence_level": "inference", "source": "Historical Analysis", "year": 1990, "note": "東歐各國主權完全恢復，駐軍不發一槍撤離"},
+          {"id": "l4_nato_peace_partnership", "name": "倫敦宣言：北約正式宣告不再視蘇聯為敵人", "name_en": "NATO London Declaration: Soviets No Longer Adversaries", "value": 30.0, "weight": 1.1, "evidence_level": "inference", "source": "NATO Archives 1990", "year": 1990, "note": "開啟『和平夥伴關係計劃』(PfP)，探討共同安全架構"},
+          {"id": "l4_german_peaceful_reunification", "name": "『二加四條約』和平解決德國統一問題", "name_en": "Two Plus Four Agreement on German Unity", "value": 26.0, "weight": 1.1, "evidence_level": "inference", "source": "Historical Analysis", "year": 1990, "note": "以條約完全放棄核生化武器及對波蘭邊界宣索，化解歐洲百餘年地緣噩夢"}
+        ]
+      },
+      "L5": {
+        "id": "L5",
+        "name": "對未來的恐懼／預防邏輯",
+        "name_en": "Fear of Future & Preventive Logic",
+        "weight": 1.1,
+        "indicators": [
+          {"id": "l5_end_of_history_euphoria", "name": "『歷史的終結』(Fukuyama) 與自由民主大勝樂觀主義", "name_en": "The End of History & Triumph of Liberal Democracy", "value": 18.0, "weight": 1.3, "evidence_level": "inference", "source": "Fukuyama The End of History (1989/1992)", "year": 1990, "note": "大國戰爭被廣泛認為已成為過時歷史遺跡，意識形態對決終結"},
+          {"id": "l5_shared_european_home", "name": "『歐洲共同家園』與新歐洲巴黎憲章", "name_en": "Charter of Paris for a New Europe & Shared Home", "value": 22.0, "weight": 1.2, "evidence_level": "inference", "source": "OSCE Paris Charter 1990", "year": 1990, "note": "從溫哥華到海參崴建立無對抗共同安全共同體的歷史峰值"},
+          {"id": "l5_zero_preventive_war_impulse", "name": "超級大國預防性打擊衝動幾近歸零", "name_en": "Total Absence of Preemptive Strike Motives", "value": 20.0, "weight": 1.4, "evidence_level": "inference", "source": "Strategic Analysis", "year": 1990, "note": "美蘇高層互訪頻密，甚至共享情報與防務通報"},
+          {"id": "l5_economic_integration_faith", "name": "世貿組織 (WTO) 與全球經濟融合信念", "name_en": "Faith in Global Market Integration & Free Trade", "value": 25.0, "weight": 1.0, "evidence_level": "inference", "source": "Historical Analysis", "year": 1990, "note": "深信只要納入全球經貿體系，各國將自動走向和平民主"},
+          {"id": "l5_long_term_horizon_stability", "name": "領導人時間視野轉向長期國內繁榮與全球合作", "name_en": "Leaders Long Time Horizons & Cooperative Legacies", "value": 24.0, "weight": 1.0, "evidence_level": "inference", "source": "Biographical Studies (Bush, Gorbachev, Kohl)", "year": 1990, "note": "老布希、戈巴契夫、柯爾致力於建立持久和平架構"}
+        ]
+      }
+    },
+    "gate_buffers": [
+      {
+        "id": "gate_diplomatic_trust",
+        "name": "大國元首空前互信（老布希-戈巴契夫-柯爾）",
+        "name_en": "Unprecedented Superpower Trust (Bush-Gorbachev-Kohl)",
+        "value": 88.0,
+        "weight": 1.3,
+        "evidence_level": "inference",
+        "source": "Historical Diplomatic Records",
+        "year": 1990,
+        "note": "馬爾他峰會宣告冷戰結束，建立了深厚個人與制度信任"
+      },
+      {
+        "id": "gate_trade_interdependence",
+        "name": "全球化加速與烏拉圭回合談判推動自由貿易",
+        "name_en": "Globalization & GATT Uruguay Round Momentum",
+        "value": 75.0,
+        "weight": 1.1,
+        "evidence_level": "inference",
+        "source": "WTO History",
+        "year": 1990,
+        "note": "跨國投資大幅增長，供應鏈跨洲整合"
+      },
+      {
+        "id": "gate_international_institutions",
+        "name": "聯合國安理會與國際多邊制度效能峰值",
+        "name_en": "Peak Efficacy of UN Security Council & Multilateral Order",
+        "value": 82.0,
+        "weight": 1.2,
+        "evidence_level": "inference",
+        "source": "UN Records",
+        "year": 1990,
+        "note": "冷戰否決權癱瘓解除，國際法與集體安全得到全面落實"
+      },
+      {
+        "id": "gate_nuclear_deterrence_stability",
+        "name": "戰略核軍控與核熱線穩定度（實質大幅裁減）",
+        "name_en": "Nuclear Arms Reduction & Hotline Stability (START I)",
+        "value": 86.0,
+        "weight": 1.4,
+        "evidence_level": "inference",
+        "source": "SIPRI",
+        "year": 1990,
+        "note": "美蘇簽署削減核武協議，全球核擴散得到嚴密共同管控"
+      }
+    ]
+  },
+  {
+    "id": "hist_2025",
+    "title": "2025年 當代前夕（烏克蘭戰事延宕、多極重組與中東外溢）",
+    "title_en": "2025 Pre-Baseline: Multipolar Friction & Tech Decoupling",
+    "year": 2025,
+    "description": "烏克蘭陣地戰長期化、加薩-黎巴嫩-紅海危機外溢、中美晶片禁運升級、全球國防預算激增，但中美高層軍事熱線部分恢復",
+    "layers": {
+      "L1": {
+        "id": "L1",
+        "name": "生存／資源稀缺",
+        "name_en": "Survival / Resource Scarcity",
+        "weight": 1.0,
+        "indicators": [
+          {"id": "l1_red_sea_shipping_shock", "name": "紅海航道改道好望角與航運保費高企", "name_en": "Red Sea Shipping Disruption & Freight Inflation", "value": 66.0, "weight": 1.1, "evidence_level": "inference", "source": "Drewry World Container Index 2025", "year": 2025, "note": "全球集裝箱運力持續受蘇伊士繞行拖累"},
+          {"id": "l1_european_energy_pivot", "name": "歐洲戒斷俄天然氣後高成本液化天然氣依賴", "name_en": "European LNG Dependency & Structural Industrial Cost", "value": 62.0, "weight": 1.1, "evidence_level": "inference", "source": "Eurostat Energy 2025", "year": 2025, "note": "高電價致使歐洲化工與重工業外流"},
+          {"id": "l1_critical_materials_antimony_gallium", "name": "銻、鎵、鍺與石墨出口許可制升級", "name_en": "Export Licensing on Antimony, Gallium & Graphite", "value": 68.0, "weight": 1.2, "evidence_level": "inference", "source": "Trade Ministry Announcements", "year": 2025, "note": "各國關鍵軍工金屬戰略儲備競賽啟動"},
+          {"id": "l1_climate_food_price_shocks", "name": "極端乾旱引發可可、橄欖油與主糧局部價格飆升", "name_en": "Climate Agricultural Supply Squeeze", "value": 58.0, "weight": 1.0, "evidence_level": "inference", "source": "FAO Food Price Index 2025", "year": 2025, "note": "農業受氣候變化波動性顯著增強"},
+          {"id": "l1_water_stress_middle_east_asia", "name": "幼發拉底-底格里斯與印度河水文爭端升溫", "name_en": "Middle East & South Asia River Basin Friction", "value": 56.0, "weight": 1.0, "evidence_level": "inference", "source": "Global Water Security Index", "year": 2025, "note": "跨國水壩蓄水在乾旱期成為地緣籌碼"}
+        ]
+      },
+      "L2": {
+        "id": "L2",
+        "name": "分配失衡",
+        "name_en": "Inequality & Distribution",
+        "weight": 1.0,
+        "indicators": [
+          {"id": "l2_wealth_concentration_tech", "name": "美股科技七巨頭市值高度集中與貧富分化", "name_en": "Magnificent Seven Wealth Concentration", "value": 72.0, "weight": 1.2, "evidence_level": "inference", "source": "Bloomberg Wealth 2025", "year": 2025, "note": "股市財富集中於少數資產持有者，中低收入階層承擔通膨"},
+          {"id": "l2_ai_compute_foundry_barrier", "name": "3nm/2nm 先進製程與GPU叢集極端資本壁壘", "name_en": "Advanced Compute & Foundry Monopolization", "value": 76.0, "weight": 1.3, "evidence_level": "inference", "source": "Semiconductor Industry Analysis", "year": 2025, "note": "單個大模型訓練成本數億美元，中小機構被完全排除"},
+          {"id": "l2_housing_unaffordability_west", "name": "英美澳加等國嚴重住房危機與代際資產斷層", "name_en": "Housing Crisis & Intergenerational Asset Gap", "value": 74.0, "weight": 1.1, "evidence_level": "inference", "source": "Demographia Housing Affordability 2025", "year": 2025, "note": "房價與利率雙高，青年購房率創歷史新低"},
+          {"id": "l2_social_polarization_election", "name": "選舉極化與民粹主義席捲多個主要經濟體", "name_en": "Electoral Polarization & Populist Wave", "value": 68.0, "weight": 1.0, "evidence_level": "inference", "source": "V-Dem Institute 2025", "year": 2025, "note": "政治對立激化，和平推進稅制改革空間收縮"},
+          {"id": "l2_institutional_cynicism", "name": "年輕世代對司法、媒體與金融機構信任赤字", "name_en": "Youth Institutional Cynicism & Alienation", "value": 65.0, "weight": 1.0, "evidence_level": "inference", "source": "Edelman Trust Barometer 2025", "year": 2025, "note": "普遍認為體系被建制派操縱，難以公平代表大眾"}
+        ]
+      },
+      "L3": {
+        "id": "L3",
+        "name": "工作／生計／AI取代",
+        "name_en": "Labor, Livelihood & AI Transition",
+        "weight": 1.1,
+        "indicators": [
+          {"id": "l3_ai_coding_entry_job_freeze", "name": "初階軟體工程師、文案與客服招募凍結", "name_en": "AI Automation Freeze in Junior Tech/Office Jobs", "value": 60.0, "weight": 1.4, "evidence_level": "inference", "source": "Tech Layoff & Hiring Trackers 2025", "year": 2025, "note": "生成式AI大幅壓縮初級白領實習與起薪崗位"},
+          {"id": "l3_global_youth_jobless_friction", "name": "主要大國青年結構性就業困難與考公內卷", "name_en": "Youth Underemployment & Civil Service Rat Race", "value": 65.0, "weight": 1.2, "evidence_level": "inference", "source": "ILO Trends 2025", "year": 2025, "note": "高學歷低就現象普遍，失業率居高不下"},
+          {"id": "l3_cost_of_living_cumulative_pain", "name": "2021-2024 累計核心通膨重創家庭實質可支配所得", "name_en": "Cumulative Inflation Trauma on Household Budgets", "value": 64.0, "weight": 1.1, "evidence_level": "inference", "source": "IMF World Economic Outlook 2025", "year": 2025, "note": "工資漲幅落後於超市與生活必需品價格"},
+          {"id": "l3_gig_economy_precarity", "name": "零工經濟與缺乏社會安全網的勞工比例增加", "name_en": "Gig Economy & Precarious Employment Share", "value": 58.0, "weight": 1.0, "evidence_level": "inference", "source": "OECD Employment Outlook 2025", "year": 2025, "note": "外賣、網約車成為蓄水池，勞動保障脆弱"},
+          {"id": "l3_return_on_effort_skepticism", "name": "東亞『躺平』與西方『安靜辭職』心態常態化", "name_en": "Normalization of Lying Flat & Quiet Quitting", "value": 62.0, "weight": 1.0, "evidence_level": "inference", "source": "Sociological Surveys 2025", "year": 2025, "note": "奮鬥敘事吸引力瓦解，社會動能放緩"}
+        ]
+      },
+      "L4": {
+        "id": "L4",
+        "name": "權力／安全困境",
+        "name_en": "Power & Security Dilemma",
+        "weight": 1.2,
+        "indicators": [
+          {"id": "l4_ukraine_attrition_war", "name": "烏克蘭前線漫長消耗戰與北約直接軍援升級", "name_en": "Ukraine Long-Term Attrition & Deep Strike Escalation", "value": 82.0, "weight": 1.4, "evidence_level": "inference", "source": "ISW / Defense Ministry Updates 2025", "year": 2025, "note": "西方解除遠程導彈打擊俄境限制，俄更新核威懾學說"},
+          {"id": "l4_taiwan_strait_grey_zone", "name": "台海灰色地帶常態化包圍軍演與聯合利劍演習", "name_en": "Taiwan Strait Joint Sword Normalization & Grey Zone Pressure", "value": 78.0, "weight": 1.3, "evidence_level": "inference", "source": "DoD China Military Power Report 2025", "year": 2025, "note": "海峽中線默契徹底消失，演訓即戰轉換時間壓縮"},
+          {"id": "l4_middle_east_multi_front", "name": "以色列與伊朗抵抗軸心（真主黨、青年運動）直接交火", "name_en": "Direct Israel-Iran Ballistic Missile & Proxy Warfare", "value": 80.0, "weight": 1.2, "evidence_level": "inference", "source": "Crisis Group 2025", "year": 2025, "note": "雙方打破數十年不直接打擊本土默契，互射彈道導彈"},
+          {"id": "l4_global_defense_budget_hike", "name": "各國軍費連續第十個年頭創冷戰後新高", "name_en": "Global Military Expenditure Surpassing $2.4 Trillion", "value": 74.0, "weight": 1.1, "evidence_level": "inference", "source": "SIPRI 2025", "year": 2025, "note": "歐洲多國防衛支出超過GDP 2.5%，日韓加碼建軍"},
+          {"id": "l4_tech_export_controls_weaponization", "name": "先進晶片、EDA軟體與光刻機長臂管轄封殺", "name_en": "Comprehensive Semiconductor & AI Technology Controls", "value": 76.0, "weight": 1.2, "evidence_level": "inference", "source": "Bureau of Industry and Security (BIS) 2025", "year": 2025, "note": "科技脫鉤實質阻斷大國間高科技良性合作"}
+        ]
+      },
+      "L5": {
+        "id": "L5",
+        "name": "對未來的恐懼／預防邏輯",
+        "name_en": "Fear of Future & Preventive Logic",
+        "weight": 1.1,
+        "indicators": [
+          {"id": "l5_agi_breakthrough_fear", "name": "對對手先行實現超級人工智慧 (AGI) 之軍事滅絕恐懼", "name_en": "Fear of Adversary AGI Military Supremacy", "value": 74.0, "weight": 1.4, "evidence_level": "inference", "source": "National Security AI Commission Follow-up", "year": 2025, "note": "若相信對手率先掌握自主演算軍事優勢，先發打擊誘惑激增"},
+          {"id": "l5_closing_demographic_window_east_asia", "name": "東亞主要國家人口總量萎縮與歷史窗口關閉感", "name_en": "East Asian Demographic Squeeze & Closing Window", "value": 72.0, "weight": 1.2, "evidence_level": "inference", "source": "UN Population Division 2025", "year": 2025, "note": "老齡化進程壓迫國力峰值預期，激發戰略緊迫感"},
+          {"id": "l5_hegemonic_loss_anxiety", "name": "美國兩黨對維持全球主導地位無可替代之共識與焦慮", "name_en": "US Bipartisan Primacy Anxiety & Containment Consensus", "value": 75.0, "weight": 1.2, "evidence_level": "inference", "source": "Foreign Affairs Essays 2025", "year": 2025, "note": "對被修正主義陣營推翻自由主義國際秩序之強烈危機感"},
+          {"id": "l5_de_dollarization_fears", "name": "金磚國家 (BRICS+) 推進非美元結算之存亡焦慮", "name_en": "De-Dollarization Initiatives & Reserve Currency Anxiety", "value": 65.0, "weight": 1.0, "evidence_level": "inference", "source": "Atlantic Council Dollar Tracker 2025", "year": 2025, "note": "金融制裁過度使用引發各國避險分散外匯儲備"},
+          {"id": "l5_short_warning_hypersonic_threat", "name": "高超音速導彈縮短防空決策時間至極致的誤判風險", "name_en": "Hypersonic Compressed Reaction Time & Nuclear Ambiguity", "value": 70.0, "weight": 1.1, "evidence_level": "inference", "source": "Arms Control Association 2025", "year": 2025, "note": "雙重用途載具（常規/核彈頭）導致雷達回波難以辨析"}
+        ]
+      }
+    },
+    "gate_buffers": [
+      {
+        "id": "gate_diplomatic_trust",
+        "name": "中美兩軍戰區司令通話與元首外交維持護欄",
+        "name_en": "US-China Theater Commander & Presidential Guardrails",
+        "value": 40.0,
+        "weight": 1.2,
+        "evidence_level": "inference",
+        "source": "State Department / MND Announcements 2025",
+        "year": 2025,
+        "note": "雖無戰略互信，但雙方明確保留溝通護欄避免意外擦槍走火"},
+      {
+        "id": "gate_trade_interdependence",
+        "name": "巨額雙邊貿易總額與跨國供應鏈去風險（非全面脫鉤）",
+        "name_en": "Trade Volume & De-risking Reality (Decoupling Constraints)",
+        "value": 52.0,
+        "weight": 1.2,
+        "evidence_level": "inference",
+        "source": "US Census Bureau / General Administration of Customs 2025",
+        "year": 2025,
+        "note": "雙邊貿易額仍達數千億美元，全面開戰代價極度沉重"},
+      {
+        "id": "gate_international_institutions",
+        "name": "聯合國與世貿組織機制在爭端協調中嚴重受限",
+        "name_en": "Constrained UN & WTO Multilateral Dispute Mechanisms",
+        "value": 30.0,
+        "weight": 1.0,
+        "evidence_level": "inference",
+        "source": "Crisis Group 2025",
+        "year": 2025,
+        "note": "安理會常任理事國互擲否決票，多邊協調效能低下"},
+      {
+        "id": "gate_nuclear_deterrence_stability",
+        "name": "大國間相互保證毀滅 (MAD) 與核第二擊能力有效性",
+        "name_en": "MAD Nuclear Deterrence & Second-Strike Survivability",
+        "value": 65.0,
+        "weight": 1.4,
+        "evidence_level": "inference",
+        "source": "SIPRI 2025",
+        "year": 2025,
+        "note": "戰略核三位一體威懾依然是阻遏大國爆發直接全面戰爭之最終底線"}
+    ]
+  }
+]

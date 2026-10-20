@@ -1,0 +1,125 @@
+{
+  "id": "ai_displacement_shock",
+  "title": "情境：AI 認知取代風暴與算力壟斷",
+  "title_en": "Scenario: AI Displacement Shock & Compute Concentration",
+  "year": 2026,
+  "description": "通用智慧與自主Agent突破加速，白領知識崗位大面積凍結或被取代，算力基礎設施極端集中於單一霸權陣營，引發前所未有的社會動盪與預防性技術封鎖",
+  "layers": {
+    "L1": {
+      "id": "L1",
+      "name": "生存／資源稀缺",
+      "name_en": "Survival / Resource Scarcity",
+      "weight": 1.0,
+      "indicators": [
+        {"id": "l1_food_security", "name": "全球糧食儲備與主糧庫存消費比", "name_en": "Global Grain Stock-to-Use & Food Insecurity", "value": 52.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "維持基準態勢"},
+        {"id": "l1_water_stress", "name": "跨界流域水資源壓力與枯竭指數", "name_en": "Transboundary Freshwater Stress & Depletion", "value": 58.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "維持基準態勢"},
+        {"id": "l1_energy_vulnerability", "name": "化石能源與電網供應鏈脆弱性（AI資料中心用電暴增）", "name_en": "Energy Supply Vulnerability & AI Data Center Grid Strain", "value": 78.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "百吉瓦級AI資料中心搶佔核電與電網容量，民用電價飆升"},
+        {"id": "l1_critical_minerals", "name": "關鍵礦物與先進半導體特殊氣體管制", "name_en": "Critical Minerals & Semiconductor Materials Embargo", "value": 85.0, "weight": 1.3, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "光刻膠、特種氟化物與散熱金屬被列為一級禁運物資"},
+        {"id": "l1_climate_impact", "name": "氣候極端衝擊對核心農業基礎設施破壞", "name_en": "Extreme Climate Shocks", "value": 65.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "維持基準態勢"},
+        {"id": "l1_maritime_chokepoints", "name": "全球戰略咽喉海運水道通行風險", "name_en": "Maritime Chokepoint Disruption", "value": 70.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "先進製程晶片海空航線受到嚴密護航與潛在封鎖威脅"}
+      ]
+    },
+    "L2": {
+      "id": "L2",
+      "name": "分配失衡",
+      "name_en": "Inequality & Distribution",
+      "weight": 1.1,
+      "indicators": [
+        {"id": "l2_wealth_gini", "name": "全球前 1% 財富佔有率（科技巨頭資本所得爆炸）", "name_en": "Top 1% Wealth Share & Tech Capital Monopoly", "value": 86.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "AI公司利潤與估值壟斷全球標普指數半壁江山"},
+        {"id": "l2_compute_monopoly", "name": "前沿 AI 算力與先進晶圓代工極端壟斷", "name_en": "Extreme Frontier AI Compute & Foundry Monopolization", "value": 96.0, "weight": 1.5, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "全球 90% 前沿算力被 3 家巨頭與單一主權國家鎖定"},
+        {"id": "l2_land_housing_concentration", "name": "土地與關鍵民生資本壟斷化指數", "name_en": "Land & Essential Living Capital Concentration", "value": 74.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "算力富豪跨界吸納水權、農業與住宅資產"},
+        {"id": "l2_social_mobility", "name": "代際社會流動停滯與向下沉淪感知", "name_en": "Intergenerational Mobility Stagnation", "value": 84.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "普通家庭教育投資完全無法抗衡演算法自動化"},
+        {"id": "l2_institutional_fairness", "name": "制度公平感衰落與演算法黑箱治理抗拒", "name_en": "Erosion of Perceived Institutional Fairness", "value": 82.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "公權力廣泛運用AI裁員與評估，公眾感到喪失人性尊嚴"},
+        {"id": "l2_peaceful_redistribution", "name": "和平再分配機制失靈與民粹排外加劇", "name_en": "Breakdown of Peaceful Redistribution Mechanisms", "value": 78.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "全民基本收入 (UBI) 提案受既得利益阻礙，政治暴力抬頭"}
+      ]
+    },
+    "L3": {
+      "id": "L3",
+      "name": "工作／生計／AI取代",
+      "name_en": "Labor, Livelihood & AI Displacement",
+      "weight": 1.3,
+      "indicators": [
+        {"id": "l3_unemployment_underemployment", "name": "白領與初級專業人士廣泛隱性失業", "name_en": "Knowledge Worker Unemployment & Underemployment", "value": 78.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "程式設計、法律研究、會計、文案、設計崗位萎縮 40%"},
+        {"id": "l3_youth_unemployment", "name": "青年失業率與名校畢業即失業危機", "name_en": "Youth Unemployment & Entry-Level Extinction", "value": 85.0, "weight": 1.3, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "企業不再招募基層初學者，青年一代失去職場階梯"},
+        {"id": "l3_wage_vs_living_cost", "name": "實質工資急速下滑 vs 核心生活通脹夾擊", "name_en": "Real Wage Collapse for Educated Labor", "value": 76.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "被取代人員流入體力零工市場壓低全行業薪資"},
+        {"id": "l3_housing_affordability", "name": "房價所得比惡化與青年被迫離開大都市", "name_en": "Severe Housing Affordability Crisis", "value": 78.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "失去穩定白領收入導致違約潮與租賃貧困"},
+        {"id": "l3_ai_displacement_rate", "name": "前瞻重點：AI 認知與知識勞動取代率狂飆", "name_en": "Extreme AI Cognitive Displacement Surge", "value": 92.0, "weight": 1.6, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "全自主多Agent工作流普及，社會調適速度遠遠落後於技術替代速度"},
+        {"id": "l3_effort_reward_breakdown", "name": "努力回報預期徹底崩潰與新盧德主義反叛", "name_en": "Total Effort-Reward Breakdown & Neo-Luddite Rebellion", "value": 86.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "衝擊資料中心與抗議AI伺服器的極端運動在多國爆發"}
+      ]
+    },
+    "L4": {
+      "id": "L4",
+      "name": "權力／安全困境",
+      "name_en": "Power & Security Dilemma",
+      "weight": 1.2,
+      "indicators": [
+        {"id": "l4_military_expenditure_growth", "name": "AI 自主武器與無人作戰集群國防開支暴增", "name_en": "Autonomous Military AI Spending Explosion", "value": 82.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "大國將軍事資源全力轉移至自主殺傷武器系統 (LAWS)"},
+        {"id": "l4_arms_race_hypersonic", "name": "AI 決策輔助與自動化指揮控制系統軍備競賽", "name_en": "Algorithmic Command & Control Arms Race", "value": 88.0, "weight": 1.3, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "無人艇、蜂群無人機與自動交火規則剝奪人類最後裁決權"},
+        {"id": "l4_bloc_polarization", "name": "全球算力鐵幕分裂為兩大不可互通生態", "name_en": "Bifurcated Compute Iron Curtain", "value": 86.0, "weight": 1.3, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "晶片標準、模型權重與開源代碼跨陣營傳播被視為間諜通敵行為"},
+        {"id": "l4_weaponized_interdependence", "name": "雲端API斷供、晶片鎖定與長臂監控武器化", "name_en": "Cloud API Termination & Hardware Kill-Switch", "value": 84.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "遠端硬體熔斷機制引發各國對主權資訊安全的致命恐懼"},
+        {"id": "l4_nuclear_breakout", "name": "AI 賦能反潛與核武先發打擊生存能力被破壞", "name_en": "AI-Enabled Anti-Submarine & First-Strike Temptation", "value": 75.0, "weight": 1.4, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "海洋透明化威脅戰略核潛艇生存，削弱二次核反擊穩定性"},
+        {"id": "l4_territorial_flashpoints", "name": "高危熱點主權與領土引信點摩擦頻度", "name_en": "Active Territorial Flashpoints", "value": 82.0, "weight": 1.2, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "先進製程所在地（如台海）戰略緊迫性達到頂點"}
+      ]
+    },
+    "L5": {
+      "id": "L5",
+      "name": "對未來的恐懼／預防邏輯",
+      "name_en": "Fear of Future & Preventive Logic",
+      "weight": 1.2,
+      "indicators": [
+        {"id": "l5_relative_decline_anxiety", "name": "霸權相對衰落焦慮與算力天命被奪恐懼", "name_en": "Compute Hegemony Transition Panic", "value": 86.0, "weight": 1.3, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "深信一旦在AGI技術上落後哪怕6個月，就將永久淪為二流附庸"},
+        {"id": "l5_demographic_cliff", "name": "以AI替代人口老齡的勝負手生死競速", "name_en": "Demographic Squeeze vs AI Deployment Sprint", "value": 76.0, "weight": 1.1, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "企圖以機器人集群填補人口真空，產生軍事冒險捷徑幻覺"},
+        {"id": "l5_economic_stagnation", "name": "消費內需因大失業斷崖式萎縮的崩潰預期", "name_en": "Consumer Demand Collapse Under Unemployment", "value": 75.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "機器人造出商品但大眾缺乏購買力，激起對外掠奪市場野心"},
+        {"id": "l5_tech_supremacy_fear", "name": "十年內喪失戰略技術霸權之先發打擊邏輯", "name_en": "Extreme Preventive Strike Imperative on Tech Superiority", "value": 94.0, "weight": 1.5, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "『在對手超級智慧成熟前必須實施物理摧毀』的預防性打擊論調公開進入戰略圈"},
+        {"id": "l5_miscalculation_risk", "name": "毫秒級自主作戰演算法引發閃電戰升級誤判", "name_en": "Millisecond Algorithmic Flash-War Escalation", "value": 88.0, "weight": 1.3, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "雙方防禦演算法自動回應交火，決策週期壓縮至幾分鐘內"},
+        {"id": "l5_leadership_time_horizon", "name": "政治領袖面臨廣泛社會憤怒與甩鍋對外衝動", "name_en": "Domestic Unrest Diversion by External Aggression", "value": 80.0, "weight": 1.0, "evidence_level": "illustrative", "source": "Scenario Simulation", "year": 2026, "note": "為平息國內失業者反抗，政府塑造強大外敵凝聚民粹支持"}
+      ]
+    }
+  },
+  "gate_buffers": [
+    {
+      "id": "gate_diplomatic_trust",
+      "name": "大國元首戰略熱線與外交互信管道（受深偽與網攻侵蝕）",
+      "name_en": "High-Level Diplomatic Hotlines & Deepfake Poisoning",
+      "value": 25.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "Scenario Simulation",
+      "year": 2026,
+      "note": "AI偽造影片與網路滲透重創外交溝通真實性，誤判率飆升"
+    },
+    {
+      "id": "gate_trade_interdependence",
+      "name": "全球高科技經貿相互依賴（算力與晶片全面脫鉤）",
+      "name_en": "Severed Tech Trade Interdependence",
+      "value": 32.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "Scenario Simulation",
+      "year": 2026,
+      "note": "技術貿易禁運擴大至基礎科學交流，經濟互賴大幅稀釋"
+    },
+    {
+      "id": "gate_international_institutions",
+      "name": "聯合國與多邊AI治理框架之實質約束力",
+      "name_en": "Multilateral AI Governance & Arms Control Treaties",
+      "value": 18.0,
+      "weight": 1.0,
+      "evidence_level": "illustrative",
+      "source": "Scenario Simulation",
+      "year": 2026,
+      "note": "各大國拒絕實質核查與限制軍事AI研發，多邊倡議淪為口號"
+    },
+    {
+      "id": "gate_nuclear_deterrence_stability",
+      "name": "相互保證毀滅 (MAD) 與防誤擊架構（受自主預警威脅）",
+      "name_en": "Strategic MAD Nuclear Deterrence Under Algorithmic Threat",
+      "value": 50.0,
+      "weight": 1.4,
+      "evidence_level": "illustrative",
+      "source": "Scenario Simulation",
+      "year": 2026,
+      "note": "AI自主化預警系統將核常界限模糊化，偶發意外風險增加"
+    }
+  ]
+}
