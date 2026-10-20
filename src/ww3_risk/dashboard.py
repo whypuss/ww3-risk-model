@@ -405,11 +405,206 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
         """)
     stage_tracker_html = "\n".join(stage_tracker_cards)
 
-    # Optional sections for Steps 2 to 5
+    # Initialize placeholder sections
     step2_html = ""
     step3_html = ""
     step4_html = ""
     step5_html = ""
+
+    # Step 2: Five Layers, Peace Gate, Interactions, Top Pushers & Structural Insights
+    if ui_step >= 2:
+        layer_meta = {
+            "L1": {"title": "L1: 生存／資源稀缺", "title_en": "Survival & Resource Scarcity", "desc": "糧食儲備、淡水枯竭、化石能源及關鍵礦物出口管制。"},
+            "L2": {"title": "L2: 分配失衡", "title_en": "Inequality & Distribution", "desc": "全球財富極化、前沿 AI 算力壟斷及戰略技術專利壁壘。"},
+            "L3": {"title": "L3: 工作／AI 取代", "title_en": "Labor & AI Displacement", "desc": "青年失業率、白領與藍領自動化焦慮及社會流動停滯。"},
+            "L4": {"title": "L4: 權力／安全困境", "title_en": "Power & Security Dilemma", "desc": "地緣陣營極化、軍費開支、熱點摩擦及經貿武器化。"},
+            "L5": {"title": "L5: 對未來的恐懼", "title_en": "Fear of Future & Preventive Logic", "desc": "霸權衰落焦慮、人口斷崖、技術喪失恐慌及預防性打擊邏輯。"},
+        }
+
+        layer_bars = []
+        for lid in ["L1", "L2", "L3", "L4", "L5"]:
+            sc = main["layer_scores"].get(lid, 0.0)
+            wt = main["layer_weights"].get(lid, 1.0)
+            meta = layer_meta[lid]
+            # Color based on score
+            if sc >= 85: bar_color = "var(--color-red)"
+            elif sc >= 70: bar_color = "var(--color-orange)"
+            elif sc >= 50: bar_color = "var(--color-yellow)"
+            else: bar_color = "var(--color-green)"
+
+            layer_bars.append(f"""
+            <div class="layer-row">
+              <div class="layer-info">
+                <div class="layer-name-wrap">
+                  <span class="layer-code">{lid}</span>
+                  <span class="layer-name">{meta['title']}</span>
+                  <span class="layer-en">{meta['title_en']}</span>
+                </div>
+                <div class="layer-val-wrap">
+                  <span class="layer-weight">權重 x{wt:.1f}</span>
+                  <span class="layer-score" style="color:{bar_color};">{sc:.1f}</span>
+                  <span class="layer-max">/100</span>
+                </div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: {sc}%; background: {bar_color};"></div>
+              </div>
+              <div class="layer-desc">{meta['desc']}</div>
+            </div>
+            """)
+        layers_html = "\n".join(layer_bars)
+
+        # Peace buffers items
+        buffers_rows = []
+        for b in main.get("top_peace_buffers", []):
+            cap = b["capacity"]
+            if cap >= 60: b_color = "var(--color-green)"
+            elif cap >= 40: b_color = "var(--color-yellow)"
+            else: b_color = "var(--color-red)"
+            buffers_rows.append(f"""
+            <div class="buffer-item">
+              <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px;">
+                <span style="color:#e2e8f0;font-weight:600;">{b['name']}</span>
+                <span style="font-family:var(--font-mono);color:{b_color};font-weight:700;">{cap:.1f} <span style="font-size:0.7rem;color:var(--text-dim);font-weight:400;">(權重 x{b['weight']:.1f})</span></span>
+              </div>
+              <div class="progress-track" style="height:6px;">
+                <div class="progress-fill" style="width:{cap}%;background:{b_color};"></div>
+              </div>
+            </div>
+            """)
+        buffers_html = "\n".join(buffers_rows)
+
+        # Top risk pushers rows
+        pusher_rows = []
+        for i, drv in enumerate(main.get("top_risk_drivers", [])[:3], 1):
+            pusher_rows.append(f"""
+            <div class="pusher-item">
+              <div class="pusher-badge">#0{i} · {drv['layer']}</div>
+              <div class="pusher-content">
+                <div class="pusher-title">{drv['name']}</div>
+                <div class="pusher-meta">指標ID: <code>{drv['id']}</code> · 權重 x{drv['weight']:.1f}</div>
+              </div>
+              <div class="pusher-val">{drv['value']:.1f}</div>
+            </div>
+            """)
+        pushers_html = "\n".join(pusher_rows)
+
+        step2_html = f"""
+    <!-- Section 2: Five Layers & Peace Gate & Insights (UI-Step 2) -->
+    <section class="grid-two-cols" style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:24px;margin-top:24px;">
+      <!-- Left Column: 5 Layers + Peace Gate -->
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        <!-- Five Structural Layers Card (Ref: 09 TradeX Dimension Balance) -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>五層結構維度平衡橫條 (Five Structural Dimensions)</span>
+            </div>
+            <span class="panel-tag">DIMENSION BALANCE · BASE WEIGHTED: {main['base_structural_score']:.1f}</span>
+          </div>
+          <div class="layers-container">
+            {layers_html}
+          </div>
+        </div>
+
+        <!-- Peace Mechanism Gate Breakdown (Ref: 08 SentinelX Wall) -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>和平機制閘門與緩衝器 (Peace Mechanism Gate &amp; Buffers)</span>
+            </div>
+            <span class="panel-tag">MULTIPLIER: x{main['gate_factor']:.3f} · CAPACITY: {main['peace_capacity']:.1f}/100</span>
+          </div>
+
+          <div class="gate-formula-banner">
+            <div class="gate-math">
+              <strong>閘門公式 (Non-Blackbox Gate Formula)：</strong><br>
+              <code>M_G = 1.4 - (PeaceCapacity / 100) × 0.8 = 1.4 - ({main['peace_capacity']:.1f}/100) × 0.8 = {main['gate_factor']:.3f}</code>
+            </div>
+            <p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;">
+              當和平容量達 100 時乘數為 0.6（最高阻尼 -40%）；當和平緩衝完全崩潰 (0) 時乘數達 1.4（最高放大 +40%）。目前機制失效度 <strong>{main['gate_failure']:.1f}%</strong>，對基礎風險產生淨放大效應。
+            </p>
+          </div>
+
+          <div style="margin-top:16px;">
+            <div style="font-size:0.75rem;font-weight:700;color:var(--text-dim);text-transform:uppercase;margin-bottom:10px;font-family:var(--font-mono);">
+              四大和平安全閥容量明細 (Peace Buffers Breakdown)
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              {buffers_html}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Interaction Terms + Top Risk Drivers Insights -->
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        <!-- Interactions Card -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>超線性互動效應加成 (Interaction Effects)</span>
+            </div>
+            <span class="panel-tag">TOTAL BONUS: +{main['interactions']['total']:.2f} / MAX 25.0</span>
+          </div>
+
+          <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:14px;">
+            單一維度未爆發時體系尚可承受，但當多個脆弱維度同步耦合時，將產生超線性（Super-linear）系統性共振加成。
+          </p>
+
+          <div class="interactions-list">
+            <div class="interaction-card">
+              <div class="inter-head">
+                <span class="inter-title">L1 × L2 資源短缺 × 分配不均</span>
+                <span class="inter-val">+{main['interactions']['L1_x_L2']:.2f}</span>
+              </div>
+              <div class="inter-desc">生存資源吃緊且極端集中於少數階層或陣營，引發內外部零和爭奪。</div>
+              <div class="inter-formula"><code>c=0.08 × (L1 × L2 / 100)</code></div>
+            </div>
+
+            <div class="interaction-card">
+              <div class="inter-head">
+                <span class="inter-title">L3 × L5 失業AI衝擊 × 未來恐懼</span>
+                <span class="inter-val">+{main['interactions']['L3_x_L5']:.2f}</span>
+              </div>
+              <div class="inter-desc">大規模認知自動化與青年階層失業，疊加對未來長期衰落的絕望感，催生極端民粹與對外冒險。</div>
+              <div class="inter-formula"><code>c=0.08 × (L3 × L5 / 100)</code></div>
+            </div>
+
+            <div class="interaction-card">
+              <div class="inter-head">
+                <span class="inter-title">L4 × 閘門 安全困境 × 機制失效</span>
+                <span class="inter-val">+{main['interactions']['L4_x_GateFailure']:.2f}</span>
+              </div>
+              <div class="inter-desc">同盟剛性與常規軍事升級，遇上外交互信與國際仲裁全面停擺，缺乏脫困煞車皮。</div>
+              <div class="inter-formula"><code>c=0.10 × (L4 × GateFail / 100)</code></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Pushers & Structural Insights (Ref: 08 SentinelX Insights) -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>主推高因素與結構洞察 (Key Risk Pushers &amp; Insights)</span>
+            </div>
+            <span class="panel-tag">CRITICAL OBSERVATIONS</span>
+          </div>
+
+          <div class="pushers-list">
+            {pushers_html}
+          </div>
+
+          <div class="insight-box" style="margin-top:16px;padding:12px;background:rgba(15, 23, 42, 0.6);border-left:3px solid var(--color-orange);border-radius:4px;">
+            <div style="font-size:0.8rem;font-weight:700;color:#fed7aa;margin-bottom:4px;">戰略防務分析員洞察：</div>
+            <p style="font-size:0.78rem;color:#cbd5e1;line-height:1.45;">
+              當前風險總分高達 <strong>{risk_score:.1f}</strong>（進入階段三），核心驅動並非單一傳統軍備競賽，而是<strong>「算力晶圓與技術壟斷 (82.0)」</strong>與<strong>「多點領土引信 (80.0)」</strong>相互鎖死。外交互信緩衝（僅 36.0）與多邊仲裁（28.0）極度孱弱，導致任何邊境摩擦或技術先發管制均極易跨越防火牆直接升級。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+        """
 
     # CSS styles
     css = """
@@ -759,6 +954,201 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
       font-size: 0.76rem;
       color: var(--accent-cyan);
       font-family: var(--font-mono);
+    }
+
+    /* Step 2: Five Layers & Dimension Bars */
+    .layers-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .layer-row {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .layer-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .layer-name-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .layer-code {
+      font-size: 0.75rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.1);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .layer-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .layer-en {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    .layer-val-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-family: var(--font-mono);
+    }
+    .layer-weight {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+    .layer-score {
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+    .layer-max {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.4s ease;
+    }
+    .layer-desc {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+
+    /* Gate Banner & Buffers */
+    .gate-formula-banner {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px dashed var(--border-bright);
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+    .gate-math {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+    }
+    .gate-math code {
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .buffer-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 10px 14px;
+    }
+
+    /* Interactions Cards */
+    .interactions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .interaction-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .inter-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .inter-title {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .inter-val {
+      font-size: 1rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--color-orange);
+    }
+    .inter-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .inter-formula {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    /* Top Pushers */
+    .pushers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .pusher-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .pusher-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--color-red);
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .pusher-content {
+      flex: 1;
+    }
+    .pusher-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #f8fafc;
+    }
+    .pusher-meta {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+    .pusher-val {
+      font-size: 1.15rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--color-red);
+    }
+
+    @media (max-width: 1024px) {
+      .grid-two-cols { grid-template-columns: 1fr !important; }
     }
 
     /* Footer */

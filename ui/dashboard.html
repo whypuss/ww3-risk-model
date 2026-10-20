@@ -353,6 +353,201 @@
       font-family: var(--font-mono);
     }
 
+    /* Step 2: Five Layers & Dimension Bars */
+    .layers-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .layer-row {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .layer-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .layer-name-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .layer-code {
+      font-size: 0.75rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.1);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .layer-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .layer-en {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    .layer-val-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-family: var(--font-mono);
+    }
+    .layer-weight {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+    .layer-score {
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+    .layer-max {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.4s ease;
+    }
+    .layer-desc {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+
+    /* Gate Banner & Buffers */
+    .gate-formula-banner {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px dashed var(--border-bright);
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+    .gate-math {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+    }
+    .gate-math code {
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .buffer-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 10px 14px;
+    }
+
+    /* Interactions Cards */
+    .interactions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .interaction-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .inter-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .inter-title {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .inter-val {
+      font-size: 1rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--color-orange);
+    }
+    .inter-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .inter-formula {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    /* Top Pushers */
+    .pushers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .pusher-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .pusher-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--color-red);
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .pusher-content {
+      flex: 1;
+    }
+    .pusher-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #f8fafc;
+    }
+    .pusher-meta {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+    .pusher-val {
+      font-size: 1.15rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--color-red);
+    }
+
+    @media (max-width: 1024px) {
+      .grid-two-cols { grid-template-columns: 1fr !important; }
+    }
+
     /* Footer */
     .dash-footer {
       max-width: 1380px;
@@ -378,7 +573,7 @@
       </div>
     </div>
     <div class="top-meta">
-      <span class="meta-badge badge-step">UI-STEP 1</span>
+      <span class="meta-badge badge-step">UI-STEP 2</span>
       <span class="meta-badge badge-alert">警戒級別：階段三：和平解決機制失效 (STAGE 3)</span>
       <span class="meta-badge badge-offline">● 100% 本地離線運行 (ZERO CDN)</span>
       <span style="font-family:var(--font-mono);color:var(--text-dim);">2026-10-20 · 2026 基準</span>
@@ -540,6 +735,292 @@
     </section>
 
     
+    <!-- Section 2: Five Layers & Peace Gate & Insights (UI-Step 2) -->
+    <section class="grid-two-cols" style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:24px;margin-top:24px;">
+      <!-- Left Column: 5 Layers + Peace Gate -->
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        <!-- Five Structural Layers Card (Ref: 09 TradeX Dimension Balance) -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>五層結構維度平衡橫條 (Five Structural Dimensions)</span>
+            </div>
+            <span class="panel-tag">DIMENSION BALANCE · BASE WEIGHTED: 69.3</span>
+          </div>
+          <div class="layers-container">
+            
+            <div class="layer-row">
+              <div class="layer-info">
+                <div class="layer-name-wrap">
+                  <span class="layer-code">L1</span>
+                  <span class="layer-name">L1: 生存／資源稀缺</span>
+                  <span class="layer-en">Survival & Resource Scarcity</span>
+                </div>
+                <div class="layer-val-wrap">
+                  <span class="layer-weight">權重 x1.0</span>
+                  <span class="layer-score" style="color:var(--color-yellow);">63.0</span>
+                  <span class="layer-max">/100</span>
+                </div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 63.01%; background: var(--color-yellow);"></div>
+              </div>
+              <div class="layer-desc">糧食儲備、淡水枯竭、化石能源及關鍵礦物出口管制。</div>
+            </div>
+            
+
+            <div class="layer-row">
+              <div class="layer-info">
+                <div class="layer-name-wrap">
+                  <span class="layer-code">L2</span>
+                  <span class="layer-name">L2: 分配失衡</span>
+                  <span class="layer-en">Inequality & Distribution</span>
+                </div>
+                <div class="layer-val-wrap">
+                  <span class="layer-weight">權重 x1.0</span>
+                  <span class="layer-score" style="color:var(--color-orange);">71.3</span>
+                  <span class="layer-max">/100</span>
+                </div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 71.32%; background: var(--color-orange);"></div>
+              </div>
+              <div class="layer-desc">全球財富極化、前沿 AI 算力壟斷及戰略技術專利壁壘。</div>
+            </div>
+            
+
+            <div class="layer-row">
+              <div class="layer-info">
+                <div class="layer-name-wrap">
+                  <span class="layer-code">L3</span>
+                  <span class="layer-name">L3: 工作／AI 取代</span>
+                  <span class="layer-en">Labor & AI Displacement</span>
+                </div>
+                <div class="layer-val-wrap">
+                  <span class="layer-weight">權重 x1.1</span>
+                  <span class="layer-score" style="color:var(--color-yellow);">64.9</span>
+                  <span class="layer-max">/100</span>
+                </div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 64.87%; background: var(--color-yellow);"></div>
+              </div>
+              <div class="layer-desc">青年失業率、白領與藍領自動化焦慮及社會流動停滯。</div>
+            </div>
+            
+
+            <div class="layer-row">
+              <div class="layer-info">
+                <div class="layer-name-wrap">
+                  <span class="layer-code">L4</span>
+                  <span class="layer-name">L4: 權力／安全困境</span>
+                  <span class="layer-en">Power & Security Dilemma</span>
+                </div>
+                <div class="layer-val-wrap">
+                  <span class="layer-weight">權重 x1.2</span>
+                  <span class="layer-score" style="color:var(--color-orange);">74.5</span>
+                  <span class="layer-max">/100</span>
+                </div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 74.47%; background: var(--color-orange);"></div>
+              </div>
+              <div class="layer-desc">地緣陣營極化、軍費開支、熱點摩擦及經貿武器化。</div>
+            </div>
+            
+
+            <div class="layer-row">
+              <div class="layer-info">
+                <div class="layer-name-wrap">
+                  <span class="layer-code">L5</span>
+                  <span class="layer-name">L5: 對未來的恐懼</span>
+                  <span class="layer-en">Fear of Future & Preventive Logic</span>
+                </div>
+                <div class="layer-val-wrap">
+                  <span class="layer-weight">權重 x1.1</span>
+                  <span class="layer-score" style="color:var(--color-orange);">71.9</span>
+                  <span class="layer-max">/100</span>
+                </div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 71.91%; background: var(--color-orange);"></div>
+              </div>
+              <div class="layer-desc">霸權衰落焦慮、人口斷崖、技術喪失恐慌及預防性打擊邏輯。</div>
+            </div>
+            
+          </div>
+        </div>
+
+        <!-- Peace Mechanism Gate Breakdown (Ref: 08 SentinelX Wall) -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>和平機制閘門與緩衝器 (Peace Mechanism Gate &amp; Buffers)</span>
+            </div>
+            <span class="panel-tag">MULTIPLIER: x1.041 · CAPACITY: 44.9/100</span>
+          </div>
+
+          <div class="gate-formula-banner">
+            <div class="gate-math">
+              <strong>閘門公式 (Non-Blackbox Gate Formula)：</strong><br>
+              <code>M_G = 1.4 - (PeaceCapacity / 100) × 0.8 = 1.4 - (44.9/100) × 0.8 = 1.041</code>
+            </div>
+            <p style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;">
+              當和平容量達 100 時乘數為 0.6（最高阻尼 -40%）；當和平緩衝完全崩潰 (0) 時乘數達 1.4（最高放大 +40%）。目前機制失效度 <strong>55.1%</strong>，對基礎風險產生淨放大效應。
+            </p>
+          </div>
+
+          <div style="margin-top:16px;">
+            <div style="font-size:0.75rem;font-weight:700;color:var(--text-dim);text-transform:uppercase;margin-bottom:10px;font-family:var(--font-mono);">
+              四大和平安全閥容量明細 (Peace Buffers Breakdown)
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              
+            <div class="buffer-item">
+              <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px;">
+                <span style="color:#e2e8f0;font-weight:600;">核恐怖平衡相互保證毀滅 (MAD) 與防誤擊架構</span>
+                <span style="font-family:var(--font-mono);color:var(--color-green);font-weight:700;">62.0 <span style="font-size:0.7rem;color:var(--text-dim);font-weight:400;">(權重 x1.4)</span></span>
+              </div>
+              <div class="progress-track" style="height:6px;">
+                <div class="progress-fill" style="width:62.0%;background:var(--color-green);"></div>
+              </div>
+            </div>
+            
+
+            <div class="buffer-item">
+              <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px;">
+                <span style="color:#e2e8f0;font-weight:600;">全球深度經貿相互依賴與脫鉤沉沒成本</span>
+                <span style="font-family:var(--font-mono);color:var(--color-yellow);font-weight:700;">48.0 <span style="font-size:0.7rem;color:var(--text-dim);font-weight:400;">(權重 x1.2)</span></span>
+              </div>
+              <div class="progress-track" style="height:6px;">
+                <div class="progress-fill" style="width:48.0%;background:var(--color-yellow);"></div>
+              </div>
+            </div>
+            
+
+            <div class="buffer-item">
+              <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px;">
+                <span style="color:#e2e8f0;font-weight:600;">大國元首戰略熱線與外交互信管道</span>
+                <span style="font-family:var(--font-mono);color:var(--color-red);font-weight:700;">36.0 <span style="font-size:0.7rem;color:var(--text-dim);font-weight:400;">(權重 x1.2)</span></span>
+              </div>
+              <div class="progress-track" style="height:6px;">
+                <div class="progress-fill" style="width:36.0%;background:var(--color-red);"></div>
+              </div>
+            </div>
+            
+
+            <div class="buffer-item">
+              <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:4px;">
+                <span style="color:#e2e8f0;font-weight:600;">聯合國與國際法多邊仲裁機制之執行力</span>
+                <span style="font-family:var(--font-mono);color:var(--color-red);font-weight:700;">28.0 <span style="font-size:0.7rem;color:var(--text-dim);font-weight:400;">(權重 x1.0)</span></span>
+              </div>
+              <div class="progress-track" style="height:6px;">
+                <div class="progress-fill" style="width:28.0%;background:var(--color-red);"></div>
+              </div>
+            </div>
+            
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Interaction Terms + Top Risk Drivers Insights -->
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        <!-- Interactions Card -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>超線性互動效應加成 (Interaction Effects)</span>
+            </div>
+            <span class="panel-tag">TOTAL BONUS: +11.43 / MAX 25.0</span>
+          </div>
+
+          <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:14px;">
+            單一維度未爆發時體系尚可承受，但當多個脆弱維度同步耦合時，將產生超線性（Super-linear）系統性共振加成。
+          </p>
+
+          <div class="interactions-list">
+            <div class="interaction-card">
+              <div class="inter-head">
+                <span class="inter-title">L1 × L2 資源短缺 × 分配不均</span>
+                <span class="inter-val">+3.60</span>
+              </div>
+              <div class="inter-desc">生存資源吃緊且極端集中於少數階層或陣營，引發內外部零和爭奪。</div>
+              <div class="inter-formula"><code>c=0.08 × (L1 × L2 / 100)</code></div>
+            </div>
+
+            <div class="interaction-card">
+              <div class="inter-head">
+                <span class="inter-title">L3 × L5 失業AI衝擊 × 未來恐懼</span>
+                <span class="inter-val">+3.73</span>
+              </div>
+              <div class="inter-desc">大規模認知自動化與青年階層失業，疊加對未來長期衰落的絕望感，催生極端民粹與對外冒險。</div>
+              <div class="inter-formula"><code>c=0.08 × (L3 × L5 / 100)</code></div>
+            </div>
+
+            <div class="interaction-card">
+              <div class="inter-head">
+                <span class="inter-title">L4 × 閘門 安全困境 × 機制失效</span>
+                <span class="inter-val">+4.10</span>
+              </div>
+              <div class="inter-desc">同盟剛性與常規軍事升級，遇上外交互信與國際仲裁全面停擺，缺乏脫困煞車皮。</div>
+              <div class="inter-formula"><code>c=0.10 × (L4 × GateFail / 100)</code></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Pushers & Structural Insights (Ref: 08 SentinelX Insights) -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>主推高因素與結構洞察 (Key Risk Pushers &amp; Insights)</span>
+            </div>
+            <span class="panel-tag">CRITICAL OBSERVATIONS</span>
+          </div>
+
+          <div class="pushers-list">
+            
+            <div class="pusher-item">
+              <div class="pusher-badge">#01 · L2</div>
+              <div class="pusher-content">
+                <div class="pusher-title">前沿 AI 算力與先進晶圓代工極端壟斷</div>
+                <div class="pusher-meta">指標ID: <code>l2_compute_monopoly</code> · 權重 x1.4</div>
+              </div>
+              <div class="pusher-val">82.0</div>
+            </div>
+            
+
+            <div class="pusher-item">
+              <div class="pusher-badge">#02 · L4</div>
+              <div class="pusher-content">
+                <div class="pusher-title">高危熱點主權與領土引信點摩擦頻度</div>
+                <div class="pusher-meta">指標ID: <code>l4_territorial_flashpoints</code> · 權重 x1.4</div>
+              </div>
+              <div class="pusher-val">80.0</div>
+            </div>
+            
+
+            <div class="pusher-item">
+              <div class="pusher-badge">#03 · L4</div>
+              <div class="pusher-content">
+                <div class="pusher-title">全球地緣政治陣營極化與同盟剛性</div>
+                <div class="pusher-meta">指標ID: <code>l4_bloc_polarization</code> · 權重 x1.3</div>
+              </div>
+              <div class="pusher-val">78.0</div>
+            </div>
+            
+          </div>
+
+          <div class="insight-box" style="margin-top:16px;padding:12px;background:rgba(15, 23, 42, 0.6);border-left:3px solid var(--color-orange);border-radius:4px;">
+            <div style="font-size:0.8rem;font-weight:700;color:#fed7aa;margin-bottom:4px;">戰略防務分析員洞察：</div>
+            <p style="font-size:0.78rem;color:#cbd5e1;line-height:1.45;">
+              當前風險總分高達 <strong>83.1</strong>（進入階段三），核心驅動並非單一傳統軍備競賽，而是<strong>「算力晶圓與技術壟斷 (82.0)」</strong>與<strong>「多點領土引信 (80.0)」</strong>相互鎖死。外交互信緩衝（僅 36.0）與多邊仲裁（28.0）極度孱弱，導致任何邊境摩擦或技術先發管制均極易跨越防火牆直接升級。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+        
     
     
     
