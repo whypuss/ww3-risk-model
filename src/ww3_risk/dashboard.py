@@ -843,6 +843,203 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
     </section>
         """
 
+    # Step 5: Historical Timeline, Full Indicators Breakdown Table, Unconnected Sources & Methodology
+    if ui_step >= 5:
+        # 1. Historical Cases Cards
+        hist_cards = []
+        for h in data.get("historical", []):
+            h_sc = h["global_risk_index"]
+            if h_sc >= 85: h_color = "var(--color-red)"
+            elif h_sc >= 70: h_color = "var(--color-orange)"
+            elif h_sc >= 50: h_color = "var(--color-yellow)"
+            else: h_color = "var(--color-green)"
+
+            hist_cards.append(f"""
+            <div class="hist-card">
+              <div class="hist-head">
+                <span class="hist-year">{h['year']}</span>
+                <span class="hist-stage">STAGE {h['stage_number']} · {h['stage_title']}</span>
+              </div>
+              <div class="hist-title">{h['title']}</div>
+              <div class="hist-score-wrap">
+                <span class="hist-score" style="color:{h_color};">{h_sc:.1f}</span>
+                <span class="hist-max">/100 · 閘門 x{h['gate_factor']:.3f} · 和平容量 {h['peace_capacity']:.1f}</span>
+              </div>
+              <div class="progress-track" style="margin: 8px 0;">
+                <div class="progress-fill" style="width:{h_sc}%; background:{h_color};"></div>
+              </div>
+              <div class="hist-desc">{h['notes']}</div>
+            </div>
+            """)
+        historical_html = "\n".join(hist_cards)
+
+        # 2. Comprehensive Indicators Rows (L1-L5 + Gate Buffers = 34 indicators)
+        indicator_rows = []
+        combined_indicators = data.get("indicators", []) + data.get("gate_buffers", [])
+        for ind in combined_indicators:
+            ev_lvl = ind.get("evidence_level", "illustrative")
+            if ev_lvl == "verified":
+                ev_badge = '<span class="ev-badge ev-verified">VERIFIED · 實測驗證</span>'
+            elif ev_lvl == "inference":
+                ev_badge = '<span class="ev-badge ev-inference">INFERENCE · 統計推算</span>'
+            else:
+                ev_badge = '<span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span>'
+
+            v = ind["value"]
+            if v >= 85: v_color = "var(--color-red)"
+            elif v >= 70: v_color = "var(--color-orange)"
+            elif v >= 50: v_color = "var(--color-yellow)"
+            else: v_color = "var(--color-green)"
+
+            indicator_rows.append(f"""
+            <tr class="ind-row" data-layer="{ind['layer']}" data-search="{ind['id']} {ind['name']} {ind['source']}">
+              <td><span class="layer-code">{ind['layer']}</span></td>
+              <td><code>{ind['id']}</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">{ind['name']}</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">{ind.get('name_en', '')}</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:{v_color};width:38px;">{v:.1f}</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:{v}%;background:{v_color};"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x{ind['weight']:.1f}</td>
+              <td>{ev_badge}</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">{ind['source']} ({ind['year']})</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">{ind['note']}</td>
+            </tr>
+            """)
+        indicators_table_body = "\n".join(indicator_rows)
+
+        # 3. Unconnected Data Sources Cards
+        unc_cards = []
+        for src in data.get("unconnected_sources", []):
+            targets_str = " · ".join(src["target_regions"])
+            unc_cards.append(f"""
+            <div class="unc-card">
+              <div class="unc-head">
+                <span class="unc-name">{src['name']}</span>
+                <span class="unc-badge">[未接數據源 · V1 STUB]</span>
+              </div>
+              <div class="unc-en">{src['name_en']}</div>
+              <div class="unc-specs">
+                <div>頻率：<code>{src['expected_cadence']}</code></div>
+                <div>協議：<code>{src['protocol']}</code></div>
+                <div>目標：<span>{targets_str}</span></div>
+              </div>
+              <p class="unc-desc">{src['description']}</p>
+            </div>
+            """)
+        unconnected_html = "\n".join(unc_cards)
+
+        step5_html = f"""
+    <!-- Section 5: Historical Backtesting Timeline (UI-Step 5) -->
+    <section class="panel-card" style="margin-top:24px;">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>歷史重大危機回測時間線 (Historical Crisis Backtesting Timeline)</span>
+        </div>
+        <span class="panel-tag">1913 / 1938 / 1962 / 1990 / 2025 BENCHMARKING</span>
+      </div>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:16px;">
+        將同一套五層結構公式與和平閘門應用於 20 世紀至今五大標誌性危機節點。歷史排序驗證：1938年二戰前夕 (99.6) &gt; 1913年一戰前夕 (96.1) &gt; 2025年當代前夕 (81.0) &gt; 1962年古巴危機 (77.4) &gt; 1990年冷戰終結 (23.4)。
+      </p>
+      <div class="history-grid">
+        {historical_html}
+      </div>
+    </section>
+
+    <!-- Section 6: Comprehensive Indicators Breakdown Table (UI-Step 5) -->
+    <section class="panel-card" style="margin-top:24px;">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>模型底層全量指標明細表 (Comprehensive Indicator Inventory)</span>
+        </div>
+        <span class="panel-tag">34 INDICATORS · 3-TIER EVIDENCE TRANSPARENCY</span>
+      </div>
+      
+      <!-- Table Controls -->
+      <div class="table-controls">
+        <div class="filter-group">
+          <button class="filter-btn active" onclick="filterTable('ALL', this)">全部 (ALL 34)</button>
+          <button class="filter-btn" onclick="filterTable('L1', this)">L1 生存資源</button>
+          <button class="filter-btn" onclick="filterTable('L2', this)">L2 分配失衡</button>
+          <button class="filter-btn" onclick="filterTable('L3', this)">L3 工作與AI</button>
+          <button class="filter-btn" onclick="filterTable('L4', this)">L4 安全困境</button>
+          <button class="filter-btn" onclick="filterTable('L5', this)">L5 未來恐懼</button>
+          <button class="filter-btn" onclick="filterTable('GATE', this)">GATE 和平閘門</button>
+        </div>
+        <div class="search-box-wrap">
+          <input type="text" id="ind-search" class="search-input" placeholder="搜尋指標代碼、名稱或來源出處..." oninput="searchTable()">
+        </div>
+      </div>
+
+      <div class="table-responsive" style="margin-top:14px;overflow-x:auto;">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th style="width:50px;">層級</th>
+              <th style="width:170px;">指標代碼</th>
+              <th>指標名稱與英文定義</th>
+              <th style="width:130px;">當前取值</th>
+              <th style="width:60px;">權重</th>
+              <th style="width:140px;">證據級別</th>
+              <th style="width:200px;">權威出處與期數</th>
+              <th style="width:280px;">結構背景說明</th>
+            </tr>
+          </thead>
+          <tbody id="indicators-tbody">
+            {indicators_table_body}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 7: Unconnected Data Sources Stubs (UI-Step 5) -->
+    <section class="panel-card" style="margin-top:24px;">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>即時感知信號源接入佔位 (Live Sensor Feeds &amp; Telemetry Stubs)</span>
+        </div>
+        <span class="panel-tag">STRICTLY LABELED AS UNCONNECTED · ZERO FAKE TELEMETRY</span>
+      </div>
+      <div style="background:rgba(239, 68, 68, 0.08);border:1px solid rgba(239, 68, 68, 0.25);border-radius:6px;padding:8px 12px;margin-bottom:16px;font-size:0.76rem;color:#fca5a5;">
+        <strong>嚴肅聲明：</strong>以下 5 大即時遙測源在 v1 靜態版本中<strong>全部標記為「未接數據源」</strong>佔位預留。本系統為純純離線靜態儀表板，嚴格不偽造任何虛假即時動態、模擬雷達或冒充即時新聞。
+      </div>
+      <div class="unconnected-grid">
+        {unconnected_html}
+      </div>
+    </section>
+
+    <!-- Section 8: Methodology & Disclaimer Footer Card (UI-Step 5) -->
+    <section class="panel-card" style="margin-top:24px;border-color:var(--border-bright);">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>方法學邊界與免責聲明 (Methodology &amp; Disclaimers)</span>
+        </div>
+        <span class="panel-tag">SCENARIO EVALUATION · NOT TACTICAL PREDICTION</span>
+      </div>
+      <div class="methodology-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:0.78rem;color:var(--text-muted);line-height:1.5;">
+        <div>
+          <h4 style="color:#f8fafc;margin-bottom:6px;">一、模型定位與局限性</h4>
+          <p>
+            本模型旨在評估國際體系是否滑入<strong>「四階段危機」</strong>之總體結構壓力，重點在於揭示「生存資源、分配不均、AI取代、安全困境、未來恐懼」五層因子之超線性耦合共振，以及和平緩衝安全閥之有效性。本模型<strong>非戰術預警系統</strong>，無法預測具體引信事件觸發的精確日期與作戰細節。
+          </p>
+        </div>
+        <div>
+          <h4 style="color:#f8fafc;margin-bottom:6px;">二、三級數據透明度標準</h4>
+          <p>
+            所有指標嚴格區分 <code>verified</code>（客觀實測來源）、<code>inference</code>（多方數據統計推算）與 <code>illustrative</code>（情境示範性假說）。情境概率帶為結構壓力函數之 Logistic 映射估算，非頻率學派或已驗證之統計預測，讀者切勿將其直接作為金融投機或不可逆防務決策之唯一依據。
+          </p>
+        </div>
+      </div>
+    </section>
+        """
+
     # CSS styles
     css = """
     :root {
@@ -1797,6 +1994,226 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
       color: var(--accent-cyan);
     }
 
+    /* Step 5: Historical Timeline */
+    .history-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 1200px) {
+      .history-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .history-grid { grid-template-columns: 1fr; }
+    }
+    .hist-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .hist-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .hist-year {
+      font-size: 1.1rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: #fff;
+    }
+    .hist-stage {
+      font-size: 0.68rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+    }
+    .hist-title {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      line-height: 1.35;
+      min-height: 2.3rem;
+    }
+    .hist-score-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .hist-score {
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+    }
+    .hist-max {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+    .hist-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    /* Table Styles */
+    .table-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .filter-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover {
+      border-color: var(--border-bright);
+      color: #fff;
+    }
+    .filter-btn.active {
+      background: rgba(6, 182, 212, 0.15);
+      border-color: var(--accent-cyan);
+      color: #67e8f9;
+    }
+    .search-box-wrap {
+      flex: 1;
+      max-width: 320px;
+    }
+    .search-input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      color: #fff;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: var(--accent-cyan);
+    }
+    .styled-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.76rem;
+      text-align: left;
+    }
+    .styled-table th {
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-dim);
+      font-weight: 700;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      white-space: nowrap;
+    }
+    .styled-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: top;
+    }
+    .styled-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .styled-table code {
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+    .ev-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+    .ev-verified { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid var(--color-green); }
+    .ev-inference { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid var(--accent-blue); }
+    .ev-illustrative { background: rgba(234, 179, 8, 0.15); color: #fef08a; border: 1px solid var(--color-yellow); }
+
+    /* Unconnected Stubs */
+    .unconnected-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+    .unc-card {
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-bright);
+      border-radius: 6px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .unc-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .unc-name {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .unc-badge {
+      font-size: 0.65rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.15);
+      padding: 2px 5px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+    .unc-en {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+    }
+    .unc-specs {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin: 4px 0;
+    }
+    .unc-specs code {
+      color: var(--accent-cyan);
+    }
+    .unc-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
     /* Footer */
     .dash-footer {
       max-width: 1380px;
@@ -2024,6 +2441,36 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
         if (el) el.value = val;
       }
       runSimulation();
+    }
+
+    // Step 5: Filter Table by Layer
+    function filterTable(layerCode, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      const rows = document.querySelectorAll('.ind-row');
+      rows.forEach(r => {
+        const l = r.getAttribute('data-layer');
+        if (layerCode === 'ALL' || l === layerCode) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      });
+    }
+
+    // Step 5: Search Table by Text
+    function searchTable() {
+      const q = (document.getElementById('ind-search')?.value || '').toLowerCase().trim();
+      const rows = document.querySelectorAll('.ind-row');
+      rows.forEach(r => {
+        const text = (r.getAttribute('data-search') || '').toLowerCase();
+        if (!q || text.includes(q)) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      });
     }
     """
 

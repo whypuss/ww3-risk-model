@@ -185,7 +185,7 @@ pip install -e .    # 可選：安裝為本地 CLI 工具
 ```bash
 python3 -m pytest -q
 ```
-*預期輸出：21 passed in 0.08s（全綠）*
+*預期輸出：24 passed in 0.15s（全綠）*
 
 ### 3. 單一情境評估
 ```bash
@@ -204,6 +204,20 @@ python3 -m ww3_risk.cli --compare scenarios/*.json
 ### 5. 歷史案例回測排行
 ```bash
 python3 -m ww3_risk.cli --historical data/historical_cases.json
+```
+
+### 6. 生成與查看純靜態 Dashboard 儀表板 (Zero CDN / 100% 離線)
+```bash
+# 方式一：經由 CLI 生成儀表板
+python3 -m ww3_risk.cli --scenario scenarios/baseline_2026.json --dashboard ui/dashboard.html
+
+# 方式二：直接運行 dashboard 模組
+python3 -m ww3_risk.dashboard --scenario scenarios/baseline_2026.json --output ui/dashboard.html
+
+# 開啟儀表板：
+# 由於為純原生 HTML/CSS/JS 且內嵌模型實時數據（零外部框架、零 CDN），可直接用瀏覽器離線開啟本地文件：
+xdg-open ui/dashboard.html
+# 或在瀏覽器地址列直接開啟：file:///home/hatch/workspace/ww3-risk-model/ui/dashboard.html
 ```
 
 ---

@@ -957,6 +957,226 @@
       color: var(--accent-cyan);
     }
 
+    /* Step 5: Historical Timeline */
+    .history-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 1200px) {
+      .history-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .history-grid { grid-template-columns: 1fr; }
+    }
+    .hist-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .hist-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .hist-year {
+      font-size: 1.1rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: #fff;
+    }
+    .hist-stage {
+      font-size: 0.68rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+    }
+    .hist-title {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      line-height: 1.35;
+      min-height: 2.3rem;
+    }
+    .hist-score-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .hist-score {
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+    }
+    .hist-max {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+    .hist-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    /* Table Styles */
+    .table-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .filter-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover {
+      border-color: var(--border-bright);
+      color: #fff;
+    }
+    .filter-btn.active {
+      background: rgba(6, 182, 212, 0.15);
+      border-color: var(--accent-cyan);
+      color: #67e8f9;
+    }
+    .search-box-wrap {
+      flex: 1;
+      max-width: 320px;
+    }
+    .search-input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      color: #fff;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: var(--accent-cyan);
+    }
+    .styled-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.76rem;
+      text-align: left;
+    }
+    .styled-table th {
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-dim);
+      font-weight: 700;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      white-space: nowrap;
+    }
+    .styled-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: top;
+    }
+    .styled-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .styled-table code {
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+    .ev-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+    .ev-verified { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid var(--color-green); }
+    .ev-inference { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid var(--accent-blue); }
+    .ev-illustrative { background: rgba(234, 179, 8, 0.15); color: #fef08a; border: 1px solid var(--color-yellow); }
+
+    /* Unconnected Stubs */
+    .unconnected-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+    .unc-card {
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-bright);
+      border-radius: 6px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .unc-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .unc-name {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .unc-badge {
+      font-size: 0.65rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.15);
+      padding: 2px 5px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+    .unc-en {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+    }
+    .unc-specs {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin: 4px 0;
+    }
+    .unc-specs code {
+      color: var(--accent-cyan);
+    }
+    .unc-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
     /* Footer */
     .dash-footer {
       max-width: 1380px;
@@ -982,7 +1202,7 @@
       </div>
     </div>
     <div class="top-meta">
-      <span class="meta-badge badge-step">UI-STEP 4</span>
+      <span class="meta-badge badge-step">UI-STEP 5</span>
       <span class="meta-badge badge-alert">警戒級別：階段三：和平解決機制失效 (STAGE 3)</span>
       <span class="meta-badge badge-offline">● 100% 本地離線運行 (ZERO CDN)</span>
       <span style="font-family:var(--font-mono);color:var(--text-dim);">2026-10-20 · 2026 基準</span>
@@ -1925,6 +2145,1013 @@
     </section>
         
     
+    <!-- Section 5: Historical Backtesting Timeline (UI-Step 5) -->
+    <section class="panel-card" style="margin-top:24px;">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>歷史重大危機回測時間線 (Historical Crisis Backtesting Timeline)</span>
+        </div>
+        <span class="panel-tag">1913 / 1938 / 1962 / 1990 / 2025 BENCHMARKING</span>
+      </div>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:16px;">
+        將同一套五層結構公式與和平閘門應用於 20 世紀至今五大標誌性危機節點。歷史排序驗證：1938年二戰前夕 (99.6) &gt; 1913年一戰前夕 (96.1) &gt; 2025年當代前夕 (81.0) &gt; 1962年古巴危機 (77.4) &gt; 1990年冷戰終結 (23.4)。
+      </p>
+      <div class="history-grid">
+        
+            <div class="hist-card">
+              <div class="hist-head">
+                <span class="hist-year">1913</span>
+                <span class="hist-stage">STAGE 4 · 階段四：暴力成為被接受選項</span>
+              </div>
+              <div class="hist-title">1913年 一戰前夕（帝國爭霸與同盟剛性）</div>
+              <div class="hist-score-wrap">
+                <span class="hist-score" style="color:var(--color-red);">96.1</span>
+                <span class="hist-max">/100 · 閘門 x1.198 · 和平容量 25.2</span>
+              </div>
+              <div class="progress-track" style="margin: 8px 0;">
+                <div class="progress-fill" style="width:96.1%; background:var(--color-red);"></div>
+              </div>
+              <div class="hist-desc">巴爾幹危機、英德無畏艦造艦競賽、施里芬計劃動員倒計時，以及德國對俄國軍事現代化於1917年完成之預防性開戰恐懼</div>
+            </div>
+            
+
+            <div class="hist-card">
+              <div class="hist-head">
+                <span class="hist-year">1938</span>
+                <span class="hist-stage">STAGE 4 · 階段四：暴力成為被接受選項</span>
+              </div>
+              <div class="hist-title">1938年 二戰前夕（大蕭條潰敗、法西斯擴張與國聯崩塌）</div>
+              <div class="hist-score-wrap">
+                <span class="hist-score" style="color:var(--color-red);">99.6</span>
+                <span class="hist-max">/100 · 閘門 x1.338 · 和平容量 7.8</span>
+              </div>
+              <div class="progress-track" style="margin: 8px 0;">
+                <div class="progress-fill" style="width:99.6%; background:var(--color-red);"></div>
+              </div>
+              <div class="hist-desc">慕尼黑協定、德奧合併、日本全面侵華、大蕭條後全球貿易自給自足塊狀化、國聯徹底癱瘓，法西斯極權之生存空間意識形態全面抬頭</div>
+            </div>
+            
+
+            <div class="hist-card">
+              <div class="hist-head">
+                <span class="hist-year">1962</span>
+                <span class="hist-stage">STAGE 3 · 階段三：和平解決機制失效</span>
+              </div>
+              <div class="hist-title">1962年 古巴導彈危機（核邊緣政策與近失案例）</div>
+              <div class="hist-score-wrap">
+                <span class="hist-score" style="color:var(--color-orange);">77.4</span>
+                <span class="hist-max">/100 · 閘門 x1.000 · 和平容量 50.0</span>
+              </div>
+              <div class="progress-track" style="margin: 8px 0;">
+                <div class="progress-fill" style="width:77.4%; background:var(--color-orange);"></div>
+              </div>
+              <div class="hist-desc">蘇聯秘密向古巴部署MRBM/IRBM核導彈、美軍實施海上隔離檢疫、U-2偵察機被擊落、B-59潛艇差點發射核魚雷；但最終憑藉秘密外交管道與核末日畏懼避免全面毀滅</div>
+            </div>
+            
+
+            <div class="hist-card">
+              <div class="hist-head">
+                <span class="hist-year">1990</span>
+                <span class="hist-stage">STAGE 1 · 階段一：結構壓力形成</span>
+              </div>
+              <div class="hist-title">1990年 冷戰終結（柏林牆倒塌、大和解與新世界秩序）</div>
+              <div class="hist-score-wrap">
+                <span class="hist-score" style="color:var(--color-green);">23.4</span>
+                <span class="hist-max">/100 · 閘門 x0.735 · 和平容量 83.1</span>
+              </div>
+              <div class="progress-track" style="margin: 8px 0;">
+                <div class="progress-fill" style="width:23.4%; background:var(--color-green);"></div>
+              </div>
+              <div class="hist-desc">東歐劇變、兩德統一、美蘇簽署削減戰略武器條約 (START)、巴黎新歐洲憲章、波灣危機多邊安理會聯合授權，全球和平機制處於歷史峰值</div>
+            </div>
+            
+
+            <div class="hist-card">
+              <div class="hist-head">
+                <span class="hist-year">2025</span>
+                <span class="hist-stage">STAGE 3 · 階段三：和平解決機制失效</span>
+              </div>
+              <div class="hist-title">2025年 當代前夕（烏克蘭戰事延宕、多極重組與中東外溢）</div>
+              <div class="hist-score-wrap">
+                <span class="hist-score" style="color:var(--color-orange);">81.0</span>
+                <span class="hist-max">/100 · 閘門 x1.014 · 和平容量 48.2</span>
+              </div>
+              <div class="progress-track" style="margin: 8px 0;">
+                <div class="progress-fill" style="width:81.0%; background:var(--color-orange);"></div>
+              </div>
+              <div class="hist-desc">烏克蘭陣地戰長期化、加薩-黎巴嫩-紅海危機外溢、中美晶片禁運升級、全球國防預算激增，但中美高層軍事熱線部分恢復</div>
+            </div>
+            
+      </div>
+    </section>
+
+    <!-- Section 6: Comprehensive Indicators Breakdown Table (UI-Step 5) -->
+    <section class="panel-card" style="margin-top:24px;">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>模型底層全量指標明細表 (Comprehensive Indicator Inventory)</span>
+        </div>
+        <span class="panel-tag">34 INDICATORS · 3-TIER EVIDENCE TRANSPARENCY</span>
+      </div>
+      
+      <!-- Table Controls -->
+      <div class="table-controls">
+        <div class="filter-group">
+          <button class="filter-btn active" onclick="filterTable('ALL', this)">全部 (ALL 34)</button>
+          <button class="filter-btn" onclick="filterTable('L1', this)">L1 生存資源</button>
+          <button class="filter-btn" onclick="filterTable('L2', this)">L2 分配失衡</button>
+          <button class="filter-btn" onclick="filterTable('L3', this)">L3 工作與AI</button>
+          <button class="filter-btn" onclick="filterTable('L4', this)">L4 安全困境</button>
+          <button class="filter-btn" onclick="filterTable('L5', this)">L5 未來恐懼</button>
+          <button class="filter-btn" onclick="filterTable('GATE', this)">GATE 和平閘門</button>
+        </div>
+        <div class="search-box-wrap">
+          <input type="text" id="ind-search" class="search-input" placeholder="搜尋指標代碼、名稱或來源出處..." oninput="searchTable()">
+        </div>
+      </div>
+
+      <div class="table-responsive" style="margin-top:14px;overflow-x:auto;">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th style="width:50px;">層級</th>
+              <th style="width:170px;">指標代碼</th>
+              <th>指標名稱與英文定義</th>
+              <th style="width:130px;">當前取值</th>
+              <th style="width:60px;">權重</th>
+              <th style="width:140px;">證據級別</th>
+              <th style="width:200px;">權威出處與期數</th>
+              <th style="width:280px;">結構背景說明</th>
+            </tr>
+          </thead>
+          <tbody id="indicators-tbody">
+            
+            <tr class="ind-row" data-layer="L1" data-search="l1_food_security 全球糧食儲備與主糧庫存消費比 FAO Cereal Supply and Demand Brief 2025/2026 (illustrative baseline)">
+              <td><span class="layer-code">L1</span></td>
+              <td><code>l1_food_security</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">全球糧食儲備與主糧庫存消費比</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Global Grain Stock-to-Use & Food Insecurity</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">52.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:52.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.0</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">FAO Cereal Supply and Demand Brief 2025/2026 (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">極端氣候引致多國小麥、水稻產區減產，主糧儲備低於十年均線</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L1" data-search="l1_water_stress 跨界流域水資源壓力與枯竭指數 WRI Aqueduct Water Risk Atlas (illustrative baseline)">
+              <td><span class="layer-code">L1</span></td>
+              <td><code>l1_water_stress</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">跨界流域水資源壓力與枯竭指數</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Transboundary Freshwater Stress & Depletion</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">58.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:58.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.0</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">WRI Aqueduct Water Risk Atlas (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">中東、南亞及中亞跨界水壩與冰川消融加劇上下游地緣緊張</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L1" data-search="l1_energy_vulnerability 化石能源與電網供應鏈脆弱性 IEA World Energy Outlook 2025 (illustrative baseline)">
+              <td><span class="layer-code">L1</span></td>
+              <td><code>l1_energy_vulnerability</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">化石能源與電網供應鏈脆弱性</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Energy Supply Vulnerability & Grid Stress</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">60.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:60.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.2</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">IEA World Energy Outlook 2025 (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">烏克蘭與中東戰事外溢致航道運費波動，電網面臨AI算力用電暴增之負荷</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L1" data-search="l1_critical_minerals 關鍵礦物與稀土出口管制集中度 USGS Mineral Commodity Summaries (illustrative baseline)">
+              <td><span class="layer-code">L1</span></td>
+              <td><code>l1_critical_minerals</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">關鍵礦物與稀土出口管制集中度</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Critical Minerals & Rare Earth Export Restrictions</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-orange);width:38px;">72.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:72.0%;background:var(--color-orange);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.3</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">USGS Mineral Commodity Summaries (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">鎵、鍺、銻、鋰、鈷受出口許可證與關稅圍堵，供應鏈替代週期長達數年</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L1" data-search="l1_climate_impact 氣候極端衝擊對核心農業基礎設施破壞 WMO State of the Global Climate (illustrative baseline)">
+              <td><span class="layer-code">L1</span></td>
+              <td><code>l1_climate_impact</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">氣候極端衝擊對核心農業基礎設施破壞</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Extreme Climate Shocks to Agricultural Infrastructure</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">65.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:65.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.0</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">WMO State of the Global Climate (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">厄爾尼諾/拉尼娜震盪推高旱澇頻次，港口與農地受損加劇</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L1" data-search="l1_maritime_chokepoints 全球戰略咽喉海運水道通行風險 UNCTAD Maritime Transport Review (illustrative baseline)">
+              <td><span class="layer-code">L1</span></td>
+              <td><code>l1_maritime_chokepoints</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">全球戰略咽喉海運水道通行風險</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Maritime Chokepoint Disruption (Red Sea, Hormuz, Malacca)</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">68.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:68.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.2</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">UNCTAD Maritime Transport Review (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">紅海襲擊持續、霍爾木茲與馬六甲海峽受無人機與水雷非對稱威脅</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L2" data-search="l2_wealth_gini 全球前 1% 財富佔有率與階層差距 World Inequality Report 2026 (illustrative baseline)">
+              <td><span class="layer-code">L2</span></td>
+              <td><code>l2_wealth_gini</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">全球前 1% 財富佔有率與階層差距</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Top 1% Wealth Share & Economic Inequality</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-orange);width:38px;">74.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:74.0%;background:var(--color-orange);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.2</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">World Inequality Report 2026 (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">資產升值大幅超越勞動報酬，主要大國基尼係數維持歷史高位</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L2" data-search="l2_compute_monopoly 前沿 AI 算力與先進晶圓代工極端壟斷 SemiAnalysis / Epoch AI hardware tracker (illustrative baseline)">
+              <td><span class="layer-code">L2</span></td>
+              <td><code>l2_compute_monopoly</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">前沿 AI 算力與先進晶圓代工極端壟斷</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Frontier AI Compute & Foundry Monopolization</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-orange);width:38px;">82.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:82.0%;background:var(--color-orange);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.4</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">SemiAnalysis / Epoch AI hardware tracker (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">頂級訓練叢集高度集中於少數跨國巨頭與單一島嶼先進製程，國家間差距急速拉大</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L2" data-search="l2_land_housing_concentration 土地與關鍵民生資本壟斷化指數 OECD Housing Indicators (illustrative baseline)">
+              <td><span class="layer-code">L2</span></td>
+              <td><code>l2_land_housing_concentration</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">土地與關鍵民生資本壟斷化指數</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Land & Essential Living Capital Concentration</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">68.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:68.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.0</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">OECD Housing Indicators (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">跨國機構與富裕階層吸納都會區優質資產，普通家庭資本積累阻斷</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L2" data-search="l2_social_mobility 代際社會流動停滯與向下沉淪感知 World Economic Forum Social Mobility Index (illustrative baseline)">
+              <td><span class="layer-code">L2</span></td>
+              <td><code>l2_social_mobility</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">代際社會流動停滯與向下沉淪感知</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Intergenerational Mobility Stagnation & Despair</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-orange);width:38px;">70.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:70.0%;background:var(--color-orange);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.1</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">World Economic Forum Social Mobility Index (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">教育投資回報率下滑，年輕一代深感生活水準難以超越父輩</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L2" data-search="l2_institutional_fairness 制度公平感衰落與建制派信任赤字 Edelman Trust Barometer (illustrative baseline)">
+              <td><span class="layer-code">L2</span></td>
+              <td><code>l2_institutional_fairness</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">制度公平感衰落與建制派信任赤字</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Erosion of Perceived Institutional Fairness</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">66.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:66.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.0</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">Edelman Trust Barometer (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">司法、稅收與公營制度偏袒精英階層的社會民怨普遍深化</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L2" data-search="l2_peaceful_redistribution 和平再分配機制失靈與政治極化 V-Dem Electoral Democracy & Polarization Index (illustrative baseline)">
+              <td><span class="layer-code">L2</span></td>
+              <td><code>l2_peaceful_redistribution</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">和平再分配機制失靈與政治極化</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Breakdown of Peaceful Redistribution Mechanisms</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">64.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:64.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.1</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">V-Dem Electoral Democracy & Polarization Index (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">議會財稅改革癱瘓，各政黨訴諸民粹與保護主義轉移分配矛盾</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L3" data-search="l3_unemployment_underemployment 整體非充分就業與隱性失業壓力 ILO World Employment and Social Outlook 2026 (illustrative baseline)">
+              <td><span class="layer-code">L3</span></td>
+              <td><code>l3_unemployment_underemployment</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">整體非充分就業與隱性失業壓力</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Overall Underemployment & Hidden Joblessness</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">56.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:56.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.0</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">ILO World Employment and Social Outlook 2026 (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">零工經濟氾濫，名義失業率低掩蓋了實質工作時間與福利萎縮</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L3" data-search="l3_youth_unemployment 青年失業率與啃老躺平比例 OECD / National Bureaus of Statistics (illustrative baseline)">
+              <td><span class="layer-code">L3</span></td>
+              <td><code>l3_youth_unemployment</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">青年失業率與啃老躺平比例</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Youth Unemployment & NEET Rate</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">68.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:68.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.2</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">OECD / National Bureaus of Statistics (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">多國青年失業居高不下，大學畢業生就業結構性脫節</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L3" data-search="l3_wage_vs_living_cost 實質工資停滯 vs 核心生活通脹夾擊 IMF World Economic Outlook (illustrative baseline)">
+              <td><span class="layer-code">L3</span></td>
+              <td><code>l3_wage_vs_living_cost</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">實質工資停滯 vs 核心生活通脹夾擊</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Real Wage Squeeze vs Core Cost of Living</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">65.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:65.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.1</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">IMF World Economic Outlook (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">食物、能源、醫療長期通脹蚕食可支配收入</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L3" data-search="l3_housing_affordability 房價/租金所得比高企壓力 Numbeo Property Price Index 2026 (illustrative baseline)">
+              <td><span class="layer-code">L3</span></td>
+              <td><code>l3_housing_affordability</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">房價/租金所得比高企壓力</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Housing Price-to-Income / Rent Burden Index</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-orange);width:38px;">75.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:75.0%;background:var(--color-orange);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.0</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">Numbeo Property Price Index 2026 (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">核心都市住宅負擔遠超普通家庭承載能力，壓抑生育與創業</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L3" data-search="l3_ai_displacement_rate 前瞻重點：AI 認知與知識勞動取代率 Stanford HAI AI Index / Goldman Sachs Automation Forecast (illustrative baseline)">
+              <td><span class="layer-code">L3</span></td>
+              <td><code>l3_ai_displacement_rate</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">前瞻重點：AI 認知與知識勞動取代率</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">AI Cognitive & Knowledge Work Displacement Shock</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">62.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:62.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.5</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">Stanford HAI AI Index / Goldman Sachs Automation Forecast (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">自研程式、客服、初級分析、外語翻譯與內容創作受端側與雲端Agent實質取代</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L3" data-search="l3_effort_reward_breakdown 努力回報預期崩塌與社會習得性無助 Gallup State of the Global Workplace (illustrative baseline)">
+              <td><span class="layer-code">L3</span></td>
+              <td><code>l3_effort_reward_breakdown</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">努力回報預期崩塌與社會習得性無助</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Collapse of Effort-Reward Ratio & Resignation</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">64.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:64.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.0</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">Gallup State of the Global Workplace (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">勤奮無法換取體面生活的信念蔓延，削弱社會凝聚力與政治穩定</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L4" data-search="l4_military_expenditure_growth 全球軍費加速擴張與防衛預算GDP佔比 SIPRI Military Expenditure Database (illustrative baseline)">
+              <td><span class="layer-code">L4</span></td>
+              <td><code>l4_military_expenditure_growth</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">全球軍費加速擴張與防衛預算GDP佔比</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Military Spending Growth & Global Armament Surge</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-orange);width:38px;">72.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:72.0%;background:var(--color-orange);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.2</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">SIPRI Military Expenditure Database (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">北約、中俄、日韓台及中東軍費全面超過冷戰結束後峰值</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L4" data-search="l4_arms_race_hypersonic 高超音速、無人蜂群與太空反衛星軍備競賽 IISS Military Balance 2026 (illustrative baseline)">
+              <td><span class="layer-code">L4</span></td>
+              <td><code>l4_arms_race_hypersonic</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">高超音速、無人蜂群與太空反衛星軍備競賽</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Hypersonic, Drone Swarm & Counter-Space Arms Race</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-orange);width:38px;">75.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:75.0%;background:var(--color-orange);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.2</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">IISS Military Balance 2026 (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">攻防非對稱武器削弱傳統預警防禦窗口，戰略突襲誘惑增加</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L4" data-search="l4_bloc_polarization 全球地緣政治陣營極化與同盟剛性 Munich Security Report 2026 (illustrative baseline)">
+              <td><span class="layer-code">L4</span></td>
+              <td><code>l4_bloc_polarization</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">全球地緣政治陣營極化與同盟剛性</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Geopolitical Bloc Polarization & Alliance Rigidity</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-orange);width:38px;">78.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:78.0%;background:var(--color-orange);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.3</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">Munich Security Report 2026 (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">美歐日韓 vs 俄中伊朝陣營壁壘分明，小國戰略自主中立空間收窄</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L4" data-search="l4_weaponized_interdependence 經貿金融相互依賴武器化與關鍵禁運 Atlantic Council Geoeconomics Center (illustrative baseline)">
+              <td><span class="layer-code">L4</span></td>
+              <td><code>l4_weaponized_interdependence</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">經貿金融相互依賴武器化與關鍵禁運</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Weaponized Economic Interdependence & Financial Sanctions</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-orange);width:38px;">76.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:76.0%;background:var(--color-orange);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.2</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">Atlantic Council Geoeconomics Center (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">SWIFT制裁、半導體長臂管制、出口許可全面泛安全化</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L4" data-search="l4_nuclear_breakout 核擴散門檻降低與戰術核武使用禁忌鬆動 Bulletin of the Atomic Scientists (illustrative baseline)">
+              <td><span class="layer-code">L4</span></td>
+              <td><code>l4_nuclear_breakout</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">核擴散門檻降低與戰術核武使用禁忌鬆動</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Nuclear Proliferation & Erosion of Taboo</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">66.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:66.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.4</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">Bulletin of the Atomic Scientists (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">戰略核條約終止、伊朗濃縮接近突破、戰術核演習常態化</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L4" data-search="l4_territorial_flashpoints 高危熱點主權與領土引信點摩擦頻度 Crisis Group CrisisWatch (illustrative baseline)">
+              <td><span class="layer-code">L4</span></td>
+              <td><code>l4_territorial_flashpoints</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">高危熱點主權與領土引信點摩擦頻度</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Active Territorial & Sovereign Flashpoint Heat (Taiwan, SCS, Ukraine, ME)</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-orange);width:38px;">80.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:80.0%;background:var(--color-orange);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.4</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">Crisis Group CrisisWatch (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">台海、南海、烏克蘭前線、中東紅海多線並行處於高觸發態勢</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L5" data-search="l5_relative_decline_anxiety 霸權相對衰落焦慮與修昔底德權力轉移壓力 Graham Allison Thucydides Trap Case Index (illustrative baseline)">
+              <td><span class="layer-code">L5</span></td>
+              <td><code>l5_relative_decline_anxiety</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">霸權相對衰落焦慮與修昔底德權力轉移壓力</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Hegemonic Decline Anxiety & Thucydides Friction</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-orange);width:38px;">76.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:76.0%;background:var(--color-orange);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.3</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">Graham Allison Thucydides Trap Case Index (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">既有大國對實力被超越之恐懼，與新興大國對被打斷崛起之警惕共存</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L5" data-search="l5_demographic_cliff 人口老齡斷崖與戰略機會之窗即將關閉恐慌 UN World Population Prospects (illustrative baseline)">
+              <td><span class="layer-code">L5</span></td>
+              <td><code>l5_demographic_cliff</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">人口老齡斷崖與戰略機會之窗即將關閉恐慌</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Demographic Aging Cliff & Closing Window Syndrome</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-orange);width:38px;">70.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:70.0%;background:var(--color-orange);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.1</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">UN World Population Prospects (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">主要強權勞動力與兵源見頂，激起『此時不解決日後更難』的冒險心態</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L5" data-search="l5_economic_stagnation 長期生產力停滯與債務懸崖悲觀預期 World Bank Global Economic Prospects (illustrative baseline)">
+              <td><span class="layer-code">L5</span></td>
+              <td><code>l5_economic_stagnation</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">長期生產力停滯與債務懸崖悲觀預期</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Secular Stagnation & Sovereign Debt Wall Fears</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">64.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:64.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.0</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">World Bank Global Economic Prospects (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">全球債務佔GDP攀升至極限，和平時期的增量博弈轉化為存量零和撕裂</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L5" data-search="l5_tech_supremacy_fear 未來十年內喪失戰略技術霸權之預防性開戰邏輯 Special Competitive Studies Project (SCSP) (illustrative baseline)">
+              <td><span class="layer-code">L5</span></td>
+              <td><code>l5_tech_supremacy_fear</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">未來十年內喪失戰略技術霸權之預防性開戰邏輯</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Fear of Losing 10-Year Strategic Tech Dominance (Preventive Logic)</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-orange);width:38px;">78.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:78.0%;background:var(--color-orange);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.4</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">Special Competitive Studies Project (SCSP) (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">若相信對手即將取得 AGI 或顛覆性軍事技術，將大幅刺激當下發動先發打擊</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L5" data-search="l5_miscalculation_risk 即時資訊作戰與危機反應窗口極度壓縮之誤判風險 RAND Strategic Miscalculation Studies (illustrative baseline)">
+              <td><span class="layer-code">L5</span></td>
+              <td><code>l5_miscalculation_risk</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">即時資訊作戰與危機反應窗口極度壓縮之誤判風險</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Compressed Decision Windows & Miscalculation Escalation</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-orange);width:38px;">72.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:72.0%;background:var(--color-orange);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.2</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">RAND Strategic Miscalculation Studies (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">自主武器與網軍偵察反應以分秒計，政治領導人缺乏冷靜核實時間</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="L5" data-search="l5_leadership_time_horizon 政治週期短視與政權合法性焦慮 Freedom House / EIU Democracy Index (illustrative baseline)">
+              <td><span class="layer-code">L5</span></td>
+              <td><code>l5_leadership_time_horizon</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">政治週期短視與政權合法性焦慮</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Leadership Short Time Horizon & Regime Survival Anxiety</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">68.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:68.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.0</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">Freedom House / EIU Democracy Index (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">內政困局推動領導層對外展現強硬以凝聚民意，妥協代價遠高於冒險</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="GATE" data-search="gate_diplomatic_trust 大國元首戰略熱線與外交互信管道 Chatham House Diplomatic Relations Monitor (illustrative baseline)">
+              <td><span class="layer-code">GATE</span></td>
+              <td><code>gate_diplomatic_trust</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">大國元首戰略熱線與外交互信管道</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">High-Level Diplomatic Hotlines & Strategic Trust</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-green);width:38px;">36.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:36.0%;background:var(--color-green);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.2</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">Chatham House Diplomatic Relations Monitor (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">高層偶有通話但戰略互信跌入冰點，事務性外交降格為互念宣傳稿</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="GATE" data-search="gate_trade_interdependence 全球深度經貿相互依賴與脫鉤沉沒成本 WTO World Trade Statistical Review (illustrative baseline)">
+              <td><span class="layer-code">GATE</span></td>
+              <td><code>gate_trade_interdependence</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">全球深度經貿相互依賴與脫鉤沉沒成本</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Economic Interdependence & Decoupling Sunk Costs</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-green);width:38px;">48.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:48.0%;background:var(--color-green);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.2</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">WTO World Trade Statistical Review (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">雖有友岸外包與脫鉤，跨國投資與供應鏈網絡仍構成實質制衡阻力</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="GATE" data-search="gate_international_institutions 聯合國與國際法多邊仲裁機制之執行力 International Crisis Group UN Watch (illustrative baseline)">
+              <td><span class="layer-code">GATE</span></td>
+              <td><code>gate_international_institutions</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">聯合國與國際法多邊仲裁機制之執行力</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Multilateral International Law & UN Efficacy</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-green);width:38px;">28.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:28.0%;background:var(--color-green);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.0</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">International Crisis Group UN Watch (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">安理會常任理事國否決權癱瘓，國際法院決議難以在強權間落實</td>
+            </tr>
+            
+
+            <tr class="ind-row" data-layer="GATE" data-search="gate_nuclear_deterrence_stability 核恐怖平衡相互保證毀滅 (MAD) 與防誤擊架構 SIPRI Nuclear Forces Overview 2026 (illustrative baseline)">
+              <td><span class="layer-code">GATE</span></td>
+              <td><code>gate_nuclear_deterrence_stability</code></td>
+              <td>
+                <div style="font-weight:600;color:#f8fafc;">核恐怖平衡相互保證毀滅 (MAD) 與防誤擊架構</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);">Strategic MAD Nuclear Deterrence & Fail-Safe Protocols</div>
+              </td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-yellow);width:38px;">62.0</span>
+                  <div class="progress-track" style="width:70px;height:6px;">
+                    <div class="progress-fill" style="width:62.0%;background:var(--color-yellow);"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">x1.4</td>
+              <td><span class="ev-badge ev-illustrative">ILLUSTRATIVE · 示範估算</span></td>
+              <td style="font-size:0.74rem;color:var(--text-muted);">SIPRI Nuclear Forces Overview 2026 (illustrative baseline) (2026)</td>
+              <td style="font-size:0.74rem;color:var(--text-muted);line-height:1.35;">核武庫存足以確保毀滅，但常規打擊與戰術核界線模糊化構成侵蝕</td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 7: Unconnected Data Sources Stubs (UI-Step 5) -->
+    <section class="panel-card" style="margin-top:24px;">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>即時感知信號源接入佔位 (Live Sensor Feeds &amp; Telemetry Stubs)</span>
+        </div>
+        <span class="panel-tag">STRICTLY LABELED AS UNCONNECTED · ZERO FAKE TELEMETRY</span>
+      </div>
+      <div style="background:rgba(239, 68, 68, 0.08);border:1px solid rgba(239, 68, 68, 0.25);border-radius:6px;padding:8px 12px;margin-bottom:16px;font-size:0.76rem;color:#fca5a5;">
+        <strong>嚴肅聲明：</strong>以下 5 大即時遙測源在 v1 靜態版本中<strong>全部標記為「未接數據源」</strong>佔位預留。本系統為純純離線靜態儀表板，嚴格不偽造任何虛假即時動態、模擬雷達或冒充即時新聞。
+      </div>
+      <div class="unconnected-grid">
+        
+            <div class="unc-card">
+              <div class="unc-head">
+                <span class="unc-name">全球軍用機載 ADS-B 實時異動偵測</span>
+                <span class="unc-badge">[未接數據源 · V1 STUB]</span>
+              </div>
+              <div class="unc-en">Global Military ADS-B Transponder Stream</div>
+              <div class="unc-specs">
+                <div>頻率：<code>10-sec telemetry</code></div>
+                <div>協議：<code>ADS-B Mode-S Receiver Feed</code></div>
+                <div>目標：<span>波羅的海 · 黑海 · 波斯灣 · 台海空域</span></div>
+              </div>
+              <p class="unc-desc">即時監控空中加油機、RC-135 偵察機與預警機起降活動，v1 純靜態離線模型不接入外部即時通訊。</p>
+            </div>
+            
+
+            <div class="unc-card">
+              <div class="unc-head">
+                <span class="unc-name">GDELT 全球衝突事件實時脈衝</span>
+                <span class="unc-badge">[未接數據源 · V1 STUB]</span>
+              </div>
+              <div class="unc-en">GDELT Conflict Pulse & Event Stream</div>
+              <div class="unc-specs">
+                <div>頻率：<code>15-minute batch</code></div>
+                <div>協議：<code>GDELT 2.0 Global Event Feed</code></div>
+                <div>目標：<span>全球主要衝突邊界</span></div>
+              </div>
+              <p class="unc-desc">多語言自然語言處理新聞突發事件與暴力衝突事件熱度脈衝，目前以結構性情境指標靜態替代。</p>
+            </div>
+            
+
+            <div class="unc-card">
+              <div class="unc-head">
+                <span class="unc-name">Polymarket 地緣衝突合約實時預測賠率</span>
+                <span class="unc-badge">[未接數據源 · V1 STUB]</span>
+              </div>
+              <div class="unc-en">Polymarket Conflict Prediction Market Odds</div>
+              <div class="unc-specs">
+                <div>頻率：<code>Real-time websocket</code></div>
+                <div>協議：<code>On-chain Prediction API</code></div>
+                <div>目標：<span>美中台海合約 · 以伊衝突合約 · 俄烏停火合約</span></div>
+              </div>
+              <p class="unc-desc">市場真金白銀定價之地緣衝突賠率，UI 目前提供情境推演概率帶，未接入實時鏈上訂單簿。</p>
+            </div>
+            
+
+            <div class="unc-card">
+              <div class="unc-head">
+                <span class="unc-name">戰略海運咽喉 (霍爾木茲/曼德) 實時 AIS 船隻通航量</span>
+                <span class="unc-badge">[未接數據源 · V1 STUB]</span>
+              </div>
+              <div class="unc-en">Strategic Chokepoints Vessel AIS Telemetry</div>
+              <div class="unc-specs">
+                <div>頻率：<code>1-minute AIS stream</code></div>
+                <div>協議：<code>Satellite & Terrestrial AIS API</code></div>
+                <div>目標：<span>曼德海峽 · 霍爾木茲海峽 · 馬六甲海峽 · 蘇伊士運河</span></div>
+              </div>
+              <p class="unc-desc">商船、油輪與液化天然氣船轉向繞道好望角之即時繞航比率，目前由 L1 海運咽喉指標 (68.0) 靜態代表。</p>
+            </div>
+            
+
+            <div class="unc-card">
+              <div class="unc-head">
+                <span class="unc-name">核心戰略前線公開監視與實況流</span>
+                <span class="unc-badge">[未接數據源 · V1 STUB]</span>
+              </div>
+              <div class="unc-en">Border Frontline Public Feeds & Webcams</div>
+              <div class="unc-specs">
+                <div>頻率：<code>Live HLS/RTSP Stream</code></div>
+                <div>協議：<code>Public Live Video Feeds</code></div>
+                <div>目標：<span>霍爾木茲海峽兩岸 · 波羅的海港口 · 紅海口</span></div>
+              </div>
+              <p class="unc-desc">公開港口與邊界攝影機串流，本系統為純純離線儀表板，嚴格標記為佔位預留。</p>
+            </div>
+            
+      </div>
+    </section>
+
+    <!-- Section 8: Methodology & Disclaimer Footer Card (UI-Step 5) -->
+    <section class="panel-card" style="margin-top:24px;border-color:var(--border-bright);">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>方法學邊界與免責聲明 (Methodology &amp; Disclaimers)</span>
+        </div>
+        <span class="panel-tag">SCENARIO EVALUATION · NOT TACTICAL PREDICTION</span>
+      </div>
+      <div class="methodology-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:0.78rem;color:var(--text-muted);line-height:1.5;">
+        <div>
+          <h4 style="color:#f8fafc;margin-bottom:6px;">一、模型定位與局限性</h4>
+          <p>
+            本模型旨在評估國際體系是否滑入<strong>「四階段危機」</strong>之總體結構壓力，重點在於揭示「生存資源、分配不均、AI取代、安全困境、未來恐懼」五層因子之超線性耦合共振，以及和平緩衝安全閥之有效性。本模型<strong>非戰術預警系統</strong>，無法預測具體引信事件觸發的精確日期與作戰細節。
+          </p>
+        </div>
+        <div>
+          <h4 style="color:#f8fafc;margin-bottom:6px;">二、三級數據透明度標準</h4>
+          <p>
+            所有指標嚴格區分 <code>verified</code>（客觀實測來源）、<code>inference</code>（多方數據統計推算）與 <code>illustrative</code>（情境示範性假說）。情境概率帶為結構壓力函數之 Logistic 映射估算，非頻率學派或已驗證之統計預測，讀者切勿將其直接作為金融投機或不可逆防務決策之唯一依據。
+          </p>
+        </div>
+      </div>
+    </section>
+        
   </main>
 
   <footer class="dash-footer">
@@ -3238,6 +4465,36 @@
         if (el) el.value = val;
       }
       runSimulation();
+    }
+
+    // Step 5: Filter Table by Layer
+    function filterTable(layerCode, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      const rows = document.querySelectorAll('.ind-row');
+      rows.forEach(r => {
+        const l = r.getAttribute('data-layer');
+        if (layerCode === 'ALL' || l === layerCode) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      });
+    }
+
+    // Step 5: Search Table by Text
+    function searchTable() {
+      const q = (document.getElementById('ind-search')?.value || '').toLowerCase().trim();
+      const rows = document.querySelectorAll('.ind-row');
+      rows.forEach(r => {
+        const text = (r.getAttribute('data-search') || '').toLowerCase();
+        if (!q || text.includes(q)) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      });
     }
     
   </script>
