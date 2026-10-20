@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from html.parser import HTMLParser
 import json
 import re
 from pathlib import Path
@@ -160,4 +161,83 @@ def test_simulator_formula_consistency():
     assert round(base_structural, 1) == round(py_result.base_structural_score, 1)
     assert round(gate_factor, 3) == round(py_result.gate_factor, 3)
     assert round(total_interaction, 2) == round(py_result.interactions["total"], 2)
+
+
+def test_dashboard_html_style_tags_balanced_and_enclosing_root_css(tmp_path):
+    """Verify that dashboard HTML has balanced <style> tags and strictly encloses :root CSS rules."""
+    out_html = tmp_path / "dashboard.html"
+    build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        ui_step=5,
+    )
+    content = out_html.read_text(encoding="utf-8")
+
+    # 1. <style> and </style> counts must be equal and >= 1
+    style_open_matches = re.findall(r"<style\b[^>]*>", content, re.IGNORECASE)
+    style_close_matches = re.findall(r"</style>", content, re.IGNORECASE)
+    assert len(style_open_matches) == len(style_close_matches), (
+        f"Mismatched style tags: {len(style_open_matches)} open vs {len(style_close_matches)} close"
+    )
+    assert len(style_open_matches) >= 1, "At least one <style> block must be present"
+
+    # 2. :root { must be strictly enclosed within a <style>...</style> block
+    style_blocks = re.findall(r"<style[^>]*>(.*?)</style>", content, re.DOTALL | re.IGNORECASE)
+    assert any(":root" in block for block in style_blocks), (
+        ":root CSS rules must be strictly enclosed inside <style>...</style>"
+    )
+
+
+def test_dashboard_head_structure_has_no_bare_css_or_text_nodes(tmp_path):
+    """Verify via standard library html.parser that <head> has no bare CSS or unescaped text nodes."""
+    out_html = tmp_path / "dashboard.html"
+    build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        ui_step=5,
+    )
+    content = out_html.read_text(encoding="utf-8")
+
+    class HeadStructureParser(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.in_head = False
+            self.current_tag: str | None = None
+            self.head_tag_order: list[str] = []
+            self.bare_head_text: list[str] = []
+
+        def handle_starttag(self, tag: str, attrs: list):
+            tag_lower = tag.lower()
+            if tag_lower == "head":
+                self.in_head = True
+            elif self.in_head:
+                self.current_tag = tag_lower
+                self.head_tag_order.append(tag_lower)
+
+        def handle_endtag(self, tag: str):
+            tag_lower = tag.lower()
+            if tag_lower == "head":
+                self.in_head = False
+            elif self.in_head and self.current_tag == tag_lower:
+                self.current_tag = None
+
+        def handle_data(self, data: str):
+            if self.in_head:
+                stripped = data.strip()
+                # Elements legitimately containing text inside <head> are title, style, script
+                if self.current_tag not in ("title", "style", "script") and stripped:
+                    self.bare_head_text.append(stripped)
+
+    parser = HeadStructureParser()
+    parser.feed(content)
+
+    assert not parser.bare_head_text, (
+        f"Detected bare un-tagged text nodes inside <head>: {parser.bare_head_text[:3]}"
+    )
+    assert "title" in parser.head_tag_order, "<title> must exist in <head>"
+    assert "style" in parser.head_tag_order, "<style> must exist in <head>"
+    assert parser.head_tag_order.index("title") < parser.head_tag_order.index("style"), (
+        "<style> must appear after <title> in <head>"
+    )
+
 

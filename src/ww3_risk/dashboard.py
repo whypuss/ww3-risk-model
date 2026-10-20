@@ -1041,7 +1041,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
         """
 
     # CSS styles
-    css = """
+    css = """<style>
     :root {
       --bg-base: #080d1a;
       --bg-surface: #0f172a;
@@ -2225,8 +2225,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
       color: var(--text-dim);
       font-size: 0.78rem;
     }
-    </style>
-    """
+  </style>"""
 
     js_script = """
     // Global Access to Embedded Scenario and Model Data
