@@ -336,6 +336,61 @@ def test_probability_bands_order(baseline_scenario: ScenarioData, model: WW3Risk
     assert 0.0 <= res.probability_bands["1y"].lower_pct <= res.probability_bands["1y"].upper_pct <= 100.0
 
 
+def test_probability_bands_anchor_table_calibration(model: WW3RiskModel):
+    """Anchor table calibration test (v0.2):
+    Verify that 1y, 5y, 10y central probabilities at index 25, 50, 75, 85, 100
+    fall strictly within the required tolerance (+-3% for 25-85, +-5% for 100).
+    """
+    anchors = [
+        # (index, target_1y, target_5y, target_10y, tolerance)
+        (25.0, 0.5, 2.0, 5.0, 3.0),
+        (50.0, 2.0, 8.0, 15.0, 3.0),
+        (75.0, 6.0, 22.0, 38.0, 3.0),
+        (85.0, 10.0, 32.0, 50.0, 3.0),
+        (100.0, 20.0, 55.0, 75.0, 5.0),
+    ]
+
+    for score, tgt_1y, tgt_5y, tgt_10y, tol in anchors:
+        bands = model.calculate_probability_bands(score)
+        p1 = bands["1y"].central_pct
+        p5 = bands["5y"].central_pct
+        p10 = bands["10y"].central_pct
+
+        assert abs(p1 - tgt_1y) <= tol, f"Score {score} 1y: got {p1}%, target {tgt_1y}% (tol +-{tol}%)"
+        assert abs(p5 - tgt_5y) <= tol, f"Score {score} 5y: got {p5}%, target {tgt_5y}% (tol +-{tol}%)"
+        assert abs(p10 - tgt_10y) <= tol, f"Score {score} 10y: got {p10}%, target {tgt_10y}% (tol +-{tol}%)"
+
+        # Horizon monotonicity: 1y < 5y < 10y
+        assert p1 < p5 < p10
+
+        # Asymptotic bounds: never 0% or 100%
+        assert 0.0 < bands["1y"].lower_pct <= p1 <= bands["1y"].upper_pct < 100.0
+        assert 0.0 < bands["5y"].lower_pct <= p5 <= bands["5y"].upper_pct < 100.0
+        assert 0.0 < bands["10y"].lower_pct <= p10 <= bands["10y"].upper_pct < 100.0
+
+
+def test_probability_bands_continuous_monotonicity(model: WW3RiskModel):
+    """Verify strictly monotonic increasing behavior across 0 to 100 in steps of 1."""
+    prev_1y = -1.0
+    prev_5y = -1.0
+    prev_10y = -1.0
+
+    for s in range(0, 101):
+        bands = model.calculate_probability_bands(float(s))
+        c1 = bands["1y"].central_pct
+        c5 = bands["5y"].central_pct
+        c10 = bands["10y"].central_pct
+
+        assert c1 > prev_1y, f"1y monotonicity violated at {s}: {c1} <= {prev_1y}"
+        assert c5 > prev_5y, f"5y monotonicity violated at {s}: {c5} <= {prev_5y}"
+        assert c10 > prev_10y, f"10y monotonicity violated at {s}: {c10} <= {prev_10y}"
+        assert c1 < c5 < c10, f"Ordering violated at {s}: {c1}, {c5}, {c10}"
+
+        prev_1y = c1
+        prev_5y = c5
+        prev_10y = c10
+
+
 def test_stage_mapping_comprehensive(model: WW3RiskModel):
     assert model.map_stage(15.0).stage_number == 1
     assert model.map_stage(35.0).stage_number == 2

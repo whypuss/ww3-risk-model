@@ -35,7 +35,10 @@ class ProbabilityBand:
     central_pct: float
     lower_pct: float
     upper_pct: float
-    disclaimer: str = "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+    disclaimer: str = (
+        "結構風險之情境推演估算，非已驗證統計預測；大國全面戰爭歷史基率極低，"
+        "結構指數係易燃度而非事件機率（Scenario Estimate, not verified statistical forecast）"
+    )
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -226,18 +229,31 @@ class WW3RiskModel:
 
     @staticmethod
     def calculate_probability_bands(score: float) -> Dict[str, ProbabilityBand]:
-        """Estimate 1-year, 5-year, and 10-year scenario probability bands via logistic mapping."""
+        """Estimate 1-year, 5-year, and 10-year scenario probability bands via calibrated conservative mapping.
+
+        Calibrated against empirical anchor table (tolerance +-3%, 100 +-5%):
+        - Index 25:  1y ~0.5% (0.4%),  5y ~2.0% (1.6%),  10y ~5.0% (3.2%)
+        - Index 50:  1y ~2.0% (1.7%),  5y ~8.0% (6.5%),  10y ~15.0% (12.6%)
+        - Index 75:  1y ~6.0% (6.2%),  5y ~22.0% (22.7%), 10y ~38.0% (38.3%)
+        - Index 85:  1y ~10.0% (10.2%), 5y ~32.0% (34.1%), 10y ~50.0% (52.6%)
+        - Index 100: 1y ~20.0% (20.0%), 5y ~55.0% (54.3%), 10y ~75.0% (72.3%)
+
+        Properties:
+        - Smooth, strictly monotonic increasing C^inf logistic curves
+        - Strictly 1y < 5y < 10y for all s in [0, 100]
+        - Asymptotically avoids 0% or 100%
+        """
         s = max(0.0, min(100.0, score))
 
-        # Parameters calibrated for systemic war risk horizon:
-        # 1-Year: War is an acute flashpoint trigger; lower baseline even under pressure
-        # 5-Year: Structural pressures accumulate and trigger cycles
-        # 10-Year: Decadal preventive logics and hegemonic transitions fully unfold
+        # Parameters calibrated for conservative systemic war risk horizon:
+        # 1-Year: Acute flashpoint trigger window
+        # 5-Year: Structural crisis accumulation window
+        # 10-Year: Hegemonic transition & long-wave confrontation window
         horizons = [
             # (years, L_max, k, x0, lower_ratio, upper_ratio)
-            (1, 30.0, 0.08, 65.0, 0.65, 1.45),
-            (5, 65.0, 0.07, 55.0, 0.75, 1.30),
-            (10, 85.0, 0.065, 48.0, 0.80, 1.25),
+            (1, 80.0, 0.055, 120.0, 0.65, 1.45),
+            (5, 95.0, 0.058, 95.0, 0.75, 1.30),
+            (10, 98.0, 0.059, 82.5, 0.80, 1.25),
         ]
 
         bands: Dict[str, ProbabilityBand] = {}

@@ -2371,10 +2371,10 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
         stageNum = 4; stageTitle = "階段四：暴力成為被接受選項";
       }
 
-      // 9. Probability Bands
-      const p1y = 30.0 / (1.0 + Math.exp(-0.08 * (simIndex - 65.0)));
-      const p5y = 65.0 / (1.0 + Math.exp(-0.07 * (simIndex - 55.0)));
-      const p10y = 85.0 / (1.0 + Math.exp(-0.065 * (simIndex - 48.0)));
+      // 9. Probability Bands (v0.2 Calibrated Anchors)
+      const p1y = 80.0 / (1.0 + Math.exp(-0.055 * (simIndex - 120.0)));
+      const p5y = 95.0 / (1.0 + Math.exp(-0.058 * (simIndex - 95.0)));
+      const p10y = 98.0 / (1.0 + Math.exp(-0.059 * (simIndex - 82.5)));
 
       // 10. Update DOM elements
       const indexDisplay = document.getElementById('sim-index-display');
