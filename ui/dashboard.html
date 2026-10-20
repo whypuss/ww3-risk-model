@@ -548,6 +548,214 @@
       .grid-two-cols { grid-template-columns: 1fr !important; }
     }
 
+    /* Step 3: Scenario Matrix Cards */
+    .scenarios-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 1024px) {
+      .scenarios-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .scenarios-grid { grid-template-columns: 1fr; }
+    }
+    .scenario-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .scenario-card:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+    .scenario-card.active-sc {
+      border-color: var(--accent-cyan);
+      background: linear-gradient(180deg, rgba(6, 182, 212, 0.08) 0%, rgba(15, 23, 42, 0.95) 100%);
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+    }
+    .sc-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sc-id {
+      font-size: 0.7rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+    }
+    .sc-delta {
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .delta-up { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
+    .delta-down { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; }
+    .delta-base { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; }
+    .sc-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #f8fafc;
+      line-height: 1.35;
+      min-height: 2.7rem;
+    }
+    .sc-score-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .sc-score {
+      font-size: 1.6rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: #fff;
+    }
+    .sc-stage-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+    }
+    .sc-mini-bars {
+      display: flex;
+      gap: 3px;
+      height: 20px;
+      align-items: flex-end;
+      margin-left: auto;
+    }
+    .sc-mini-bar-wrap {
+      width: 5px;
+      height: 100%;
+      background: #1e293b;
+      border-radius: 2px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+    }
+    .sc-mini-bar-fill {
+      width: 100%;
+      background: var(--accent-cyan);
+      border-radius: 1px;
+    }
+    .sc-probs {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 6px;
+    }
+    .sc-probs strong { color: #e2e8f0; }
+    .sc-desc {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    /* Regional Cards Grid */
+    .regions-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 1200px) {
+      .regions-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .regions-grid { grid-template-columns: 1fr; }
+    }
+    .region-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .reg-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .reg-title-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+    .reg-name {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .reg-en {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+    }
+    .reg-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .badge-danger { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid var(--color-red); }
+    .badge-warning { background: rgba(249, 115, 22, 0.15); color: #fdba74; border: 1px solid var(--color-orange); }
+    .badge-elevated { background: rgba(234, 179, 8, 0.15); color: #fef08a; border: 1px solid var(--color-yellow); }
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid var(--color-green); }
+    .reg-score-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .reg-score {
+      font-size: 1.45rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: #fff;
+    }
+    .reg-max {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+    .reg-disclaimer-tag {
+      font-size: 0.68rem;
+      color: #f59e0b;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+    .reg-indicators-list {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+    .reg-indicators-list code {
+      background: rgba(0, 0, 0, 0.25);
+      padding: 1px 4px;
+      border-radius: 3px;
+      color: var(--accent-cyan);
+    }
+    .reg-note {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+      margin-top: 4px;
+    }
+
     /* Footer */
     .dash-footer {
       max-width: 1380px;
@@ -573,7 +781,7 @@
       </div>
     </div>
     <div class="top-meta">
-      <span class="meta-badge badge-step">UI-STEP 2</span>
+      <span class="meta-badge badge-step">UI-STEP 3</span>
       <span class="meta-badge badge-alert">警戒級別：階段三：和平解決機制失效 (STAGE 3)</span>
       <span class="meta-badge badge-offline">● 100% 本地離線運行 (ZERO CDN)</span>
       <span style="font-family:var(--font-mono);color:var(--text-dim);">2026-10-20 · 2026 基準</span>
@@ -1022,6 +1230,324 @@
     </section>
         
     
+    <!-- Section 3: Scenario Matrix & Regional Pressures (UI-Step 3) -->
+    <section style="margin-top:24px;display:flex;flex-direction:column;gap:24px;">
+      <!-- Scenario Matrix Cards (Ref: 03 GOD MODE Scenario Matrix) -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>情境卡矩陣與動態比對 (Scenario Matrix &amp; Comparative Analysis)</span>
+          </div>
+          <span class="panel-tag">CLICK ANY CARD TO SWITCH SCENARIO VIEW</span>
+        </div>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:14px;">
+          點擊下方任一情境卡片，即可將全儀表盤（總分 Gauge、四階段進度、五層維度橫條、閘門與互動效應）切換至該情境評估視角。所有數值均由模型公式實時驅動。
+        </p>
+        <div class="scenarios-grid">
+          
+            <div class="scenario-card " id="sc-card-ai_displacement_shock" onclick="switchScenario('ai_displacement_shock')">
+              <div class="sc-head">
+                <span class="sc-id">ai_displacement_shock</span>
+                <span class="sc-delta delta-up">+13.1 pts</span>
+              </div>
+              <div class="sc-title">情境：AI 認知取代風暴與算力壟斷</div>
+              <div class="sc-score-row">
+                <div class="sc-score">96.2</div>
+                <div class="sc-stage-badge">STAGE 4</div>
+                <div class="sc-mini-bars">
+                <div class="sc-mini-bar-wrap" title="L1: 69.1">
+                  <div class="sc-mini-bar-fill" style="height:69.1%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L2: 84.3">
+                  <div class="sc-mini-bar-fill" style="height:84.3%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L3: 83.2">
+                  <div class="sc-mini-bar-fill" style="height:83.2%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L4: 82.7">
+                  <div class="sc-mini-bar-fill" style="height:82.7%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L5: 84.1">
+                  <div class="sc-mini-bar-fill" style="height:84.1%;"></div>
+                </div>
+                </div>
+              </div>
+              <div class="sc-probs">
+                <span>1y: <strong>27.7%</strong></span>
+                <span>5y: <strong>61.6%</strong></span>
+                <span>10y: <strong>81.5%</strong></span>
+              </div>
+              <p class="sc-desc">通用智慧與自主Agent突破加速，白領知識崗位大面積凍結或被取代，算力基礎設施極端集中於單一霸權陣營，引發前所未有的社會動盪與預防性技術封鎖</p>
+            </div>
+            
+
+            <div class="scenario-card active-sc" id="sc-card-baseline_2026" onclick="switchScenario('baseline_2026')">
+              <div class="sc-head">
+                <span class="sc-id">baseline_2026</span>
+                <span class="sc-delta delta-base">基準 (Baseline)</span>
+              </div>
+              <div class="sc-title">2026 全球結構風險基準情境</div>
+              <div class="sc-score-row">
+                <div class="sc-score">83.1</div>
+                <div class="sc-stage-badge">STAGE 3</div>
+                <div class="sc-mini-bars">
+                <div class="sc-mini-bar-wrap" title="L1: 63.0">
+                  <div class="sc-mini-bar-fill" style="height:63.0%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L2: 71.3">
+                  <div class="sc-mini-bar-fill" style="height:71.3%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L3: 64.9">
+                  <div class="sc-mini-bar-fill" style="height:64.9%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L4: 74.5">
+                  <div class="sc-mini-bar-fill" style="height:74.5%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L5: 71.9">
+                  <div class="sc-mini-bar-fill" style="height:71.9%;"></div>
+                </div>
+                </div>
+              </div>
+              <div class="sc-probs">
+                <span>1y: <strong>24.3%</strong></span>
+                <span>5y: <strong>57.0%</strong></span>
+                <span>10y: <strong>77.1%</strong></span>
+              </div>
+              <p class="sc-desc">當前多極化過渡期、AI技術震盪及地緣陣營重組之全球結構性風險基準評估（數值標註 illustrative 示範性估算）</p>
+            </div>
+            
+
+            <div class="scenario-card " id="sc-card-detente" onclick="switchScenario('detente')">
+              <div class="sc-head">
+                <span class="sc-id">detente</span>
+                <span class="sc-delta delta-down">-47.5 pts</span>
+              </div>
+              <div class="sc-title">情境：大國緩和、經貿互賴重建與軍控協定</div>
+              <div class="sc-score-row">
+                <div class="sc-score">35.6</div>
+                <div class="sc-stage-badge">STAGE 2</div>
+                <div class="sc-mini-bars">
+                <div class="sc-mini-bar-wrap" title="L1: 39.3">
+                  <div class="sc-mini-bar-fill" style="height:39.3%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L2: 49.2">
+                  <div class="sc-mini-bar-fill" style="height:49.2%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L3: 44.5">
+                  <div class="sc-mini-bar-fill" style="height:44.5%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L4: 41.9">
+                  <div class="sc-mini-bar-fill" style="height:41.9%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L5: 38.2">
+                  <div class="sc-mini-bar-fill" style="height:38.2%;"></div>
+                </div>
+                </div>
+              </div>
+              <div class="sc-probs">
+                <span>1y: <strong>2.6%</strong></span>
+                <span>5y: <strong>13.3%</strong></span>
+                <span>10y: <strong>26.2%</strong></span>
+              </div>
+              <p class="sc-desc">主要強權達成戰略護欄與新軍控協議，重啟高層外交與兩軍熱線，撤銷懲罰性關稅與限制，建立全球AI安全與關鍵礦產共享對話機制</p>
+            </div>
+            
+
+            <div class="scenario-card " id="sc-card-energy_food_crisis" onclick="switchScenario('energy_food_crisis')">
+              <div class="sc-head">
+                <span class="sc-id">energy_food_crisis</span>
+                <span class="sc-delta delta-up">+14.5 pts</span>
+              </div>
+              <div class="sc-title">情境：全球能源與糧食供應鏈崩潰危機</div>
+              <div class="sc-score-row">
+                <div class="sc-score">97.6</div>
+                <div class="sc-stage-badge">STAGE 4</div>
+                <div class="sc-mini-bars">
+                <div class="sc-mini-bar-wrap" title="L1: 90.5">
+                  <div class="sc-mini-bar-fill" style="height:90.5%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L2: 83.6">
+                  <div class="sc-mini-bar-fill" style="height:83.6%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L3: 81.0">
+                  <div class="sc-mini-bar-fill" style="height:81.0%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L4: 85.4">
+                  <div class="sc-mini-bar-fill" style="height:85.4%;"></div>
+                </div>
+                
+                <div class="sc-mini-bar-wrap" title="L5: 84.7">
+                  <div class="sc-mini-bar-fill" style="height:84.7%;"></div>
+                </div>
+                </div>
+              </div>
+              <div class="sc-probs">
+                <span>1y: <strong>27.9%</strong></span>
+                <span>5y: <strong>61.9%</strong></span>
+                <span>10y: <strong>81.7%</strong></span>
+              </div>
+              <p class="sc-desc">氣候複合災害疊加戰略咽喉（紅海、霍爾木茲、黑海）全面封鎖，主要產油國與糧食大國實施絕對出口禁令，全球陷入生存資源極端短缺與搶奪</p>
+            </div>
+            
+        </div>
+      </div>
+
+      <!-- Regional Pressure Cards (Ref: 03 / 07 MRI Regional Cards) -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>全球五大關鍵地緣戰區壓力卡列 (Regional Crisis Pressures)</span>
+          </div>
+          <span class="panel-tag">ILLUSTRATIVE DECOMPOSITION · MAPPED FROM CORE INDICATORS</span>
+        </div>
+        <div style="background:rgba(234, 179, 8, 0.08);border:1px solid rgba(234, 179, 8, 0.25);border-radius:6px;padding:8px 12px;margin-bottom:16px;font-size:0.76rem;color:#fef08a;">
+          <strong>透明度說明 (Transparency Standard)：</strong>區域分數為「<strong>示意拆分 (Illustrative Mapping)</strong>」，由模型中既有之客觀指標（如海運咽喉受阻、領土引信點摩擦、算力壟斷等）加權合成，非獨立地理感測器實測，特此標註以防誤導。
+        </div>
+        <div class="regions-grid">
+          
+            <div class="region-card danger">
+              <div class="reg-head">
+                <div class="reg-title-wrap">
+                  <span class="reg-name">東歐（烏克蘭 / 北約東翼前線）</span>
+                  <span class="reg-en">Eastern Europe / NATO Eastern Flank</span>
+                </div>
+                <span class="reg-badge badge-danger">極度高壓 (Critical)</span>
+              </div>
+              <div class="reg-score-wrap">
+                <span class="reg-score">86.9</span>
+                <span class="reg-max">/100 區域綜合壓力</span>
+              </div>
+              <div class="progress-track" style="margin: 8px 0;">
+                <div class="progress-fill" style="width: 86.9%; background: var(--color-danger);"></div>
+              </div>
+              <div class="reg-disclaimer-tag">
+                [示意拆分 · 模型指標映射]
+              </div>
+              <div class="reg-indicators-list">
+                映射來源：<code>l4_territorial_flashpoints</code> <code>l4_bloc_polarization</code> <code>l4_military_spending</code> <code>l4_nuclear_posture</code>
+              </div>
+              <div class="reg-note">示意拆分：加權映射指標 [l4_territorial_flashpoints, l4_bloc_polarization, l4_military_spending, l4_nuclear_posture]，反映陸權對峙與前沿引信摩擦。</div>
+            </div>
+            
+
+            <div class="region-card warning">
+              <div class="reg-head">
+                <div class="reg-title-wrap">
+                  <span class="reg-name">中東（紅海 / 波斯灣 / 霍爾木茲咽喉）</span>
+                  <span class="reg-en">Middle East / Persian Gulf & Red Sea Chokepoints</span>
+                </div>
+                <span class="reg-badge badge-warning">高度緊張 (High)</span>
+              </div>
+              <div class="reg-score-wrap">
+                <span class="reg-score">73.2</span>
+                <span class="reg-max">/100 區域綜合壓力</span>
+              </div>
+              <div class="progress-track" style="margin: 8px 0;">
+                <div class="progress-fill" style="width: 73.2%; background: var(--color-warning);"></div>
+              </div>
+              <div class="reg-disclaimer-tag">
+                [示意拆分 · 模型指標映射]
+              </div>
+              <div class="reg-indicators-list">
+                映射來源：<code>l1_maritime_chokepoints</code> <code>l1_energy_vulnerability</code> <code>l4_territorial_flashpoints</code> <code>l1_water_stress</code>
+              </div>
+              <div class="reg-note">示意拆分：加權映射指標 [l1_maritime_chokepoints, l1_energy_vulnerability, l4_territorial_flashpoints, l1_water_stress]，反映航道封鎖與能源外溢風險。</div>
+            </div>
+            
+
+            <div class="region-card danger">
+              <div class="reg-head">
+                <div class="reg-title-wrap">
+                  <span class="reg-name">東亞（台海 / 南海 / 第一島鏈）</span>
+                  <span class="reg-en">East Asia / Taiwan Strait & South China Sea</span>
+                </div>
+                <span class="reg-badge badge-danger">極度高壓 (Critical)</span>
+              </div>
+              <div class="reg-score-wrap">
+                <span class="reg-score">95.4</span>
+                <span class="reg-max">/100 區域綜合壓力</span>
+              </div>
+              <div class="progress-track" style="margin: 8px 0;">
+                <div class="progress-fill" style="width: 95.4%; background: var(--color-danger);"></div>
+              </div>
+              <div class="reg-disclaimer-tag">
+                [示意拆分 · 模型指標映射]
+              </div>
+              <div class="reg-indicators-list">
+                映射來源：<code>l2_compute_monopoly</code> <code>l4_territorial_flashpoints</code> <code>l5_tech_supremacy_fear</code> <code>l4_bloc_polarization</code>
+              </div>
+              <div class="reg-note">示意拆分：加權映射指標 [l2_compute_monopoly, l4_territorial_flashpoints, l5_tech_supremacy_fear, l4_bloc_polarization]，反映算力晶圓代工壟斷與預防性技術爭霸。</div>
+            </div>
+            
+
+            <div class="region-card elevated">
+              <div class="reg-head">
+                <div class="reg-title-wrap">
+                  <span class="reg-name">南亞與中亞（印巴 / 喜馬拉雅跨界水資源）</span>
+                  <span class="reg-en">South & Central Asia / Transboundary Basins</span>
+                </div>
+                <span class="reg-badge badge-elevated">顯著升級 (Elevated)</span>
+              </div>
+              <div class="reg-score-wrap">
+                <span class="reg-score">55.4</span>
+                <span class="reg-max">/100 區域綜合壓力</span>
+              </div>
+              <div class="progress-track" style="margin: 8px 0;">
+                <div class="progress-fill" style="width: 55.4%; background: var(--color-elevated);"></div>
+              </div>
+              <div class="reg-disclaimer-tag">
+                [示意拆分 · 模型指標映射]
+              </div>
+              <div class="reg-indicators-list">
+                映射來源：<code>l1_water_stress</code> <code>l1_climate_impact</code> <code>l4_nuclear_posture</code>
+              </div>
+              <div class="reg-note">示意拆分：加權映射指標 [l1_water_stress, l1_climate_impact, l4_nuclear_posture]，反映高山冰川消融引致水資源爭奪與核門檻壓力。</div>
+            </div>
+            
+
+            <div class="region-card warning">
+              <div class="reg-head">
+                <div class="reg-title-wrap">
+                  <span class="reg-name">全球戰略咽喉與關鍵礦物網</span>
+                  <span class="reg-en">Global Chokepoints & Strategic Critical Mineral Webs</span>
+                </div>
+                <span class="reg-badge badge-warning">高度緊張 (High)</span>
+              </div>
+              <div class="reg-score-wrap">
+                <span class="reg-score">70.0</span>
+                <span class="reg-max">/100 區域綜合壓力</span>
+              </div>
+              <div class="progress-track" style="margin: 8px 0;">
+                <div class="progress-fill" style="width: 70.0%; background: var(--color-warning);"></div>
+              </div>
+              <div class="reg-disclaimer-tag">
+                [示意拆分 · 模型指標映射]
+              </div>
+              <div class="reg-indicators-list">
+                映射來源：<code>l1_maritime_chokepoints</code> <code>l1_critical_minerals</code> <code>l4_trade_weaponization</code>
+              </div>
+              <div class="reg-note">示意拆分：加權映射指標 [l1_maritime_chokepoints, l1_critical_minerals, l4_trade_weaponization]，反映關鍵礦物禁運與全球海運供應鏈梗阻。</div>
+            </div>
+            
+        </div>
+      </div>
+    </section>
+        
     
     
   </main>
@@ -2124,9 +2650,81 @@
 }
   </script>
   <script>
+
     // Global Access to Embedded Scenario and Model Data
     window.WW3_MODEL_DATA = JSON.parse(document.getElementById('ww3-model-data').textContent);
     console.log("WW3 Model Data Loaded Successfully:", window.WW3_MODEL_DATA);
+
+    // Switch Active Scenario View (UI-Step 3 Interactive Matrix)
+    function switchScenario(scId) {
+      const data = window.WW3_MODEL_DATA;
+      if (!data || !data.scenarios) return;
+
+      const sc = data.scenarios.find(s => s.id === scId);
+      if (!sc) return;
+
+      // 1. Update Scenario Cards highlight
+      document.querySelectorAll('.scenario-card').forEach(el => el.classList.remove('active-sc'));
+      const activeCard = document.getElementById('sc-card-' + scId);
+      if (activeCard) activeCard.classList.add('active-sc');
+
+      // 2. Update Gauge & Scores
+      const scoreEl = document.getElementById('score-display');
+      if (scoreEl) scoreEl.textContent = sc.global_risk_index.toFixed(1);
+
+      const pillBase = document.getElementById('pill-base');
+      if (pillBase) pillBase.textContent = sc.base_structural_score.toFixed(1);
+
+      const pillGate = document.getElementById('pill-gate');
+      if (pillGate) pillGate.textContent = 'x' + sc.gate_factor.toFixed(3);
+
+      const pillFail = document.getElementById('pill-fail');
+      if (pillFail) pillFail.textContent = (100 - sc.peace_capacity).toFixed(1) + '%';
+
+      // 3. Update Gauge Needle (cx=160, cy=145, r=100)
+      const svg = document.querySelector('.gauge-svg');
+      if (svg) {
+        const needle = svg.querySelector('line');
+        if (needle) {
+          const clamped = Math.max(0, Math.min(100, sc.global_risk_index));
+          const theta = Math.PI - (clamped / 100.0) * Math.PI;
+          const nx = 160 + 100 * Math.cos(theta);
+          const ny = 145 - 100 * Math.sin(theta);
+          needle.setAttribute('x2', nx.toFixed(1));
+          needle.setAttribute('y2', ny.toFixed(1));
+        }
+      }
+
+      // 4. Update Stage Progression Tracker
+      document.querySelectorAll('.stage-card').forEach(el => el.classList.remove('active'));
+      const activeStageCard = document.getElementById('stage-card-' + sc.stage_number);
+      if (activeStageCard) activeStageCard.classList.add('active');
+
+      // 5. Update Five Layers bars if present
+      if (sc.layer_scores) {
+        for (const [lid, val] of Object.entries(sc.layer_scores)) {
+          const rows = document.querySelectorAll('.layer-row');
+          rows.forEach(r => {
+            const codeEl = r.querySelector('.layer-code');
+            if (codeEl && codeEl.textContent.trim() === lid) {
+              const scoreEl = r.querySelector('.layer-score');
+              const fillEl = r.querySelector('.progress-fill');
+              if (scoreEl) scoreEl.textContent = val.toFixed(1);
+              if (fillEl) {
+                fillEl.style.width = val + '%';
+                let color = "var(--color-green)";
+                if (val >= 85) color = "var(--color-red)";
+                else if (val >= 70) color = "var(--color-orange)";
+                else if (val >= 50) color = "var(--color-yellow)";
+                fillEl.style.background = color;
+                if (scoreEl) scoreEl.style.color = color;
+              }
+            }
+          });
+        }
+      }
+    }
+    
   </script>
 </body>
 </html>

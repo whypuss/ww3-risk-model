@@ -606,6 +606,129 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
     </section>
         """
 
+    # Step 3: Scenario Matrix Cards & Regional Pressure Cards
+    if ui_step >= 3:
+        # Generate Scenario Cards
+        sc_cards = []
+        for sc in data.get("scenarios", []):
+            is_active_sc = (sc["id"] == data["metadata"]["active_scenario_id"])
+            active_sc_cls = "active-sc" if is_active_sc else ""
+            delta_val = sc.get("delta_from_baseline", 0.0)
+            if delta_val > 0:
+                delta_str = f"+{delta_val:.1f} pts"
+                delta_cls = "delta-up"
+            elif delta_val < 0:
+                delta_str = f"{delta_val:.1f} pts"
+                delta_cls = "delta-down"
+            else:
+                delta_str = "基準 (Baseline)"
+                delta_cls = "delta-base"
+
+            prob_1y = sc.get("probability_bands", {}).get("1y", {}).get("central_pct", 0.0)
+            prob_5y = sc.get("probability_bands", {}).get("5y", {}).get("central_pct", 0.0)
+            prob_10y = sc.get("probability_bands", {}).get("10y", {}).get("central_pct", 0.0)
+
+            # Mini layer bars
+            mini_bars = []
+            for lid in ["L1", "L2", "L3", "L4", "L5"]:
+                l_sc = sc.get("layer_scores", {}).get(lid, 50.0)
+                mini_bars.append(f"""
+                <div class="sc-mini-bar-wrap" title="{lid}: {l_sc:.1f}">
+                  <div class="sc-mini-bar-fill" style="height:{l_sc}%;"></div>
+                </div>
+                """)
+            mini_bars_html = "".join(mini_bars)
+
+            sc_cards.append(f"""
+            <div class="scenario-card {active_sc_cls}" id="sc-card-{sc['id']}" onclick="switchScenario('{sc['id']}')">
+              <div class="sc-head">
+                <span class="sc-id">{sc['id']}</span>
+                <span class="sc-delta {delta_cls}">{delta_str}</span>
+              </div>
+              <div class="sc-title">{sc['title']}</div>
+              <div class="sc-score-row">
+                <div class="sc-score">{sc['global_risk_index']:.1f}</div>
+                <div class="sc-stage-badge">STAGE {sc['stage_number']}</div>
+                <div class="sc-mini-bars">{mini_bars_html}</div>
+              </div>
+              <div class="sc-probs">
+                <span>1y: <strong>{prob_1y:.1f}%</strong></span>
+                <span>5y: <strong>{prob_5y:.1f}%</strong></span>
+                <span>10y: <strong>{prob_10y:.1f}%</strong></span>
+              </div>
+              <p class="sc-desc">{sc['description']}</p>
+            </div>
+            """)
+        scenarios_html = "\n".join(sc_cards)
+
+        # Generate Regional Pressure Cards
+        reg_cards = []
+        for reg in data.get("regional_pressures", []):
+            indicators_tags = " ".join([f"<code>{ind}</code>" for ind in reg["indicators_used"]])
+            reg_cards.append(f"""
+            <div class="region-card {reg['color_class']}">
+              <div class="reg-head">
+                <div class="reg-title-wrap">
+                  <span class="reg-name">{reg['name']}</span>
+                  <span class="reg-en">{reg['name_en']}</span>
+                </div>
+                <span class="reg-badge badge-{reg['color_class']}">{reg['level_label']}</span>
+              </div>
+              <div class="reg-score-wrap">
+                <span class="reg-score">{reg['score']:.1f}</span>
+                <span class="reg-max">/100 區域綜合壓力</span>
+              </div>
+              <div class="progress-track" style="margin: 8px 0;">
+                <div class="progress-fill" style="width: {reg['score']}%; background: var(--color-{reg['color_class']});"></div>
+              </div>
+              <div class="reg-disclaimer-tag">
+                [示意拆分 · 模型指標映射]
+              </div>
+              <div class="reg-indicators-list">
+                映射來源：{indicators_tags}
+              </div>
+              <div class="reg-note">{reg['note']}</div>
+            </div>
+            """)
+        regions_html = "\n".join(reg_cards)
+
+        step3_html = f"""
+    <!-- Section 3: Scenario Matrix & Regional Pressures (UI-Step 3) -->
+    <section style="margin-top:24px;display:flex;flex-direction:column;gap:24px;">
+      <!-- Scenario Matrix Cards (Ref: 03 GOD MODE Scenario Matrix) -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>情境卡矩陣與動態比對 (Scenario Matrix &amp; Comparative Analysis)</span>
+          </div>
+          <span class="panel-tag">CLICK ANY CARD TO SWITCH SCENARIO VIEW</span>
+        </div>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:14px;">
+          點擊下方任一情境卡片，即可將全儀表盤（總分 Gauge、四階段進度、五層維度橫條、閘門與互動效應）切換至該情境評估視角。所有數值均由模型公式實時驅動。
+        </p>
+        <div class="scenarios-grid">
+          {scenarios_html}
+        </div>
+      </div>
+
+      <!-- Regional Pressure Cards (Ref: 03 / 07 MRI Regional Cards) -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>全球五大關鍵地緣戰區壓力卡列 (Regional Crisis Pressures)</span>
+          </div>
+          <span class="panel-tag">ILLUSTRATIVE DECOMPOSITION · MAPPED FROM CORE INDICATORS</span>
+        </div>
+        <div style="background:rgba(234, 179, 8, 0.08);border:1px solid rgba(234, 179, 8, 0.25);border-radius:6px;padding:8px 12px;margin-bottom:16px;font-size:0.76rem;color:#fef08a;">
+          <strong>透明度說明 (Transparency Standard)：</strong>區域分數為「<strong>示意拆分 (Illustrative Mapping)</strong>」，由模型中既有之客觀指標（如海運咽喉受阻、領土引信點摩擦、算力壟斷等）加權合成，非獨立地理感測器實測，特此標註以防誤導。
+        </div>
+        <div class="regions-grid">
+          {regions_html}
+        </div>
+      </div>
+    </section>
+        """
+
     # CSS styles
     css = """
     :root {
@@ -1151,6 +1274,214 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
       .grid-two-cols { grid-template-columns: 1fr !important; }
     }
 
+    /* Step 3: Scenario Matrix Cards */
+    .scenarios-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 1024px) {
+      .scenarios-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .scenarios-grid { grid-template-columns: 1fr; }
+    }
+    .scenario-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .scenario-card:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+    .scenario-card.active-sc {
+      border-color: var(--accent-cyan);
+      background: linear-gradient(180deg, rgba(6, 182, 212, 0.08) 0%, rgba(15, 23, 42, 0.95) 100%);
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+    }
+    .sc-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sc-id {
+      font-size: 0.7rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+    }
+    .sc-delta {
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .delta-up { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
+    .delta-down { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; }
+    .delta-base { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; }
+    .sc-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #f8fafc;
+      line-height: 1.35;
+      min-height: 2.7rem;
+    }
+    .sc-score-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .sc-score {
+      font-size: 1.6rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: #fff;
+    }
+    .sc-stage-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+    }
+    .sc-mini-bars {
+      display: flex;
+      gap: 3px;
+      height: 20px;
+      align-items: flex-end;
+      margin-left: auto;
+    }
+    .sc-mini-bar-wrap {
+      width: 5px;
+      height: 100%;
+      background: #1e293b;
+      border-radius: 2px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+    }
+    .sc-mini-bar-fill {
+      width: 100%;
+      background: var(--accent-cyan);
+      border-radius: 1px;
+    }
+    .sc-probs {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 6px;
+    }
+    .sc-probs strong { color: #e2e8f0; }
+    .sc-desc {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    /* Regional Cards Grid */
+    .regions-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 1200px) {
+      .regions-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .regions-grid { grid-template-columns: 1fr; }
+    }
+    .region-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .reg-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .reg-title-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+    .reg-name {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .reg-en {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+    }
+    .reg-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .badge-danger { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid var(--color-red); }
+    .badge-warning { background: rgba(249, 115, 22, 0.15); color: #fdba74; border: 1px solid var(--color-orange); }
+    .badge-elevated { background: rgba(234, 179, 8, 0.15); color: #fef08a; border: 1px solid var(--color-yellow); }
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid var(--color-green); }
+    .reg-score-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .reg-score {
+      font-size: 1.45rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: #fff;
+    }
+    .reg-max {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+    .reg-disclaimer-tag {
+      font-size: 0.68rem;
+      color: #f59e0b;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+    .reg-indicators-list {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+    .reg-indicators-list code {
+      background: rgba(0, 0, 0, 0.25);
+      padding: 1px 4px;
+      border-radius: 3px;
+      color: var(--accent-cyan);
+    }
+    .reg-note {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+      margin-top: 4px;
+    }
+
     /* Footer */
     .dash-footer {
       max-width: 1380px;
@@ -1163,6 +1494,82 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
       font-size: 0.78rem;
     }
     </style>
+    """
+
+    js_script = """
+    // Global Access to Embedded Scenario and Model Data
+    window.WW3_MODEL_DATA = JSON.parse(document.getElementById('ww3-model-data').textContent);
+    console.log("WW3 Model Data Loaded Successfully:", window.WW3_MODEL_DATA);
+
+    // Switch Active Scenario View (UI-Step 3 Interactive Matrix)
+    function switchScenario(scId) {
+      const data = window.WW3_MODEL_DATA;
+      if (!data || !data.scenarios) return;
+
+      const sc = data.scenarios.find(s => s.id === scId);
+      if (!sc) return;
+
+      // 1. Update Scenario Cards highlight
+      document.querySelectorAll('.scenario-card').forEach(el => el.classList.remove('active-sc'));
+      const activeCard = document.getElementById('sc-card-' + scId);
+      if (activeCard) activeCard.classList.add('active-sc');
+
+      // 2. Update Gauge & Scores
+      const scoreEl = document.getElementById('score-display');
+      if (scoreEl) scoreEl.textContent = sc.global_risk_index.toFixed(1);
+
+      const pillBase = document.getElementById('pill-base');
+      if (pillBase) pillBase.textContent = sc.base_structural_score.toFixed(1);
+
+      const pillGate = document.getElementById('pill-gate');
+      if (pillGate) pillGate.textContent = 'x' + sc.gate_factor.toFixed(3);
+
+      const pillFail = document.getElementById('pill-fail');
+      if (pillFail) pillFail.textContent = (100 - sc.peace_capacity).toFixed(1) + '%';
+
+      // 3. Update Gauge Needle (cx=160, cy=145, r=100)
+      const svg = document.querySelector('.gauge-svg');
+      if (svg) {
+        const needle = svg.querySelector('line');
+        if (needle) {
+          const clamped = Math.max(0, Math.min(100, sc.global_risk_index));
+          const theta = Math.PI - (clamped / 100.0) * Math.PI;
+          const nx = 160 + 100 * Math.cos(theta);
+          const ny = 145 - 100 * Math.sin(theta);
+          needle.setAttribute('x2', nx.toFixed(1));
+          needle.setAttribute('y2', ny.toFixed(1));
+        }
+      }
+
+      // 4. Update Stage Progression Tracker
+      document.querySelectorAll('.stage-card').forEach(el => el.classList.remove('active'));
+      const activeStageCard = document.getElementById('stage-card-' + sc.stage_number);
+      if (activeStageCard) activeStageCard.classList.add('active');
+
+      // 5. Update Five Layers bars if present
+      if (sc.layer_scores) {
+        for (const [lid, val] of Object.entries(sc.layer_scores)) {
+          const rows = document.querySelectorAll('.layer-row');
+          rows.forEach(r => {
+            const codeEl = r.querySelector('.layer-code');
+            if (codeEl && codeEl.textContent.trim() === lid) {
+              const scoreEl = r.querySelector('.layer-score');
+              const fillEl = r.querySelector('.progress-fill');
+              if (scoreEl) scoreEl.textContent = val.toFixed(1);
+              if (fillEl) {
+                fillEl.style.width = val + '%';
+                let color = "var(--color-green)";
+                if (val >= 85) color = "var(--color-red)";
+                else if (val >= 70) color = "var(--color-orange)";
+                else if (val >= 50) color = "var(--color-yellow)";
+                fillEl.style.background = color;
+                if (scoreEl) scoreEl.style.color = color;
+              }
+            }
+          });
+        }
+      }
+    }
     """
 
     # HTML Skeleton
@@ -1288,9 +1695,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
 {data_json_str}
   </script>
   <script>
-    // Global Access to Embedded Scenario and Model Data
-    window.WW3_MODEL_DATA = JSON.parse(document.getElementById('ww3-model-data').textContent);
-    console.log("WW3 Model Data Loaded Successfully:", window.WW3_MODEL_DATA);
+{js_script}
   </script>
 </body>
 </html>
