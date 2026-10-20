@@ -451,7 +451,11 @@ def test_cli_historical(capsys):
 
 def test_evidence_counts_breakdown(baseline_scenario: ScenarioData, model: WW3RiskModel):
     res = model.evaluate(baseline_scenario)
-    assert res.evidence_counts["illustrative"] > 20
+    # v0.2: 7 verified, 5 inference, 22 illustrative (total 34)
+    assert res.evidence_counts["verified"] == 7
+    assert res.evidence_counts["inference"] == 5
+    assert res.evidence_counts["illustrative"] == 22
+    assert res.evidence_counts["verified"] + res.evidence_counts["inference"] >= 10
     assert sum(res.evidence_counts.values()) == len(baseline_scenario.gate_buffers) + sum(
         len(layer.indicators) for layer in baseline_scenario.layers.values()
     )

@@ -21,8 +21,10 @@ class Indicator:
     weight: float = 1.0  # Relative weight within layer
     evidence_level: str = "illustrative"  # verified | inference | illustrative
     source: str = ""
+    source_url: str = ""
     year: str | int = 2026
     note: str = ""
+    retrieval_note: str = ""
 
     def __post_init__(self) -> None:
         self.value = float(self.value)
@@ -37,7 +39,7 @@ class Indicator:
             )
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        d = {
             "id": self.id,
             "name": self.name,
             "name_en": self.name_en,
@@ -48,6 +50,11 @@ class Indicator:
             "year": self.year,
             "note": self.note,
         }
+        if self.source_url:
+            d["source_url"] = self.source_url
+        if self.retrieval_note:
+            d["retrieval_note"] = self.retrieval_note
+        return d
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> Indicator:
@@ -59,8 +66,10 @@ class Indicator:
             weight=float(data.get("weight", 1.0)),
             evidence_level=data.get("evidence_level", "illustrative"),
             source=data.get("source", ""),
+            source_url=data.get("source_url", ""),
             year=data.get("year", 2026),
             note=data.get("note", ""),
+            retrieval_note=data.get("retrieval_note", ""),
         )
 
 
@@ -120,8 +129,10 @@ class GateBuffer:
     weight: float = 1.0
     evidence_level: str = "illustrative"
     source: str = ""
+    source_url: str = ""
     year: str | int = 2026
     note: str = ""
+    retrieval_note: str = ""
 
     def __post_init__(self) -> None:
         self.value = float(self.value)
@@ -136,7 +147,7 @@ class GateBuffer:
             )
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        d = {
             "id": self.id,
             "name": self.name,
             "name_en": self.name_en,
@@ -147,6 +158,11 @@ class GateBuffer:
             "year": self.year,
             "note": self.note,
         }
+        if self.source_url:
+            d["source_url"] = self.source_url
+        if self.retrieval_note:
+            d["retrieval_note"] = self.retrieval_note
+        return d
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> GateBuffer:
@@ -158,8 +174,10 @@ class GateBuffer:
             weight=float(data.get("weight", 1.0)),
             evidence_level=data.get("evidence_level", "illustrative"),
             source=data.get("source", ""),
+            source_url=data.get("source_url", ""),
             year=data.get("year", 2026),
             note=data.get("note", ""),
+            retrieval_note=data.get("retrieval_note", ""),
         )
 
 
