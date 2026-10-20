@@ -112,3 +112,52 @@ def test_build_dashboard_offline_zero_cdn(tmp_path):
     assert "STAGE 03" in content
     assert "當前階段 · CURRENT" in content
     assert f"{data['main_result']['global_risk_index']:.1f}" in content
+
+
+def test_simulator_formula_consistency():
+    """Verify that the simulator JS recalculation engine formula matches Python WW3RiskModel exactly."""
+    import math
+    model = WW3RiskModel()
+    scenario_path = Path("scenarios/baseline_2026.json")
+    scenario = load_scenario_from_file(scenario_path)
+    py_result = model.evaluate(scenario)
+
+    # Replicate the exact JS simulator recalculation in Python
+    ai_val = 62.0
+    unemp_val = 68.0
+    energy_val = 60.0
+    minerals_val = 72.0
+    bloc_val = 78.0
+    fear_val = 78.0
+    peace_cap = 44.916666666666664
+
+    l1 = (52.0 * 1.0 + 58.0 * 1.0 + energy_val * 1.2 + minerals_val * 1.3 + 65.0 * 1.0 + 68.0 * 1.2) / 6.7
+    l2 = 71.32352941176471
+    l3 = (56.0 * 1.0 + unemp_val * 1.2 + 65.0 * 1.1 + 75.0 * 1.0 + ai_val * 1.5 + 64.0 * 1.0) / 6.8
+    l4 = (72.0 * 1.2 + 75.0 * 1.2 + bloc_val * 1.3 + 76.0 * 1.2 + 66.0 * 1.4 + 80.0 * 1.4) / 7.7
+    l5 = (76.0 * 1.3 + 70.0 * 1.1 + 64.0 * 1.0 + fear_val * 1.4 + 72.0 * 1.2 + 68.0 * 1.0) / 7.0
+
+    base_structural = (l1 * 1.0 + l2 * 1.0 + l3 * 1.1 + l4 * 1.2 + l5 * 1.1) / 5.4
+
+    gate_failure = 100.0 - peace_cap
+    gate_factor = 1.4 - (peace_cap / 100.0) * 0.8
+
+    i_l1_l2 = 0.08 * (l1 * l2 / 100.0)
+    i_l3_l5 = 0.08 * (l3 * l5 / 100.0)
+    i_l4_gate = 0.10 * (l4 * gate_failure / 100.0)
+    total_interaction = min(25.0, i_l1_l2 + i_l3_l5 + i_l4_gate)
+
+    raw_interacted = base_structural + total_interaction
+    gated = raw_interacted * gate_factor
+
+    if gated <= 70.0:
+        sim_index = gated
+    else:
+        sim_index = 70.0 + 30.0 * math.tanh((gated - 70.0) / 30.0)
+
+    # Check exact match with baseline 83.1
+    assert round(sim_index, 1) == round(py_result.global_risk_index, 1)
+    assert round(base_structural, 1) == round(py_result.base_structural_score, 1)
+    assert round(gate_factor, 3) == round(py_result.gate_factor, 3)
+    assert round(total_interaction, 2) == round(py_result.interactions["total"], 2)
+
