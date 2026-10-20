@@ -27,6 +27,11 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100%;
+    }
     body {
       background: var(--bg-base);
       color: var(--text-main);
@@ -34,6 +39,21 @@
       line-height: 1.5;
       padding-bottom: 40px;
       -webkit-font-smoothing: antialiased;
+    }
+    .dashboard-container,
+    .panel-card,
+    .hero-grid,
+    .grid-two-cols,
+    .simulator-layout,
+    .sim-controls-col,
+    .sim-result-col,
+    .scenarios-grid,
+    .regions-grid,
+    .history-grid,
+    .table-scroll,
+    .unconnected-grid,
+    .methodology-grid {
+      min-width: 0;
     }
 
     /* Top Navigation Bar */
@@ -48,6 +68,8 @@
       top: 0;
       z-index: 50;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      min-width: 0;
+      width: 100%;
     }
     .brand-group {
       display: flex;
@@ -155,9 +177,6 @@
       grid-template-columns: 420px 1fr;
       gap: 24px;
     }
-    @media (max-width: 1024px) {
-      .hero-grid { grid-template-columns: 1fr; }
-    }
 
     /* Gauge Card */
     .gauge-card {
@@ -237,9 +256,6 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
-    }
-    @media (max-width: 768px) {
-      .stages-grid { grid-template-columns: 1fr; }
     }
     .stage-card {
       background: var(--bg-surface);
@@ -544,21 +560,11 @@
       color: var(--color-red);
     }
 
-    @media (max-width: 1024px) {
-      .grid-two-cols { grid-template-columns: 1fr !important; }
-    }
-
     /* Step 3: Scenario Matrix Cards */
     .scenarios-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 16px;
-    }
-    @media (max-width: 1024px) {
-      .scenarios-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 640px) {
-      .scenarios-grid { grid-template-columns: 1fr; }
     }
     .scenario-card {
       background: var(--bg-surface);
@@ -670,12 +676,6 @@
       grid-template-columns: repeat(5, 1fr);
       gap: 14px;
     }
-    @media (max-width: 1200px) {
-      .regions-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (max-width: 768px) {
-      .regions-grid { grid-template-columns: 1fr; }
-    }
     .region-card {
       background: var(--bg-surface);
       border: 1px solid var(--border-color);
@@ -761,9 +761,6 @@
       display: grid;
       grid-template-columns: 1.25fr 0.75fr;
       gap: 24px;
-    }
-    @media (max-width: 1024px) {
-      .simulator-layout { grid-template-columns: 1fr; }
     }
     .btn-tactical {
       background: rgba(6, 182, 212, 0.15);
@@ -963,12 +960,6 @@
       grid-template-columns: repeat(5, 1fr);
       gap: 14px;
     }
-    @media (max-width: 1200px) {
-      .history-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (max-width: 640px) {
-      .history-grid { grid-template-columns: 1fr; }
-    }
     .hist-card {
       background: var(--bg-surface);
       border: 1px solid var(--border-color);
@@ -1074,11 +1065,31 @@
     .search-input:focus {
       border-color: var(--accent-cyan);
     }
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-top: 14px;
+      min-width: 0;
+    }
     .styled-table {
       width: 100%;
+      min-width: 860px;
       border-collapse: collapse;
       font-size: 0.76rem;
       text-align: left;
+    }
+    .mobile-table-hint {
+      display: none;
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.08);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      border-radius: 4px;
+      padding: 8px 12px;
+      margin-top: 10px;
+      text-align: center;
+      font-family: var(--font-mono);
     }
     .styled-table th {
       background: rgba(15, 23, 42, 0.9);
@@ -1188,6 +1199,309 @@
       color: var(--text-dim);
       font-size: 0.78rem;
     }
+
+    /* ==========================================================================
+       Responsive Breakpoints (Desktop >= 1025px untouched)
+       ========================================================================== */
+
+    @media (max-width: 1200px) {
+      .regions-grid { grid-template-columns: repeat(3, 1fr); }
+      .history-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 1024px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .grid-two-cols { grid-template-columns: 1fr !important; }
+      .scenarios-grid { grid-template-columns: repeat(2, 1fr); }
+      .simulator-layout { grid-template-columns: 1fr; }
+      .sim-result-card { position: static; }
+    }
+
+    @media (max-width: 768px) {
+      /* Typography & Base */
+      body, p, .panel-card p, .sim-slider-desc, .sc-desc, .reg-note, .hist-desc, .unc-desc, .stage-card-desc, .insight-box p {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .meta-badge, .ev-badge, .stage-num, .stage-tag, .sc-id, .sc-delta, .pusher-badge, .unc-badge, .reg-badge, .reg-disclaimer-tag {
+        font-size: 11px;
+      }
+
+      /* Top Navigation Bar: Stack vertically, wrap badges, no clipping */
+      .top-bar {
+        padding: 12px 14px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .brand-group {
+        width: 100%;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .brand-title {
+        font-size: 1.02rem;
+        line-height: 1.35;
+        white-space: normal;
+        word-break: break-word;
+      }
+      .brand-title span {
+        display: inline;
+      }
+      .brand-sub {
+        font-size: 0.7rem;
+        word-break: break-word;
+        margin-top: 2px;
+      }
+      .top-meta {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        font-size: 11px;
+      }
+      .meta-badge {
+        white-space: normal;
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border-radius: 4px;
+        line-height: 1.3;
+      }
+      .top-date {
+        width: 100%;
+        font-size: 11px;
+        color: var(--text-dim);
+        display: block;
+        margin-top: 2px;
+      }
+
+      /* Container & Panels */
+      .dashboard-container {
+        margin: 12px auto;
+        padding: 0 10px;
+        gap: 16px;
+        max-width: 100%;
+      }
+      .panel-card {
+        padding: 14px;
+        border-radius: 6px;
+        max-width: 100%;
+      }
+
+      /* Grids to Single Column */
+      .scenarios-grid { grid-template-columns: 1fr; }
+      .regions-grid { grid-template-columns: 1fr; }
+      .history-grid { grid-template-columns: 1fr; }
+      .unconnected-grid { grid-template-columns: 1fr; }
+      .methodology-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
+
+      /* Stages Grid: 2 columns at 641-768px */
+      .stages-grid { grid-template-columns: repeat(2, 1fr); }
+
+      /* Touch Targets >= 44px */
+      .btn-tactical {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 14px;
+        font-size: 13px;
+      }
+      .filter-btn {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+      .scenario-card {
+        min-height: 44px;
+        padding: 14px;
+      }
+
+      /* Slider touch target & thumb enlargement */
+      .sim-range {
+        height: 10px;
+        margin: 10px 0;
+      }
+      .sim-range::-webkit-slider-thumb {
+        width: 28px;
+        height: 28px;
+      }
+      .sim-range::-moz-range-thumb {
+        width: 28px;
+        height: 28px;
+      }
+      .sim-slider-group {
+        min-height: 44px;
+        padding: 14px 12px;
+      }
+
+      /* Table responsive & scroll hint */
+      .mobile-table-hint {
+        display: block;
+      }
+      .table-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+      .search-box-wrap {
+        max-width: 100%;
+        width: 100%;
+      }
+      .search-input {
+        min-height: 44px;
+        font-size: 14px;
+      }
+      .filter-group {
+        width: 100%;
+      }
+
+      /* Gate formula & code break safety */
+      .gate-formula-banner {
+        word-break: break-word;
+        overflow-wrap: break-word;
+      }
+      .gate-math {
+        font-size: 13px;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        line-height: 1.5;
+      }
+      .gate-math code {
+        white-space: normal;
+        word-break: break-all;
+        display: inline-block;
+        font-size: 12px;
+      }
+
+      /* Five layers row mobile responsive */
+      .layer-info {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .layer-name-wrap {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .layer-en {
+        width: 100%;
+        display: block;
+      }
+
+      /* Pushers mobile layout */
+      .pusher-item {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .pusher-val {
+        margin-left: auto;
+      }
+
+      /* Footer */
+      .dash-footer {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+        padding: 16px 12px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      /* Panel Header wrap & left-aligned tag */
+      .panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .panel-title {
+        width: 100%;
+      }
+      .panel-tag {
+        width: 100%;
+        text-align: left;
+        display: block;
+      }
+
+      /* Stages Grid: single column on <=640px */
+      .stages-grid {
+        grid-template-columns: 1fr;
+      }
+
+      /* Probability Bands: single column on <=640px */
+      .prob-grid {
+        grid-template-columns: 1fr;
+      }
+
+      /* Gauge Meta Pills: wrap but horizontal */
+      .gauge-meta-pills {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .pill {
+        flex: 1 1 85px;
+        max-width: none;
+        padding: 6px 8px;
+      }
+
+      /* Active Stage Banner */
+      .active-stage-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      /* Scenario Probabilities Row */
+      .sc-probs {
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+
+      /* Prob Header */
+      .prob-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .top-bar {
+        padding: 10px 10px;
+      }
+      .brand-title {
+        font-size: 0.94rem;
+      }
+      .dashboard-container {
+        padding: 0 6px;
+        margin: 10px auto;
+        gap: 12px;
+      }
+      .panel-card {
+        padding: 10px;
+      }
+      .score-big {
+        font-size: 2.7rem;
+      }
+      .sim-score-big {
+        font-size: 2.4rem;
+      }
+      .sim-metrics-grid {
+        grid-template-columns: 1fr;
+      }
+      .sim-header-actions {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+      }
+      .sim-header-actions .btn-tactical {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1196,7 +1510,7 @@
     <div class="brand-group">
       <div class="radar-icon"></div>
       <div>
-        <div class="brand-title">WW3 結構風險預警儀表板 <span style="font-weight:400;font-size:0.85rem;color:var(--text-dim);">WW3 Risk Model</span></div>
+        <div class="brand-title">WW3 結構風險預警儀表板 <span class="brand-title-en" style="font-weight:400;font-size:0.85rem;color:var(--text-dim);">WW3 Risk Model</span></div>
         <div class="brand-sub">DEFENSE INTELLIGENCE &amp; SYSTEMIC CRISIS TERMINAL</div>
       </div>
     </div>
@@ -1204,7 +1518,7 @@
       <span class="meta-badge badge-step">UI-STEP 5</span>
       <span class="meta-badge badge-alert">警戒級別：階段三：和平解決機制失效 (STAGE 3)</span>
       <span class="meta-badge badge-offline">● 100% 本地離線運行 (ZERO CDN)</span>
-      <span style="font-family:var(--font-mono);color:var(--text-dim);">2026-10-20 · 2026 基準</span>
+      <span class="top-date" style="font-family:var(--font-mono);color:var(--text-dim);">2026-10-20 · 2026 基準</span>
     </div>
   </header>
 
@@ -1337,7 +1651,7 @@
 
         <!-- Probability Bands for Baseline -->
         <div style="margin-top:20px;">
-          <div style="font-size:0.8rem;font-weight:700;color:var(--text-muted);display:flex;justify-content:space-between;">
+          <div class="prob-header" style="font-size:0.8rem;font-weight:700;color:var(--text-muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
             <span>情境推演概率帶 (Scenario Probability Bands)</span>
             <span style="font-size:0.7rem;font-weight:400;color:var(--text-dim);">非統計驗證預測 · 基於結構壓力映射</span>
           </div>
@@ -1975,7 +2289,7 @@
         <div class="panel-title">
           <span>實時交互衝突模擬器 (Interactive Crisis Escalation Simulator)</span>
         </div>
-        <div style="display:flex;align-items:center;gap:12px;">
+        <div class="sim-header-actions" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <button class="btn-tactical" onclick="resetSimulation()">重設為基準情境 (Reset)</button>
           <span class="panel-tag">PURE CLIENT-SIDE JS ENGINE · EXACT MODEL REPLICATION</span>
         </div>
@@ -2269,7 +2583,8 @@
         </div>
       </div>
 
-      <div class="table-responsive" style="margin-top:14px;overflow-x:auto;">
+      <div class="mobile-table-hint">← 左右滑動查看完整表格 →</div>
+      <div class="table-scroll">
         <table class="styled-table">
           <thead>
             <tr>

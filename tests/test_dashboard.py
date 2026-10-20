@@ -241,3 +241,37 @@ def test_dashboard_head_structure_has_no_bare_css_or_text_nodes(tmp_path):
     )
 
 
+def test_dashboard_mobile_responsive_structure(tmp_path):
+    """Verify that generated dashboard HTML contains mobile responsive breakpoints, table-scroll, and touch targets."""
+    out_html = tmp_path / "dashboard_mobile.html"
+    build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        ui_step=5,
+    )
+    content = out_html.read_text(encoding="utf-8")
+
+    # 1. Media queries hierarchy
+    assert "@media (max-width: 768px)" in content, "Missing 768px mobile breakpoint"
+    assert "@media (max-width: 640px)" in content, "Missing 640px mobile breakpoint"
+    assert "@media (max-width: 480px)" in content, "Missing 480px narrow mobile breakpoint"
+
+    # 2. Table scroll container and hint
+    assert '<div class="table-scroll">' in content, "Missing .table-scroll container"
+    assert "左右滑動查看完整表格" in content, "Missing horizontal scroll mobile hint"
+    assert re.search(r'<div class="table-scroll">\s*<table class="styled-table">', content) is not None, (
+        ".table-scroll must directly wrap <table class=\"styled-table\">"
+    )
+
+    # 3. Touch targets and slider ergonomics in CSS
+    assert "min-height: 44px" in content, "Missing >= 44px touch target rules"
+    assert "width: 28px" in content, "Missing enlarged slider thumb rule"
+    assert "overflow-x: hidden" in content, "Missing overflow safety on html/body"
+
+    # 4. Top bar mobile wrap & badge styling
+    assert "class=\"top-bar\"" in content
+    assert "class=\"top-meta\"" in content
+    assert "class=\"top-date\"" in content
+
+
+
