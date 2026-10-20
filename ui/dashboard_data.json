@@ -1,0 +1,1089 @@
+{
+  "metadata": {
+    "title": "WW3 結構風險預警儀表板",
+    "title_en": "WW3 Structural Risk Early Warning Dashboard",
+    "model_version": "0.1.0-alpha",
+    "generated_at": "2026-10-20",
+    "active_scenario_id": "baseline_2026",
+    "active_scenario_title": "2026 全球結構風險基準情境",
+    "active_scenario_year": 2026
+  },
+  "main_result": {
+    "scenario_id": "baseline_2026",
+    "scenario_title": "2026 全球結構風險基準情境",
+    "scenario_year": 2026,
+    "global_risk_index": 83.07,
+    "base_structural_score": 69.29,
+    "raw_interacted_score": 80.72,
+    "layer_scores": {
+      "L1": 63.01,
+      "L2": 71.32,
+      "L3": 64.87,
+      "L4": 74.47,
+      "L5": 71.91
+    },
+    "layer_weights": {
+      "L1": 1.0,
+      "L2": 1.0,
+      "L3": 1.1,
+      "L4": 1.2,
+      "L5": 1.1
+    },
+    "peace_capacity": 44.92,
+    "gate_failure": 55.08,
+    "gate_factor": 1.041,
+    "interactions": {
+      "L1_x_L2": 3.6,
+      "L3_x_L5": 3.73,
+      "L4_x_GateFailure": 4.1,
+      "raw_sum": 11.43,
+      "total": 11.43,
+      "is_capped": 0
+    },
+    "stage": {
+      "number": 3,
+      "code": "STAGE_3_PEACE_MECHANISM_FAILURE",
+      "title": "階段三：和平解決機制失效",
+      "title_en": "Stage 3: Breakdown of Peace Mechanisms",
+      "description": "外交互信受挫、貿易脫鉤武器化，多邊仲裁癱瘓，安全困境進入自我強化之高危狀態。"
+    },
+    "probability_bands": {
+      "1y": {
+        "horizon_years": 1,
+        "central_pct": 24.3,
+        "lower_pct": 15.8,
+        "upper_pct": 35.2,
+        "band_str": "15.8% – 35.2% (中位: 24.3%)",
+        "disclaimer": "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+      },
+      "5y": {
+        "horizon_years": 5,
+        "central_pct": 57.0,
+        "lower_pct": 42.8,
+        "upper_pct": 74.1,
+        "band_str": "42.8% – 74.1% (中位: 57.0%)",
+        "disclaimer": "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+      },
+      "10y": {
+        "horizon_years": 10,
+        "central_pct": 77.1,
+        "lower_pct": 61.7,
+        "upper_pct": 96.4,
+        "band_str": "61.7% – 96.4% (中位: 77.1%)",
+        "disclaimer": "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+      }
+    },
+    "top_risk_drivers": [
+      {
+        "layer": "L2",
+        "id": "l2_compute_monopoly",
+        "name": "前沿 AI 算力與先進晶圓代工極端壟斷",
+        "value": 82.0,
+        "weight": 1.4
+      },
+      {
+        "layer": "L4",
+        "id": "l4_territorial_flashpoints",
+        "name": "高危熱點主權與領土引信點摩擦頻度",
+        "value": 80.0,
+        "weight": 1.4
+      },
+      {
+        "layer": "L4",
+        "id": "l4_bloc_polarization",
+        "name": "全球地緣政治陣營極化與同盟剛性",
+        "value": 78.0,
+        "weight": 1.3
+      },
+      {
+        "layer": "L5",
+        "id": "l5_tech_supremacy_fear",
+        "name": "未來十年內喪失戰略技術霸權之預防性開戰邏輯",
+        "value": 78.0,
+        "weight": 1.4
+      },
+      {
+        "layer": "L4",
+        "id": "l4_weaponized_interdependence",
+        "name": "經貿金融相互依賴武器化與關鍵禁運",
+        "value": 76.0,
+        "weight": 1.2
+      }
+    ],
+    "top_peace_buffers": [
+      {
+        "id": "gate_nuclear_deterrence_stability",
+        "name": "核恐怖平衡相互保證毀滅 (MAD) 與防誤擊架構",
+        "capacity": 62.0,
+        "weight": 1.4
+      },
+      {
+        "id": "gate_trade_interdependence",
+        "name": "全球深度經貿相互依賴與脫鉤沉沒成本",
+        "capacity": 48.0,
+        "weight": 1.2
+      },
+      {
+        "id": "gate_diplomatic_trust",
+        "name": "大國元首戰略熱線與外交互信管道",
+        "capacity": 36.0,
+        "weight": 1.2
+      },
+      {
+        "id": "gate_international_institutions",
+        "name": "聯合國與國際法多邊仲裁機制之執行力",
+        "capacity": 28.0,
+        "weight": 1.0
+      }
+    ],
+    "evidence_counts": {
+      "verified": 0,
+      "inference": 0,
+      "illustrative": 34
+    },
+    "notes": [
+      "Base structural score: 69.29",
+      "Interaction bonus: +11.43 (cap: 25.0)",
+      "Peace capacity: 44.92 -> Gate multiplier: x1.041",
+      "Gated score: 84.0 -> Index: 83.07"
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "ai_displacement_shock",
+      "title": "情境：AI 認知取代風暴與算力壟斷",
+      "title_en": "Scenario: AI Displacement Shock & Compute Concentration",
+      "year": 2026,
+      "description": "通用智慧與自主Agent突破加速，白領知識崗位大面積凍結或被取代，算力基礎設施極端集中於單一霸權陣營，引發前所未有的社會動盪與預防性技術封鎖",
+      "file_path": "scenarios/ai_displacement_shock.json",
+      "global_risk_index": 96.2,
+      "delta_from_baseline": 13.1,
+      "delta_str": "+13.1",
+      "stage_number": 4,
+      "stage_title": "階段四：暴力成為被接受選項",
+      "base_structural_score": 81.1,
+      "gate_factor": 1.139,
+      "peace_capacity": 32.6,
+      "probability_bands": {
+        "1y": {
+          "horizon_years": 1,
+          "central_pct": 27.7,
+          "lower_pct": 18.0,
+          "upper_pct": 40.2,
+          "band_str": "18.0% – 40.2% (中位: 27.7%)",
+          "disclaimer": "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+        },
+        "5y": {
+          "horizon_years": 5,
+          "central_pct": 61.6,
+          "lower_pct": 46.2,
+          "upper_pct": 80.0,
+          "band_str": "46.2% – 80.0% (中位: 61.6%)",
+          "disclaimer": "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+        },
+        "10y": {
+          "horizon_years": 10,
+          "central_pct": 81.5,
+          "lower_pct": 65.2,
+          "upper_pct": 100.0,
+          "band_str": "65.2% – 100.0% (中位: 81.5%)",
+          "disclaimer": "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+        }
+      },
+      "layer_scores": {
+        "L1": 69.1,
+        "L2": 84.3,
+        "L3": 83.2,
+        "L4": 82.7,
+        "L5": 84.1
+      }
+    },
+    {
+      "id": "baseline_2026",
+      "title": "2026 全球結構風險基準情境",
+      "title_en": "2026 Global Structural Risk Baseline",
+      "year": 2026,
+      "description": "當前多極化過渡期、AI技術震盪及地緣陣營重組之全球結構性風險基準評估（數值標註 illustrative 示範性估算）",
+      "file_path": "scenarios/baseline_2026.json",
+      "global_risk_index": 83.1,
+      "delta_from_baseline": 0.0,
+      "delta_str": "+0.0",
+      "stage_number": 3,
+      "stage_title": "階段三：和平解決機制失效",
+      "base_structural_score": 69.3,
+      "gate_factor": 1.041,
+      "peace_capacity": 44.9,
+      "probability_bands": {
+        "1y": {
+          "horizon_years": 1,
+          "central_pct": 24.3,
+          "lower_pct": 15.8,
+          "upper_pct": 35.2,
+          "band_str": "15.8% – 35.2% (中位: 24.3%)",
+          "disclaimer": "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+        },
+        "5y": {
+          "horizon_years": 5,
+          "central_pct": 57.0,
+          "lower_pct": 42.8,
+          "upper_pct": 74.1,
+          "band_str": "42.8% – 74.1% (中位: 57.0%)",
+          "disclaimer": "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+        },
+        "10y": {
+          "horizon_years": 10,
+          "central_pct": 77.1,
+          "lower_pct": 61.7,
+          "upper_pct": 96.4,
+          "band_str": "61.7% – 96.4% (中位: 77.1%)",
+          "disclaimer": "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+        }
+      },
+      "layer_scores": {
+        "L1": 63.0,
+        "L2": 71.3,
+        "L3": 64.9,
+        "L4": 74.5,
+        "L5": 71.9
+      }
+    },
+    {
+      "id": "detente",
+      "title": "情境：大國緩和、經貿互賴重建與軍控協定",
+      "title_en": "Scenario: Great Power Détente & Rebuilt Interdependence",
+      "year": 2026,
+      "description": "主要強權達成戰略護欄與新軍控協議，重啟高層外交與兩軍熱線，撤銷懲罰性關稅與限制，建立全球AI安全與關鍵礦產共享對話機制",
+      "file_path": "scenarios/detente.json",
+      "global_risk_index": 35.6,
+      "delta_from_baseline": -47.5,
+      "delta_str": "-47.5",
+      "stage_number": 2,
+      "stage_title": "階段二：利益衝突顯性化",
+      "base_structural_score": 42.6,
+      "gate_factor": 0.767,
+      "peace_capacity": 79.2,
+      "probability_bands": {
+        "1y": {
+          "horizon_years": 1,
+          "central_pct": 2.6,
+          "lower_pct": 1.7,
+          "upper_pct": 3.8,
+          "band_str": "1.7% – 3.8% (中位: 2.6%)",
+          "disclaimer": "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+        },
+        "5y": {
+          "horizon_years": 5,
+          "central_pct": 13.3,
+          "lower_pct": 10.0,
+          "upper_pct": 17.3,
+          "band_str": "10.0% – 17.3% (中位: 13.3%)",
+          "disclaimer": "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+        },
+        "10y": {
+          "horizon_years": 10,
+          "central_pct": 26.2,
+          "lower_pct": 21.0,
+          "upper_pct": 32.8,
+          "band_str": "21.0% – 32.8% (中位: 26.2%)",
+          "disclaimer": "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+        }
+      },
+      "layer_scores": {
+        "L1": 39.3,
+        "L2": 49.2,
+        "L3": 44.5,
+        "L4": 41.9,
+        "L5": 38.2
+      }
+    },
+    {
+      "id": "energy_food_crisis",
+      "title": "情境：全球能源與糧食供應鏈崩潰危機",
+      "title_en": "Scenario: Global Energy & Food Supply Chain Collapse",
+      "year": 2026,
+      "description": "氣候複合災害疊加戰略咽喉（紅海、霍爾木茲、黑海）全面封鎖，主要產油國與糧食大國實施絕對出口禁令，全球陷入生存資源極端短缺與搶奪",
+      "file_path": "scenarios/energy_food_crisis.json",
+      "global_risk_index": 97.6,
+      "delta_from_baseline": 14.5,
+      "delta_str": "+14.5",
+      "stage_number": 4,
+      "stage_title": "階段四：暴力成為被接受選項",
+      "base_structural_score": 85.2,
+      "gate_factor": 1.147,
+      "peace_capacity": 31.6,
+      "probability_bands": {
+        "1y": {
+          "horizon_years": 1,
+          "central_pct": 27.9,
+          "lower_pct": 18.2,
+          "upper_pct": 40.5,
+          "band_str": "18.2% – 40.5% (中位: 27.9%)",
+          "disclaimer": "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+        },
+        "5y": {
+          "horizon_years": 5,
+          "central_pct": 61.9,
+          "lower_pct": 46.4,
+          "upper_pct": 80.4,
+          "band_str": "46.4% – 80.4% (中位: 61.9%)",
+          "disclaimer": "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+        },
+        "10y": {
+          "horizon_years": 10,
+          "central_pct": 81.7,
+          "lower_pct": 65.4,
+          "upper_pct": 100.0,
+          "band_str": "65.4% – 100.0% (中位: 81.7%)",
+          "disclaimer": "結構風險之情境推演估算，非已驗證統計預測（Scenario Estimate, not verified statistical forecast）"
+        }
+      },
+      "layer_scores": {
+        "L1": 90.5,
+        "L2": 83.6,
+        "L3": 81.0,
+        "L4": 85.4,
+        "L5": 84.7
+      }
+    }
+  ],
+  "historical": [
+    {
+      "id": "hist_1913",
+      "title": "1913年 一戰前夕（帝國爭霸與同盟剛性）",
+      "title_en": "1913 Eve of WWI: Imperial Rivalry & Alliance Rigidity",
+      "year": 1913,
+      "global_risk_index": 96.1,
+      "stage_number": 4,
+      "stage_title": "階段四：暴力成為被接受選項",
+      "gate_factor": 1.198,
+      "peace_capacity": 25.2,
+      "layer_scores": {
+        "L1": 71.0,
+        "L2": 73.8,
+        "L3": 63.4,
+        "L4": 86.3,
+        "L5": 86.3
+      },
+      "notes": "巴爾幹危機、英德無畏艦造艦競賽、施里芬計劃動員倒計時，以及德國對俄國軍事現代化於1917年完成之預防性開戰恐懼"
+    },
+    {
+      "id": "hist_1938",
+      "title": "1938年 二戰前夕（大蕭條潰敗、法西斯擴張與國聯崩塌）",
+      "title_en": "1938 Eve of WWII: Munich Crisis & Total Revisionism",
+      "year": 1938,
+      "global_risk_index": 99.6,
+      "stage_number": 4,
+      "stage_title": "階段四：暴力成為被接受選項",
+      "gate_factor": 1.338,
+      "peace_capacity": 7.8,
+      "layer_scores": {
+        "L1": 84.5,
+        "L2": 87.3,
+        "L3": 82.9,
+        "L4": 92.0,
+        "L5": 91.5
+      },
+      "notes": "慕尼黑協定、德奧合併、日本全面侵華、大蕭條後全球貿易自給自足塊狀化、國聯徹底癱瘓，法西斯極權之生存空間意識形態全面抬頭"
+    },
+    {
+      "id": "hist_1962",
+      "title": "1962年 古巴導彈危機（核邊緣政策與近失案例）",
+      "title_en": "1962 Cuban Missile Crisis: Nuclear Brinkmanship & Near Miss",
+      "year": 1962,
+      "global_risk_index": 77.4,
+      "stage_number": 3,
+      "stage_title": "階段三：和平解決機制失效",
+      "gate_factor": 1.0,
+      "peace_capacity": 50.0,
+      "layer_scores": {
+        "L1": 56.4,
+        "L2": 55.0,
+        "L3": 36.0,
+        "L4": 94.5,
+        "L5": 85.6
+      },
+      "notes": "蘇聯秘密向古巴部署MRBM/IRBM核導彈、美軍實施海上隔離檢疫、U-2偵察機被擊落、B-59潛艇差點發射核魚雷；但最終憑藉秘密外交管道與核末日畏懼避免全面毀滅"
+    },
+    {
+      "id": "hist_1990",
+      "title": "1990年 冷戰終結（柏林牆倒塌、大和解與新世界秩序）",
+      "title_en": "1990 End of Cold War: German Reunification & Great Détente",
+      "year": 1990,
+      "global_risk_index": 23.4,
+      "stage_number": 1,
+      "stage_title": "階段一：結構壓力形成",
+      "gate_factor": 0.735,
+      "peace_capacity": 83.1,
+      "layer_scores": {
+        "L1": 34.0,
+        "L2": 37.0,
+        "L3": 31.4,
+        "L4": 26.5,
+        "L5": 21.5
+      },
+      "notes": "東歐劇變、兩德統一、美蘇簽署削減戰略武器條約 (START)、巴黎新歐洲憲章、波灣危機多邊安理會聯合授權，全球和平機制處於歷史峰值"
+    },
+    {
+      "id": "hist_2025",
+      "title": "2025年 當代前夕（烏克蘭戰事延宕、多極重組與中東外溢）",
+      "title_en": "2025 Pre-Baseline: Multipolar Friction & Tech Decoupling",
+      "year": 2025,
+      "global_risk_index": 81.0,
+      "stage_number": 3,
+      "stage_title": "階段三：和平解決機制失效",
+      "gate_factor": 1.014,
+      "peace_capacity": 48.2,
+      "layer_scores": {
+        "L1": 62.3,
+        "L2": 71.4,
+        "L3": 61.8,
+        "L4": 78.2,
+        "L5": 71.5
+      },
+      "notes": "烏克蘭陣地戰長期化、加薩-黎巴嫩-紅海危機外溢、中美晶片禁運升級、全球國防預算激增，但中美高層軍事熱線部分恢復"
+    }
+  ],
+  "regional_pressures": [
+    {
+      "id": "eastern_europe",
+      "name": "東歐（烏克蘭 / 北約東翼前線）",
+      "name_en": "Eastern Europe / NATO Eastern Flank",
+      "score": 86.9,
+      "level": "CRITICAL",
+      "level_label": "極度高壓 (Critical)",
+      "color_class": "danger",
+      "indicators_used": [
+        "l4_territorial_flashpoints",
+        "l4_bloc_polarization",
+        "l4_military_spending",
+        "l4_nuclear_posture"
+      ],
+      "note": "示意拆分：加權映射指標 [l4_territorial_flashpoints, l4_bloc_polarization, l4_military_spending, l4_nuclear_posture]，反映陸權對峙與前沿引信摩擦。"
+    },
+    {
+      "id": "middle_east",
+      "name": "中東（紅海 / 波斯灣 / 霍爾木茲咽喉）",
+      "name_en": "Middle East / Persian Gulf & Red Sea Chokepoints",
+      "score": 73.2,
+      "level": "HIGH",
+      "level_label": "高度緊張 (High)",
+      "color_class": "warning",
+      "indicators_used": [
+        "l1_maritime_chokepoints",
+        "l1_energy_vulnerability",
+        "l4_territorial_flashpoints",
+        "l1_water_stress"
+      ],
+      "note": "示意拆分：加權映射指標 [l1_maritime_chokepoints, l1_energy_vulnerability, l4_territorial_flashpoints, l1_water_stress]，反映航道封鎖與能源外溢風險。"
+    },
+    {
+      "id": "east_asia",
+      "name": "東亞（台海 / 南海 / 第一島鏈）",
+      "name_en": "East Asia / Taiwan Strait & South China Sea",
+      "score": 95.4,
+      "level": "CRITICAL",
+      "level_label": "極度高壓 (Critical)",
+      "color_class": "danger",
+      "indicators_used": [
+        "l2_compute_monopoly",
+        "l4_territorial_flashpoints",
+        "l5_tech_supremacy_fear",
+        "l4_bloc_polarization"
+      ],
+      "note": "示意拆分：加權映射指標 [l2_compute_monopoly, l4_territorial_flashpoints, l5_tech_supremacy_fear, l4_bloc_polarization]，反映算力晶圓代工壟斷與預防性技術爭霸。"
+    },
+    {
+      "id": "south_central_asia",
+      "name": "南亞與中亞（印巴 / 喜馬拉雅跨界水資源）",
+      "name_en": "South & Central Asia / Transboundary Basins",
+      "score": 55.4,
+      "level": "ELEVATED",
+      "level_label": "顯著升級 (Elevated)",
+      "color_class": "elevated",
+      "indicators_used": [
+        "l1_water_stress",
+        "l1_climate_impact",
+        "l4_nuclear_posture"
+      ],
+      "note": "示意拆分：加權映射指標 [l1_water_stress, l1_climate_impact, l4_nuclear_posture]，反映高山冰川消融引致水資源爭奪與核門檻壓力。"
+    },
+    {
+      "id": "global_chokepoints",
+      "name": "全球戰略咽喉與關鍵礦物網",
+      "name_en": "Global Chokepoints & Strategic Critical Mineral Webs",
+      "score": 70.0,
+      "level": "HIGH",
+      "level_label": "高度緊張 (High)",
+      "color_class": "warning",
+      "indicators_used": [
+        "l1_maritime_chokepoints",
+        "l1_critical_minerals",
+        "l4_trade_weaponization"
+      ],
+      "note": "示意拆分：加權映射指標 [l1_maritime_chokepoints, l1_critical_minerals, l4_trade_weaponization]，反映關鍵礦物禁運與全球海運供應鏈梗阻。"
+    }
+  ],
+  "indicators": [
+    {
+      "id": "l1_food_security",
+      "layer": "L1",
+      "layer_name": "生存／資源稀缺",
+      "name": "全球糧食儲備與主糧庫存消費比",
+      "name_en": "Global Grain Stock-to-Use & Food Insecurity",
+      "value": 52.0,
+      "weight": 1.0,
+      "evidence_level": "illustrative",
+      "source": "FAO Cereal Supply and Demand Brief 2025/2026 (illustrative baseline)",
+      "year": 2026,
+      "note": "極端氣候引致多國小麥、水稻產區減產，主糧儲備低於十年均線"
+    },
+    {
+      "id": "l1_water_stress",
+      "layer": "L1",
+      "layer_name": "生存／資源稀缺",
+      "name": "跨界流域水資源壓力與枯竭指數",
+      "name_en": "Transboundary Freshwater Stress & Depletion",
+      "value": 58.0,
+      "weight": 1.0,
+      "evidence_level": "illustrative",
+      "source": "WRI Aqueduct Water Risk Atlas (illustrative baseline)",
+      "year": 2026,
+      "note": "中東、南亞及中亞跨界水壩與冰川消融加劇上下游地緣緊張"
+    },
+    {
+      "id": "l1_energy_vulnerability",
+      "layer": "L1",
+      "layer_name": "生存／資源稀缺",
+      "name": "化石能源與電網供應鏈脆弱性",
+      "name_en": "Energy Supply Vulnerability & Grid Stress",
+      "value": 60.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "IEA World Energy Outlook 2025 (illustrative baseline)",
+      "year": 2026,
+      "note": "烏克蘭與中東戰事外溢致航道運費波動，電網面臨AI算力用電暴增之負荷"
+    },
+    {
+      "id": "l1_critical_minerals",
+      "layer": "L1",
+      "layer_name": "生存／資源稀缺",
+      "name": "關鍵礦物與稀土出口管制集中度",
+      "name_en": "Critical Minerals & Rare Earth Export Restrictions",
+      "value": 72.0,
+      "weight": 1.3,
+      "evidence_level": "illustrative",
+      "source": "USGS Mineral Commodity Summaries (illustrative baseline)",
+      "year": 2026,
+      "note": "鎵、鍺、銻、鋰、鈷受出口許可證與關稅圍堵，供應鏈替代週期長達數年"
+    },
+    {
+      "id": "l1_climate_impact",
+      "layer": "L1",
+      "layer_name": "生存／資源稀缺",
+      "name": "氣候極端衝擊對核心農業基礎設施破壞",
+      "name_en": "Extreme Climate Shocks to Agricultural Infrastructure",
+      "value": 65.0,
+      "weight": 1.0,
+      "evidence_level": "illustrative",
+      "source": "WMO State of the Global Climate (illustrative baseline)",
+      "year": 2026,
+      "note": "厄爾尼諾/拉尼娜震盪推高旱澇頻次，港口與農地受損加劇"
+    },
+    {
+      "id": "l1_maritime_chokepoints",
+      "layer": "L1",
+      "layer_name": "生存／資源稀缺",
+      "name": "全球戰略咽喉海運水道通行風險",
+      "name_en": "Maritime Chokepoint Disruption (Red Sea, Hormuz, Malacca)",
+      "value": 68.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "UNCTAD Maritime Transport Review (illustrative baseline)",
+      "year": 2026,
+      "note": "紅海襲擊持續、霍爾木茲與馬六甲海峽受無人機與水雷非對稱威脅"
+    },
+    {
+      "id": "l2_wealth_gini",
+      "layer": "L2",
+      "layer_name": "分配失衡",
+      "name": "全球前 1% 財富佔有率與階層差距",
+      "name_en": "Top 1% Wealth Share & Economic Inequality",
+      "value": 74.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "World Inequality Report 2026 (illustrative baseline)",
+      "year": 2026,
+      "note": "資產升值大幅超越勞動報酬，主要大國基尼係數維持歷史高位"
+    },
+    {
+      "id": "l2_compute_monopoly",
+      "layer": "L2",
+      "layer_name": "分配失衡",
+      "name": "前沿 AI 算力與先進晶圓代工極端壟斷",
+      "name_en": "Frontier AI Compute & Foundry Monopolization",
+      "value": 82.0,
+      "weight": 1.4,
+      "evidence_level": "illustrative",
+      "source": "SemiAnalysis / Epoch AI hardware tracker (illustrative baseline)",
+      "year": 2026,
+      "note": "頂級訓練叢集高度集中於少數跨國巨頭與單一島嶼先進製程，國家間差距急速拉大"
+    },
+    {
+      "id": "l2_land_housing_concentration",
+      "layer": "L2",
+      "layer_name": "分配失衡",
+      "name": "土地與關鍵民生資本壟斷化指數",
+      "name_en": "Land & Essential Living Capital Concentration",
+      "value": 68.0,
+      "weight": 1.0,
+      "evidence_level": "illustrative",
+      "source": "OECD Housing Indicators (illustrative baseline)",
+      "year": 2026,
+      "note": "跨國機構與富裕階層吸納都會區優質資產，普通家庭資本積累阻斷"
+    },
+    {
+      "id": "l2_social_mobility",
+      "layer": "L2",
+      "layer_name": "分配失衡",
+      "name": "代際社會流動停滯與向下沉淪感知",
+      "name_en": "Intergenerational Mobility Stagnation & Despair",
+      "value": 70.0,
+      "weight": 1.1,
+      "evidence_level": "illustrative",
+      "source": "World Economic Forum Social Mobility Index (illustrative baseline)",
+      "year": 2026,
+      "note": "教育投資回報率下滑，年輕一代深感生活水準難以超越父輩"
+    },
+    {
+      "id": "l2_institutional_fairness",
+      "layer": "L2",
+      "layer_name": "分配失衡",
+      "name": "制度公平感衰落與建制派信任赤字",
+      "name_en": "Erosion of Perceived Institutional Fairness",
+      "value": 66.0,
+      "weight": 1.0,
+      "evidence_level": "illustrative",
+      "source": "Edelman Trust Barometer (illustrative baseline)",
+      "year": 2026,
+      "note": "司法、稅收與公營制度偏袒精英階層的社會民怨普遍深化"
+    },
+    {
+      "id": "l2_peaceful_redistribution",
+      "layer": "L2",
+      "layer_name": "分配失衡",
+      "name": "和平再分配機制失靈與政治極化",
+      "name_en": "Breakdown of Peaceful Redistribution Mechanisms",
+      "value": 64.0,
+      "weight": 1.1,
+      "evidence_level": "illustrative",
+      "source": "V-Dem Electoral Democracy & Polarization Index (illustrative baseline)",
+      "year": 2026,
+      "note": "議會財稅改革癱瘓，各政黨訴諸民粹與保護主義轉移分配矛盾"
+    },
+    {
+      "id": "l3_unemployment_underemployment",
+      "layer": "L3",
+      "layer_name": "工作／生計／AI取代",
+      "name": "整體非充分就業與隱性失業壓力",
+      "name_en": "Overall Underemployment & Hidden Joblessness",
+      "value": 56.0,
+      "weight": 1.0,
+      "evidence_level": "illustrative",
+      "source": "ILO World Employment and Social Outlook 2026 (illustrative baseline)",
+      "year": 2026,
+      "note": "零工經濟氾濫，名義失業率低掩蓋了實質工作時間與福利萎縮"
+    },
+    {
+      "id": "l3_youth_unemployment",
+      "layer": "L3",
+      "layer_name": "工作／生計／AI取代",
+      "name": "青年失業率與啃老躺平比例",
+      "name_en": "Youth Unemployment & NEET Rate",
+      "value": 68.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "OECD / National Bureaus of Statistics (illustrative baseline)",
+      "year": 2026,
+      "note": "多國青年失業居高不下，大學畢業生就業結構性脫節"
+    },
+    {
+      "id": "l3_wage_vs_living_cost",
+      "layer": "L3",
+      "layer_name": "工作／生計／AI取代",
+      "name": "實質工資停滯 vs 核心生活通脹夾擊",
+      "name_en": "Real Wage Squeeze vs Core Cost of Living",
+      "value": 65.0,
+      "weight": 1.1,
+      "evidence_level": "illustrative",
+      "source": "IMF World Economic Outlook (illustrative baseline)",
+      "year": 2026,
+      "note": "食物、能源、醫療長期通脹蚕食可支配收入"
+    },
+    {
+      "id": "l3_housing_affordability",
+      "layer": "L3",
+      "layer_name": "工作／生計／AI取代",
+      "name": "房價/租金所得比高企壓力",
+      "name_en": "Housing Price-to-Income / Rent Burden Index",
+      "value": 75.0,
+      "weight": 1.0,
+      "evidence_level": "illustrative",
+      "source": "Numbeo Property Price Index 2026 (illustrative baseline)",
+      "year": 2026,
+      "note": "核心都市住宅負擔遠超普通家庭承載能力，壓抑生育與創業"
+    },
+    {
+      "id": "l3_ai_displacement_rate",
+      "layer": "L3",
+      "layer_name": "工作／生計／AI取代",
+      "name": "前瞻重點：AI 認知與知識勞動取代率",
+      "name_en": "AI Cognitive & Knowledge Work Displacement Shock",
+      "value": 62.0,
+      "weight": 1.5,
+      "evidence_level": "illustrative",
+      "source": "Stanford HAI AI Index / Goldman Sachs Automation Forecast (illustrative baseline)",
+      "year": 2026,
+      "note": "自研程式、客服、初級分析、外語翻譯與內容創作受端側與雲端Agent實質取代"
+    },
+    {
+      "id": "l3_effort_reward_breakdown",
+      "layer": "L3",
+      "layer_name": "工作／生計／AI取代",
+      "name": "努力回報預期崩塌與社會習得性無助",
+      "name_en": "Collapse of Effort-Reward Ratio & Resignation",
+      "value": 64.0,
+      "weight": 1.0,
+      "evidence_level": "illustrative",
+      "source": "Gallup State of the Global Workplace (illustrative baseline)",
+      "year": 2026,
+      "note": "勤奮無法換取體面生活的信念蔓延，削弱社會凝聚力與政治穩定"
+    },
+    {
+      "id": "l4_military_expenditure_growth",
+      "layer": "L4",
+      "layer_name": "權力／安全困境",
+      "name": "全球軍費加速擴張與防衛預算GDP佔比",
+      "name_en": "Military Spending Growth & Global Armament Surge",
+      "value": 72.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "SIPRI Military Expenditure Database (illustrative baseline)",
+      "year": 2026,
+      "note": "北約、中俄、日韓台及中東軍費全面超過冷戰結束後峰值"
+    },
+    {
+      "id": "l4_arms_race_hypersonic",
+      "layer": "L4",
+      "layer_name": "權力／安全困境",
+      "name": "高超音速、無人蜂群與太空反衛星軍備競賽",
+      "name_en": "Hypersonic, Drone Swarm & Counter-Space Arms Race",
+      "value": 75.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "IISS Military Balance 2026 (illustrative baseline)",
+      "year": 2026,
+      "note": "攻防非對稱武器削弱傳統預警防禦窗口，戰略突襲誘惑增加"
+    },
+    {
+      "id": "l4_bloc_polarization",
+      "layer": "L4",
+      "layer_name": "權力／安全困境",
+      "name": "全球地緣政治陣營極化與同盟剛性",
+      "name_en": "Geopolitical Bloc Polarization & Alliance Rigidity",
+      "value": 78.0,
+      "weight": 1.3,
+      "evidence_level": "illustrative",
+      "source": "Munich Security Report 2026 (illustrative baseline)",
+      "year": 2026,
+      "note": "美歐日韓 vs 俄中伊朝陣營壁壘分明，小國戰略自主中立空間收窄"
+    },
+    {
+      "id": "l4_weaponized_interdependence",
+      "layer": "L4",
+      "layer_name": "權力／安全困境",
+      "name": "經貿金融相互依賴武器化與關鍵禁運",
+      "name_en": "Weaponized Economic Interdependence & Financial Sanctions",
+      "value": 76.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "Atlantic Council Geoeconomics Center (illustrative baseline)",
+      "year": 2026,
+      "note": "SWIFT制裁、半導體長臂管制、出口許可全面泛安全化"
+    },
+    {
+      "id": "l4_nuclear_breakout",
+      "layer": "L4",
+      "layer_name": "權力／安全困境",
+      "name": "核擴散門檻降低與戰術核武使用禁忌鬆動",
+      "name_en": "Nuclear Proliferation & Erosion of Taboo",
+      "value": 66.0,
+      "weight": 1.4,
+      "evidence_level": "illustrative",
+      "source": "Bulletin of the Atomic Scientists (illustrative baseline)",
+      "year": 2026,
+      "note": "戰略核條約終止、伊朗濃縮接近突破、戰術核演習常態化"
+    },
+    {
+      "id": "l4_territorial_flashpoints",
+      "layer": "L4",
+      "layer_name": "權力／安全困境",
+      "name": "高危熱點主權與領土引信點摩擦頻度",
+      "name_en": "Active Territorial & Sovereign Flashpoint Heat (Taiwan, SCS, Ukraine, ME)",
+      "value": 80.0,
+      "weight": 1.4,
+      "evidence_level": "illustrative",
+      "source": "Crisis Group CrisisWatch (illustrative baseline)",
+      "year": 2026,
+      "note": "台海、南海、烏克蘭前線、中東紅海多線並行處於高觸發態勢"
+    },
+    {
+      "id": "l5_relative_decline_anxiety",
+      "layer": "L5",
+      "layer_name": "對未來的恐懼／預防邏輯",
+      "name": "霸權相對衰落焦慮與修昔底德權力轉移壓力",
+      "name_en": "Hegemonic Decline Anxiety & Thucydides Friction",
+      "value": 76.0,
+      "weight": 1.3,
+      "evidence_level": "illustrative",
+      "source": "Graham Allison Thucydides Trap Case Index (illustrative baseline)",
+      "year": 2026,
+      "note": "既有大國對實力被超越之恐懼，與新興大國對被打斷崛起之警惕共存"
+    },
+    {
+      "id": "l5_demographic_cliff",
+      "layer": "L5",
+      "layer_name": "對未來的恐懼／預防邏輯",
+      "name": "人口老齡斷崖與戰略機會之窗即將關閉恐慌",
+      "name_en": "Demographic Aging Cliff & Closing Window Syndrome",
+      "value": 70.0,
+      "weight": 1.1,
+      "evidence_level": "illustrative",
+      "source": "UN World Population Prospects (illustrative baseline)",
+      "year": 2026,
+      "note": "主要強權勞動力與兵源見頂，激起『此時不解決日後更難』的冒險心態"
+    },
+    {
+      "id": "l5_economic_stagnation",
+      "layer": "L5",
+      "layer_name": "對未來的恐懼／預防邏輯",
+      "name": "長期生產力停滯與債務懸崖悲觀預期",
+      "name_en": "Secular Stagnation & Sovereign Debt Wall Fears",
+      "value": 64.0,
+      "weight": 1.0,
+      "evidence_level": "illustrative",
+      "source": "World Bank Global Economic Prospects (illustrative baseline)",
+      "year": 2026,
+      "note": "全球債務佔GDP攀升至極限，和平時期的增量博弈轉化為存量零和撕裂"
+    },
+    {
+      "id": "l5_tech_supremacy_fear",
+      "layer": "L5",
+      "layer_name": "對未來的恐懼／預防邏輯",
+      "name": "未來十年內喪失戰略技術霸權之預防性開戰邏輯",
+      "name_en": "Fear of Losing 10-Year Strategic Tech Dominance (Preventive Logic)",
+      "value": 78.0,
+      "weight": 1.4,
+      "evidence_level": "illustrative",
+      "source": "Special Competitive Studies Project (SCSP) (illustrative baseline)",
+      "year": 2026,
+      "note": "若相信對手即將取得 AGI 或顛覆性軍事技術，將大幅刺激當下發動先發打擊"
+    },
+    {
+      "id": "l5_miscalculation_risk",
+      "layer": "L5",
+      "layer_name": "對未來的恐懼／預防邏輯",
+      "name": "即時資訊作戰與危機反應窗口極度壓縮之誤判風險",
+      "name_en": "Compressed Decision Windows & Miscalculation Escalation",
+      "value": 72.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "RAND Strategic Miscalculation Studies (illustrative baseline)",
+      "year": 2026,
+      "note": "自主武器與網軍偵察反應以分秒計，政治領導人缺乏冷靜核實時間"
+    },
+    {
+      "id": "l5_leadership_time_horizon",
+      "layer": "L5",
+      "layer_name": "對未來的恐懼／預防邏輯",
+      "name": "政治週期短視與政權合法性焦慮",
+      "name_en": "Leadership Short Time Horizon & Regime Survival Anxiety",
+      "value": 68.0,
+      "weight": 1.0,
+      "evidence_level": "illustrative",
+      "source": "Freedom House / EIU Democracy Index (illustrative baseline)",
+      "year": 2026,
+      "note": "內政困局推動領導層對外展現強硬以凝聚民意，妥協代價遠高於冒險"
+    }
+  ],
+  "gate_buffers": [
+    {
+      "id": "gate_diplomatic_trust",
+      "layer": "GATE",
+      "layer_name": "和平機制閘門",
+      "name": "大國元首戰略熱線與外交互信管道",
+      "name_en": "High-Level Diplomatic Hotlines & Strategic Trust",
+      "value": 36.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "Chatham House Diplomatic Relations Monitor (illustrative baseline)",
+      "year": 2026,
+      "note": "高層偶有通話但戰略互信跌入冰點，事務性外交降格為互念宣傳稿"
+    },
+    {
+      "id": "gate_trade_interdependence",
+      "layer": "GATE",
+      "layer_name": "和平機制閘門",
+      "name": "全球深度經貿相互依賴與脫鉤沉沒成本",
+      "name_en": "Economic Interdependence & Decoupling Sunk Costs",
+      "value": 48.0,
+      "weight": 1.2,
+      "evidence_level": "illustrative",
+      "source": "WTO World Trade Statistical Review (illustrative baseline)",
+      "year": 2026,
+      "note": "雖有友岸外包與脫鉤，跨國投資與供應鏈網絡仍構成實質制衡阻力"
+    },
+    {
+      "id": "gate_international_institutions",
+      "layer": "GATE",
+      "layer_name": "和平機制閘門",
+      "name": "聯合國與國際法多邊仲裁機制之執行力",
+      "name_en": "Multilateral International Law & UN Efficacy",
+      "value": 28.0,
+      "weight": 1.0,
+      "evidence_level": "illustrative",
+      "source": "International Crisis Group UN Watch (illustrative baseline)",
+      "year": 2026,
+      "note": "安理會常任理事國否決權癱瘓，國際法院決議難以在強權間落實"
+    },
+    {
+      "id": "gate_nuclear_deterrence_stability",
+      "layer": "GATE",
+      "layer_name": "和平機制閘門",
+      "name": "核恐怖平衡相互保證毀滅 (MAD) 與防誤擊架構",
+      "name_en": "Strategic MAD Nuclear Deterrence & Fail-Safe Protocols",
+      "value": 62.0,
+      "weight": 1.4,
+      "evidence_level": "illustrative",
+      "source": "SIPRI Nuclear Forces Overview 2026 (illustrative baseline)",
+      "year": 2026,
+      "note": "核武庫存足以確保毀滅，但常規打擊與戰術核界線模糊化構成侵蝕"
+    }
+  ],
+  "unconnected_sources": [
+    {
+      "id": "adsb_military_transponder",
+      "name": "全球軍用機載 ADS-B 實時異動偵測",
+      "name_en": "Global Military ADS-B Transponder Stream",
+      "status": "未接數據源 (Offline Placeholder)",
+      "expected_cadence": "10-sec telemetry",
+      "protocol": "ADS-B Mode-S Receiver Feed",
+      "target_regions": [
+        "波羅的海",
+        "黑海",
+        "波斯灣",
+        "台海空域"
+      ],
+      "description": "即時監控空中加油機、RC-135 偵察機與預警機起降活動，v1 純靜態離線模型不接入外部即時通訊。"
+    },
+    {
+      "id": "gdelt_conflict_pulse",
+      "name": "GDELT 全球衝突事件實時脈衝",
+      "name_en": "GDELT Conflict Pulse & Event Stream",
+      "status": "未接數據源 (Offline Placeholder)",
+      "expected_cadence": "15-minute batch",
+      "protocol": "GDELT 2.0 Global Event Feed",
+      "target_regions": [
+        "全球主要衝突邊界"
+      ],
+      "description": "多語言自然語言處理新聞突發事件與暴力衝突事件熱度脈衝，目前以結構性情境指標靜態替代。"
+    },
+    {
+      "id": "polymarket_war_odds",
+      "name": "Polymarket 地緣衝突合約實時預測賠率",
+      "name_en": "Polymarket Conflict Prediction Market Odds",
+      "status": "未接數據源 (Offline Placeholder)",
+      "expected_cadence": "Real-time websocket",
+      "protocol": "On-chain Prediction API",
+      "target_regions": [
+        "美中台海合約",
+        "以伊衝突合約",
+        "俄烏停火合約"
+      ],
+      "description": "市場真金白銀定價之地緣衝突賠率，UI 目前提供情境推演概率帶，未接入實時鏈上訂單簿。"
+    },
+    {
+      "id": "ais_chokepoint_telemetry",
+      "name": "戰略海運咽喉 (霍爾木茲/曼德) 實時 AIS 船隻通航量",
+      "name_en": "Strategic Chokepoints Vessel AIS Telemetry",
+      "status": "未接數據源 (Offline Placeholder)",
+      "expected_cadence": "1-minute AIS stream",
+      "protocol": "Satellite & Terrestrial AIS API",
+      "target_regions": [
+        "曼德海峽",
+        "霍爾木茲海峽",
+        "馬六甲海峽",
+        "蘇伊士運河"
+      ],
+      "description": "商船、油輪與液化天然氣船轉向繞道好望角之即時繞航比率，目前由 L1 海運咽喉指標 (68.0) 靜態代表。"
+    },
+    {
+      "id": "conflict_border_webcams",
+      "name": "核心戰略前線公開監視與實況流",
+      "name_en": "Border Frontline Public Feeds & Webcams",
+      "status": "未接數據源 (Offline Placeholder)",
+      "expected_cadence": "Live HLS/RTSP Stream",
+      "protocol": "Public Live Video Feeds",
+      "target_regions": [
+        "霍爾木茲海峽兩岸",
+        "波羅的海港口",
+        "紅海口"
+      ],
+      "description": "公開港口與邊界攝影機串流，本系統為純純離線儀表板，嚴格標記為佔位預留。"
+    }
+  ],
+  "model_params": {
+    "c_l1_l2": 0.08,
+    "c_l3_l5": 0.08,
+    "c_l4_gate": 0.1,
+    "max_interaction_cap": 25.0,
+    "gate_min": 0.6,
+    "gate_max": 1.4,
+    "soft_clamp_threshold": 70.0,
+    "soft_clamp_ceiling": 100.0,
+    "layer_weights": {
+      "L1": 1.0,
+      "L2": 1.0,
+      "L3": 1.1,
+      "L4": 1.2,
+      "L5": 1.1
+    },
+    "stage_thresholds": [
+      25.0,
+      50.0,
+      85.0
+    ],
+    "probability_params": {
+      "1y": {
+        "l_max": 30.0,
+        "k": 0.08,
+        "x0": 65.0,
+        "low_r": 0.65,
+        "up_r": 1.45
+      },
+      "5y": {
+        "l_max": 65.0,
+        "k": 0.07,
+        "x0": 55.0,
+        "low_r": 0.75,
+        "up_r": 1.3
+      },
+      "10y": {
+        "l_max": 85.0,
+        "k": 0.065,
+        "x0": 48.0,
+        "low_r": 0.8,
+        "up_r": 1.25
+      }
+    }
+  }
+}

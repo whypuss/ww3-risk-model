@@ -1,0 +1,961 @@
+"""WW3 Risk Model Static Dashboard Generator.
+
+Produces a standalone, pure static HTML/CSS/JS dashboard (zero external frameworks,
+zero CDN dependencies, dark military-tactical theme) that can be opened directly
+offline via file://.
+"""
+
+from __future__ import annotations
+
+import argparse
+import glob
+import json
+import math
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+from .indicators import ScenarioData, load_scenario_from_file
+from .model import WW3RiskModel, RiskResult
+
+
+# Regional pressure mapping definition (derived from existing scenario indicators)
+# Explicitly noted as illustrative mapping to comply with transparency requirements.
+REGIONAL_INDICATOR_MAPPINGS = {
+    "eastern_europe": {
+        "name": "東歐（烏克蘭 / 北約東翼前線）",
+        "name_en": "Eastern Europe / NATO Eastern Flank",
+        "primary_indicators": ["l4_territorial_flashpoints", "l4_bloc_polarization", "l4_military_spending", "l4_nuclear_posture"],
+        "base_weight": 1.1,
+        "note": "示意拆分：加權映射指標 [l4_territorial_flashpoints, l4_bloc_polarization, l4_military_spending, l4_nuclear_posture]，反映陸權對峙與前沿引信摩擦。",
+    },
+    "middle_east": {
+        "name": "中東（紅海 / 波斯灣 / 霍爾木茲咽喉）",
+        "name_en": "Middle East / Persian Gulf & Red Sea Chokepoints",
+        "primary_indicators": ["l1_maritime_chokepoints", "l1_energy_vulnerability", "l4_territorial_flashpoints", "l1_water_stress"],
+        "base_weight": 1.1,
+        "note": "示意拆分：加權映射指標 [l1_maritime_chokepoints, l1_energy_vulnerability, l4_territorial_flashpoints, l1_water_stress]，反映航道封鎖與能源外溢風險。",
+    },
+    "east_asia": {
+        "name": "東亞（台海 / 南海 / 第一島鏈）",
+        "name_en": "East Asia / Taiwan Strait & South China Sea",
+        "primary_indicators": ["l2_compute_monopoly", "l4_territorial_flashpoints", "l5_tech_supremacy_fear", "l4_bloc_polarization"],
+        "base_weight": 1.2,
+        "note": "示意拆分：加權映射指標 [l2_compute_monopoly, l4_territorial_flashpoints, l5_tech_supremacy_fear, l4_bloc_polarization]，反映算力晶圓代工壟斷與預防性技術爭霸。",
+    },
+    "south_central_asia": {
+        "name": "南亞與中亞（印巴 / 喜馬拉雅跨界水資源）",
+        "name_en": "South & Central Asia / Transboundary Basins",
+        "primary_indicators": ["l1_water_stress", "l1_climate_impact", "l4_nuclear_posture"],
+        "base_weight": 0.9,
+        "note": "示意拆分：加權映射指標 [l1_water_stress, l1_climate_impact, l4_nuclear_posture]，反映高山冰川消融引致水資源爭奪與核門檻壓力。",
+    },
+    "global_chokepoints": {
+        "name": "全球戰略咽喉與關鍵礦物網",
+        "name_en": "Global Chokepoints & Strategic Critical Mineral Webs",
+        "primary_indicators": ["l1_maritime_chokepoints", "l1_critical_minerals", "l4_trade_weaponization"],
+        "base_weight": 1.0,
+        "note": "示意拆分：加權映射指標 [l1_maritime_chokepoints, l1_critical_minerals, l4_trade_weaponization]，反映關鍵礦物禁運與全球海運供應鏈梗阻。",
+    },
+}
+
+# Unconnected live data sources (stubs/placeholders - offline v1)
+UNCONNECTED_DATA_SOURCES = [
+    {
+        "id": "adsb_military_transponder",
+        "name": "全球軍用機載 ADS-B 實時異動偵測",
+        "name_en": "Global Military ADS-B Transponder Stream",
+        "status": "未接數據源 (Offline Placeholder)",
+        "expected_cadence": "10-sec telemetry",
+        "protocol": "ADS-B Mode-S Receiver Feed",
+        "target_regions": ["波羅的海", "黑海", "波斯灣", "台海空域"],
+        "description": "即時監控空中加油機、RC-135 偵察機與預警機起降活動，v1 純靜態離線模型不接入外部即時通訊。",
+    },
+    {
+        "id": "gdelt_conflict_pulse",
+        "name": "GDELT 全球衝突事件實時脈衝",
+        "name_en": "GDELT Conflict Pulse & Event Stream",
+        "status": "未接數據源 (Offline Placeholder)",
+        "expected_cadence": "15-minute batch",
+        "protocol": "GDELT 2.0 Global Event Feed",
+        "target_regions": ["全球主要衝突邊界"],
+        "description": "多語言自然語言處理新聞突發事件與暴力衝突事件熱度脈衝，目前以結構性情境指標靜態替代。",
+    },
+    {
+        "id": "polymarket_war_odds",
+        "name": "Polymarket 地緣衝突合約實時預測賠率",
+        "name_en": "Polymarket Conflict Prediction Market Odds",
+        "status": "未接數據源 (Offline Placeholder)",
+        "expected_cadence": "Real-time websocket",
+        "protocol": "On-chain Prediction API",
+        "target_regions": ["美中台海合約", "以伊衝突合約", "俄烏停火合約"],
+        "description": "市場真金白銀定價之地緣衝突賠率，UI 目前提供情境推演概率帶，未接入實時鏈上訂單簿。",
+    },
+    {
+        "id": "ais_chokepoint_telemetry",
+        "name": "戰略海運咽喉 (霍爾木茲/曼德) 實時 AIS 船隻通航量",
+        "name_en": "Strategic Chokepoints Vessel AIS Telemetry",
+        "status": "未接數據源 (Offline Placeholder)",
+        "expected_cadence": "1-minute AIS stream",
+        "protocol": "Satellite & Terrestrial AIS API",
+        "target_regions": ["曼德海峽", "霍爾木茲海峽", "馬六甲海峽", "蘇伊士運河"],
+        "description": "商船、油輪與液化天然氣船轉向繞道好望角之即時繞航比率，目前由 L1 海運咽喉指標 (68.0) 靜態代表。",
+    },
+    {
+        "id": "conflict_border_webcams",
+        "name": "核心戰略前線公開監視與實況流",
+        "name_en": "Border Frontline Public Feeds & Webcams",
+        "status": "未接數據源 (Offline Placeholder)",
+        "expected_cadence": "Live HLS/RTSP Stream",
+        "protocol": "Public Live Video Feeds",
+        "target_regions": ["霍爾木茲海峽兩岸", "波羅的海港口", "紅海口"],
+        "description": "公開港口與邊界攝影機串流，本系統為純純離線儀表板，嚴格標記為佔位預留。",
+    },
+]
+
+
+def calculate_regional_pressures(scenario: ScenarioData) -> List[Dict[str, Any]]:
+    """Compute regional pressure scores from scenario indicators."""
+    indicator_dict = {}
+    for lid, layer in scenario.layers.items():
+        for ind in layer.indicators:
+            indicator_dict[ind.id] = ind.value
+
+    regional_cards = []
+    for reg_id, conf in REGIONAL_INDICATOR_MAPPINGS.items():
+        matched_values = []
+        for iid in conf["primary_indicators"]:
+            if iid in indicator_dict:
+                matched_values.append(indicator_dict[iid])
+
+        if matched_values:
+            raw_avg = sum(matched_values) / len(matched_values)
+            # Apply slight regional sensitivity calibration
+            score = min(100.0, max(0.0, raw_avg * conf["base_weight"]))
+        else:
+            score = 50.0
+
+        if score >= 85.0:
+            level = "CRITICAL"
+            level_label = "極度高壓 (Critical)"
+            color_class = "danger"
+        elif score >= 70.0:
+            level = "HIGH"
+            level_label = "高度緊張 (High)"
+            color_class = "warning"
+        elif score >= 50.0:
+            level = "ELEVATED"
+            level_label = "顯著升級 (Elevated)"
+            color_class = "elevated"
+        else:
+            level = "MODERATE"
+            level_label = "溫和可控 (Moderate)"
+            color_class = "success"
+
+        regional_cards.append({
+            "id": reg_id,
+            "name": conf["name"],
+            "name_en": conf["name_en"],
+            "score": round(score, 1),
+            "level": level,
+            "level_label": level_label,
+            "color_class": color_class,
+            "indicators_used": conf["primary_indicators"],
+            "note": conf["note"],
+        })
+
+    return regional_cards
+
+
+def generate_dashboard_data(
+    scenario_path: Path | str,
+    all_scenarios_dir: Path | str = "scenarios",
+    historical_path: Path | str = "data/historical_cases.json",
+    model: Optional[WW3RiskModel] = None,
+) -> Dict[str, Any]:
+    """Compile all evaluated data needed by the static dashboard."""
+    if model is None:
+        model = WW3RiskModel()
+
+    scenario_file = Path(scenario_path)
+    if not scenario_file.exists():
+        raise FileNotFoundError(f"Main scenario file not found: {scenario_file}")
+
+    main_scenario = load_scenario_from_file(scenario_file)
+    main_result = model.evaluate(main_scenario)
+
+    # 1. Evaluate all comparative scenarios in folder
+    scenarios_dir = Path(all_scenarios_dir)
+    comparative_results: List[Dict[str, Any]] = []
+    if scenarios_dir.exists():
+        for p in sorted(scenarios_dir.glob("*.json")):
+            try:
+                sc = load_scenario_from_file(p)
+                res = model.evaluate(sc)
+                delta_risk = round(res.global_risk_index - main_result.global_risk_index, 1)
+                comparative_results.append({
+                    "id": sc.id,
+                    "title": sc.title,
+                    "title_en": sc.title_en,
+                    "year": sc.year,
+                    "description": sc.description,
+                    "file_path": str(p),
+                    "global_risk_index": round(res.global_risk_index, 1),
+                    "delta_from_baseline": delta_risk,
+                    "delta_str": f"{'+' if delta_risk >= 0 else ''}{delta_risk}",
+                    "stage_number": res.stage.stage_number,
+                    "stage_title": res.stage.title,
+                    "base_structural_score": round(res.base_structural_score, 1),
+                    "gate_factor": round(res.gate_factor, 3),
+                    "peace_capacity": round(res.peace_capacity, 1),
+                    "probability_bands": {k: v.to_dict() for k, v in res.probability_bands.items()},
+                    "layer_scores": {k: round(v, 1) for k, v in res.layer_scores.items()},
+                })
+            except Exception as e:
+                pass
+
+    # 2. Evaluate historical cases
+    hist_file = Path(historical_path)
+    historical_results: List[Dict[str, Any]] = []
+    if hist_file.exists():
+        with open(hist_file, "r", encoding="utf-8") as f:
+            hist_raw = json.load(f)
+        cases = hist_raw if isinstance(hist_raw, list) else hist_raw.get("cases", [])
+        for c in cases:
+            sc = ScenarioData.from_dict(c)
+            res = model.evaluate(sc)
+            historical_results.append({
+                "id": sc.id,
+                "title": sc.title,
+                "title_en": sc.title_en,
+                "year": sc.year,
+                "global_risk_index": round(res.global_risk_index, 1),
+                "stage_number": res.stage.stage_number,
+                "stage_title": res.stage.title,
+                "gate_factor": round(res.gate_factor, 3),
+                "peace_capacity": round(res.peace_capacity, 1),
+                "layer_scores": {k: round(v, 1) for k, v in res.layer_scores.items()},
+                "notes": sc.description,
+            })
+        # Sort historical by year ascending
+        historical_results.sort(key=lambda x: str(x["year"]))
+
+    # 3. Regional pressures derived from main scenario
+    regional_pressures = calculate_regional_pressures(main_scenario)
+
+    # 4. Full Indicators List for detailed inspection table
+    all_indicators = []
+    for lid in ["L1", "L2", "L3", "L4", "L5"]:
+        if lid in main_scenario.layers:
+            layer = main_scenario.layers[lid]
+            for ind in layer.indicators:
+                all_indicators.append({
+                    "id": ind.id,
+                    "layer": lid,
+                    "layer_name": layer.name,
+                    "name": ind.name,
+                    "name_en": ind.name_en,
+                    "value": round(ind.value, 1),
+                    "weight": round(ind.weight, 2),
+                    "evidence_level": ind.evidence_level,
+                    "source": ind.source,
+                    "year": ind.year,
+                    "note": ind.note,
+                })
+
+    all_buffers = []
+    for b in main_scenario.gate_buffers:
+        all_buffers.append({
+            "id": b.id,
+            "layer": "GATE",
+            "layer_name": "和平機制閘門",
+            "name": b.name,
+            "name_en": b.name_en,
+            "value": round(b.value, 1),
+            "weight": round(b.weight, 2),
+            "evidence_level": b.evidence_level,
+            "source": b.source,
+            "year": b.year,
+            "note": b.note,
+        })
+
+    # 5. Model coefficients and formula parameters for pure JS simulator
+    model_params = {
+        "c_l1_l2": model.c_l1_l2,
+        "c_l3_l5": model.c_l3_l5,
+        "c_l4_gate": model.c_l4_gate,
+        "max_interaction_cap": model.max_interaction_cap,
+        "gate_min": model.gate_min,
+        "gate_max": model.gate_max,
+        "soft_clamp_threshold": 70.0,
+        "soft_clamp_ceiling": 100.0,
+        "layer_weights": main_result.layer_weights,
+        "stage_thresholds": [25.0, 50.0, 85.0],
+        "probability_params": {
+            "1y": {"l_max": 30.0, "k": 0.08, "x0": 65.0, "low_r": 0.65, "up_r": 1.45},
+            "5y": {"l_max": 65.0, "k": 0.07, "x0": 55.0, "low_r": 0.75, "up_r": 1.30},
+            "10y": {"l_max": 85.0, "k": 0.065, "x0": 48.0, "low_r": 0.80, "up_r": 1.25},
+        },
+    }
+
+    return {
+        "metadata": {
+            "title": "WW3 結構風險預警儀表板",
+            "title_en": "WW3 Structural Risk Early Warning Dashboard",
+            "model_version": "0.1.0-alpha",
+            "generated_at": "2026-10-20",
+            "active_scenario_id": main_scenario.id,
+            "active_scenario_title": main_scenario.title,
+            "active_scenario_year": main_scenario.year,
+        },
+        "main_result": main_result.to_dict(),
+        "scenarios": comparative_results,
+        "historical": historical_results,
+        "regional_pressures": regional_pressures,
+        "indicators": all_indicators,
+        "gate_buffers": all_buffers,
+        "unconnected_sources": UNCONNECTED_DATA_SOURCES,
+        "model_params": model_params,
+    }
+
+
+def render_gauge_svg(score: float, width: int = 320, height: int = 180) -> str:
+    """Generate inline SVG for the semicircular gauge."""
+    # Semi-circle arc: angles from 180 deg (left, 0) to 0 deg (right, 100)
+    # Radius = 120, Center at (160, 150)
+    cx, cy, r = 160, 145, 115
+    clamped_score = max(0.0, min(100.0, score))
+    # Needle angle in radians: score 0 -> pi, score 100 -> 0
+    # In SVG math: angle theta from pi to 0
+    theta = math.pi - (clamped_score / 100.0) * math.pi
+    needle_len = r - 15
+    nx = cx + needle_len * math.cos(theta)
+    ny = cy - needle_len * math.sin(theta)
+
+    # Arc segments:
+    # 0 to 25: Green
+    # 25 to 50: Yellow
+    # 50 to 85: Orange
+    # 85 to 100: Red
+    return f"""
+    <svg viewBox="0 0 320 185" class="gauge-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#10b981" />
+          <stop offset="25%" stop-color="#84cc16" />
+          <stop offset="50%" stop-color="#eab308" />
+          <stop offset="85%" stop-color="#f97316" />
+          <stop offset="100%" stop-color="#ef4444" />
+        </linearGradient>
+        <filter id="needleGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#ef4444" flood-opacity="0.6"/>
+        </filter>
+      </defs>
+      <!-- Background track -->
+      <path d="M 45 145 A 115 115 0 0 1 275 145" fill="none" stroke="#1e293b" stroke-width="20" stroke-linecap="round"/>
+      <!-- Colored value track -->
+      <path d="M 45 145 A 115 115 0 0 1 275 145" fill="none" stroke="url(#gaugeGradient)" stroke-width="20" stroke-linecap="round" opacity="0.85"/>
+      
+      <!-- Scale ticks & labels -->
+      <text x="35" y="165" fill="#64748b" font-size="11" font-weight="600" text-anchor="middle">0</text>
+      <text x="75" y="65" fill="#64748b" font-size="11" font-weight="600" text-anchor="middle">25</text>
+      <text x="160" y="24" fill="#64748b" font-size="11" font-weight="600" text-anchor="middle">50</text>
+      <text x="245" y="65" fill="#64748b" font-size="11" font-weight="600" text-anchor="middle">85</text>
+      <text x="285" y="165" fill="#64748b" font-size="11" font-weight="600" text-anchor="middle">100</text>
+
+      <!-- Needle pointer -->
+      <line x1="{cx}" y1="{cy}" x2="{nx:.1f}" y2="{ny:.1f}" stroke="#f8fafc" stroke-width="3.5" stroke-linecap="round" filter="url(#needleGlow)"/>
+      <circle cx="{cx}" cy="{cy}" r="7" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
+      <circle cx="{cx}" cy="{cy}" r="3" fill="#ef4444"/>
+    </svg>
+    """
+
+
+def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
+    """Render the dashboard HTML for a specific UI Step (1 to 5)."""
+    main = data["main_result"]
+    risk_score = main["global_risk_index"]
+    stage = main["stage"]
+    gauge_svg = render_gauge_svg(risk_score)
+    data_json_str = json.dumps(data, ensure_ascii=False, indent=2)
+
+    # Escalation stages definitions for tracker
+    stages_info = [
+        {"num": 1, "code": "STAGE_1", "range": "0 - 25", "title": "結構壓力形成", "title_en": "Pressure Building", "desc": "資源、分配或經濟摩擦處於低位累積期，體系彈性充裕，國際制度能有效吸收爭端。"},
+        {"num": 2, "code": "STAGE_2", "range": "25 - 50", "title": "利益衝突顯性化", "title_en": "Overt Conflict", "desc": "關鍵產業、地緣勢力範圍或未來預期出現顯著分歧，陣營對立升溫，但常規外交與經貿制衡依然有效。"},
+        {"num": 3, "code": "STAGE_3", "range": "50 - 85", "title": "和平解決機制失效", "title_en": "Peace Breakdown", "desc": "外交互信受挫、貿易脫鉤武器化，多邊仲裁癱瘓，安全困境進入自我強化之高危狀態。"},
+        {"num": 4, "code": "STAGE_4", "range": "85 - 100", "title": "暴力成為被接受選項", "title_en": "Violence Accepted", "desc": "和平緩衝全面失靈，生存危機、預防性打擊邏輯或體系絕望感壓倒避戰共識，爆發總體戰衝突機率極高。"},
+    ]
+
+    # Step 1 Stage Cards HTML
+    stage_tracker_cards = []
+    for s in stages_info:
+        is_active = (s["num"] == stage["number"])
+        active_class = "active" if is_active else ""
+        badge = '<span class="stage-tag active-tag">當前階段 · CURRENT</span>' if is_active else f'<span class="stage-tag">區間 {s["range"]}</span>'
+        stage_tracker_cards.append(f"""
+        <div class="stage-card {active_class}" id="stage-card-{s['num']}">
+          <div class="stage-card-header">
+            <span class="stage-num">STAGE 0{s['num']}</span>
+            {badge}
+          </div>
+          <div class="stage-card-title">{s['title']}</div>
+          <div class="stage-card-title-en">{s['title_en']}</div>
+          <p class="stage-card-desc">{s['desc']}</p>
+        </div>
+        """)
+    stage_tracker_html = "\n".join(stage_tracker_cards)
+
+    # Optional sections for Steps 2 to 5
+    step2_html = ""
+    step3_html = ""
+    step4_html = ""
+    step5_html = ""
+
+    # CSS styles
+    css = """
+    :root {
+      --bg-base: #080d1a;
+      --bg-surface: #0f172a;
+      --bg-card: #131d36;
+      --bg-card-hover: #1a2747;
+      --border-color: #1e293b;
+      --border-bright: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --accent-cyan: #06b6d4;
+      --accent-blue: #3b82f6;
+      --color-green: #10b981;
+      --color-yellow: #eab308;
+      --color-orange: #f97316;
+      --color-red: #ef4444;
+      --color-red-glow: rgba(239, 68, 68, 0.25);
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      padding-bottom: 40px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Navigation Bar */
+    .top-bar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .radar-icon {
+      width: 14px;
+      height: 14px;
+      background: var(--color-red);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--color-red);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+    .brand-sub {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+    .top-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.82rem;
+    }
+    .meta-badge {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      letter-spacing: 0.5px;
+    }
+    .badge-alert {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--color-red);
+      color: #fca5a5;
+    }
+    .badge-offline {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid var(--color-green);
+      color: #6ee7b7;
+    }
+    .badge-step {
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid var(--accent-cyan);
+      color: #67e8f9;
+    }
+
+    /* Container */
+    .dashboard-container {
+      max-width: 1380px;
+      margin: 24px auto;
+      padding: 0 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Cards */
+    .panel-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 22px;
+      position: relative;
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .panel-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-tag {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+    }
+
+    /* Section 1: Top Hero Grid (Gauge + Headline Summary) */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 1024px) {
+      .hero-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Gauge Card */
+    .gauge-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      justify-content: center;
+      padding: 26px 20px;
+      background: linear-gradient(180deg, #131d36 0%, #0d1424 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    .gauge-wrapper {
+      width: 100%;
+      max-width: 320px;
+      margin-bottom: -10px;
+    }
+    .gauge-svg {
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+    .score-big {
+      font-size: 3.4rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      line-height: 1;
+      color: #fff;
+      text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+      margin-top: -6px;
+    }
+    .score-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-top: 6px;
+      letter-spacing: 0.5px;
+    }
+    .score-sub {
+      font-size: 0.76rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+    .gauge-meta-pills {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+      width: 100%;
+      justify-content: center;
+    }
+    .pill {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 6px 12px;
+      text-align: center;
+      flex: 1;
+      max-width: 140px;
+    }
+    .pill-label {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+    .pill-val {
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: #e2e8f0;
+      margin-top: 2px;
+    }
+
+    /* Stage Progression Tracker */
+    .stages-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 768px) {
+      .stages-grid { grid-template-columns: 1fr; }
+    }
+    .stage-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.2s ease;
+      opacity: 0.6;
+    }
+    .stage-card.active {
+      opacity: 1;
+      border-color: var(--color-orange);
+      background: linear-gradient(180deg, rgba(249, 115, 22, 0.08) 0%, rgba(15, 23, 42, 0.9) 100%);
+      box-shadow: 0 0 15px rgba(249, 115, 22, 0.2);
+    }
+    .stage-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .stage-num {
+      font-size: 0.7rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+    }
+    .stage-tag {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+    .active-tag {
+      color: var(--color-orange);
+      font-weight: 700;
+    }
+    .stage-card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .stage-card-title-en {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+    .stage-card-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    /* Active Stage Details Banner */
+    .active-stage-banner {
+      margin-top: 18px;
+      background: rgba(249, 115, 22, 0.08);
+      border: 1px solid rgba(249, 115, 22, 0.35);
+      border-radius: 6px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .banner-badge {
+      background: var(--color-orange);
+      color: #000;
+      font-weight: 800;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .banner-text {
+      font-size: 0.85rem;
+      color: #fdba74;
+      line-height: 1.4;
+    }
+
+    /* Probability Bands Grid */
+    .prob-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .prob-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+    .prob-horizon {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+    .prob-central {
+      font-size: 1.35rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: #f1f5f9;
+      margin: 4px 0 2px 0;
+    }
+    .prob-band {
+      font-size: 0.76rem;
+      color: var(--accent-cyan);
+      font-family: var(--font-mono);
+    }
+
+    /* Footer */
+    .dash-footer {
+      max-width: 1380px;
+      margin: 32px auto 0 auto;
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-dim);
+      font-size: 0.78rem;
+    }
+    </style>
+    """
+
+    # HTML Skeleton
+    html = f"""<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WW3 結構風險預警儀表板 | WW3 Structural Risk Early Warning Dashboard</title>
+  {css}
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <header class="top-bar">
+    <div class="brand-group">
+      <div class="radar-icon"></div>
+      <div>
+        <div class="brand-title">WW3 結構風險預警儀表板 <span style="font-weight:400;font-size:0.85rem;color:var(--text-dim);">WW3 Risk Model</span></div>
+        <div class="brand-sub">DEFENSE INTELLIGENCE &amp; SYSTEMIC CRISIS TERMINAL</div>
+      </div>
+    </div>
+    <div class="top-meta">
+      <span class="meta-badge badge-step">UI-STEP {ui_step}</span>
+      <span class="meta-badge badge-alert">警戒級別：{stage['title']} (STAGE {stage['number']})</span>
+      <span class="meta-badge badge-offline">● 100% 本地離線運行 (ZERO CDN)</span>
+      <span style="font-family:var(--font-mono);color:var(--text-dim);">{data['metadata']['generated_at']} · {data['metadata']['active_scenario_year']} 基準</span>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="dashboard-container">
+    <!-- Section 1: Hero Grid (Gauge + Stage Progression Tracker) -->
+    <section class="hero-grid">
+      <!-- Left: Big Semi-circle Gauge -->
+      <div class="gauge-card">
+        <div style="font-size:0.75rem;font-weight:700;letter-spacing:1px;color:var(--text-dim);margin-bottom:8px;font-family:var(--font-mono);">
+          GLOBAL ESCALATION INDEX
+        </div>
+        <div class="gauge-wrapper" id="gauge-container">
+          {gauge_svg}
+        </div>
+        <div class="score-big" id="score-display">{risk_score:.1f}</div>
+        <div class="score-label">全球大戰結構風險指數 (0 – 100)</div>
+        <div class="score-sub">CURRENT SCENARIO: {main['scenario_title']}</div>
+        
+        <div class="gauge-meta-pills">
+          <div class="pill">
+            <div class="pill-label">基礎結構分</div>
+            <div class="pill-val" id="pill-base">{main['base_structural_score']:.1f}</div>
+          </div>
+          <div class="pill">
+            <div class="pill-label">和平閘門乘數</div>
+            <div class="pill-val" id="pill-gate">x{main['gate_factor']:.3f}</div>
+          </div>
+          <div class="pill">
+            <div class="pill-label">機制失效度</div>
+            <div class="pill-val" id="pill-fail">{main['gate_failure']:.1f}%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Four-Stage Progression & Probabilities -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>危機升級四階段狀態 (Escalation Stage Tracker)</span>
+          </div>
+          <span class="panel-tag">FOUR-STAGE CRISIS FRAMEWORK</span>
+        </div>
+
+        <div class="stages-grid">
+          {stage_tracker_html}
+        </div>
+
+        <!-- Active Stage Details Banner -->
+        <div class="active-stage-banner">
+          <span class="banner-badge">當前定位 STAGE {stage['number']}</span>
+          <div class="banner-text">
+            <strong>{stage['title']}：</strong>{stage['description']}
+          </div>
+        </div>
+
+        <!-- Probability Bands for Baseline -->
+        <div style="margin-top:20px;">
+          <div style="font-size:0.8rem;font-weight:700;color:var(--text-muted);display:flex;justify-content:space-between;">
+            <span>情境推演概率帶 (Scenario Probability Bands)</span>
+            <span style="font-size:0.7rem;font-weight:400;color:var(--text-dim);">非統計驗證預測 · 基於結構壓力映射</span>
+          </div>
+          <div class="prob-grid">
+            <div class="prob-card">
+              <div class="prob-horizon">1 年期窗口 (1-Year)</div>
+              <div class="prob-central">{main['probability_bands']['1y']['central_pct']:.1f}%</div>
+              <div class="prob-band">置信區間: {main['probability_bands']['1y']['lower_pct']:.1f}% – {main['probability_bands']['1y']['upper_pct']:.1f}%</div>
+            </div>
+            <div class="prob-card">
+              <div class="prob-horizon">5 年期窗口 (5-Year)</div>
+              <div class="prob-central">{main['probability_bands']['5y']['central_pct']:.1f}%</div>
+              <div class="prob-band">置信區間: {main['probability_bands']['5y']['lower_pct']:.1f}% – {main['probability_bands']['5y']['upper_pct']:.1f}%</div>
+            </div>
+            <div class="prob-card">
+              <div class="prob-horizon">10 年期窗口 (10-Year)</div>
+              <div class="prob-central">{main['probability_bands']['10y']['central_pct']:.1f}%</div>
+              <div class="prob-band">置信區間: {main['probability_bands']['10y']['lower_pct']:.1f}% – {main['probability_bands']['10y']['upper_pct']:.1f}%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {step2_html}
+    {step3_html}
+    {step4_html}
+    {step5_html}
+  </main>
+
+  <footer class="dash-footer">
+    <div>WW3 Risk Model · 零框架純靜態離線架構 · 嚴格由模型公式計算</div>
+    <div>Model Version: {data['metadata']['model_version']} · File: ui/dashboard.html</div>
+  </footer>
+
+  <!-- Embedded Model Output (Guarantees 100% offline file:// rendering without CORS errors) -->
+  <script id="ww3-model-data" type="application/json">
+{data_json_str}
+  </script>
+  <script>
+    // Global Access to Embedded Scenario and Model Data
+    window.WW3_MODEL_DATA = JSON.parse(document.getElementById('ww3-model-data').textContent);
+    console.log("WW3 Model Data Loaded Successfully:", window.WW3_MODEL_DATA);
+  </script>
+</body>
+</html>
+"""
+    return html
+
+
+def build_dashboard(
+    scenario_path: str | Path = "scenarios/baseline_2026.json",
+    output_html_path: str | Path = "ui/dashboard.html",
+    output_json_path: Optional[str | Path] = "ui/dashboard_data.json",
+    ui_step: int = 5,
+    model: Optional[WW3RiskModel] = None,
+) -> Dict[str, Any]:
+    """Compile scenario data and generate output HTML/JSON files."""
+    scenario_p = Path(scenario_path)
+    output_html_p = Path(output_html_path)
+
+    # Ensure parent output directory exists
+    output_html_p.parent.mkdir(parents=True, exist_ok=True)
+
+    data = generate_dashboard_data(scenario_path=scenario_p, model=model)
+    html_content = build_dashboard_html(data, ui_step=ui_step)
+
+    with open(output_html_p, "w", encoding="utf-8") as f:
+        f.write(html_content)
+
+    if output_json_path:
+        output_json_p = Path(output_json_path)
+        output_json_p.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_json_p, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+    return data
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="WW3 Risk Model Static Dashboard Generator")
+    parser.add_argument("--scenario", "-s", type=str, default="scenarios/baseline_2026.json", help="Path to main scenario JSON")
+    parser.add_argument("--output", "-o", type=str, default="ui/dashboard.html", help="Path to output dashboard HTML")
+    parser.add_argument("--json", "-j", type=str, default="ui/dashboard_data.json", help="Path to output dashboard JSON")
+    parser.add_argument("--step", type=int, default=5, help="UI Step version to render (1 to 5)")
+
+    parsed = parser.parse_args()
+    data = build_dashboard(
+        scenario_path=parsed.scenario,
+        output_html_path=parsed.output,
+        output_json_path=parsed.json,
+        ui_step=parsed.step,
+    )
+    print(f"WW3 Dashboard successfully generated for {data['metadata']['active_scenario_title']} (UI-Step {parsed.step})")
+    print(f"HTML output: {parsed.output}")
+    if parsed.json:
+        print(f"JSON data: {parsed.json}")
+
+
+if __name__ == "__main__":
+    main()

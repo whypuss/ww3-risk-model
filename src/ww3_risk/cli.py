@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 from typing import List
 
+from .dashboard import build_dashboard
 from .indicators import ScenarioData, load_scenario_from_file
 from .model import WW3RiskModel
 from .report import generate_markdown_report
@@ -90,6 +91,7 @@ def main(args: list[str] | None = None) -> None:
     parser.add_argument("--compare", "-c", nargs="+", help="Paths or globs of scenario JSON files to compare")
     parser.add_argument("--historical", "-H", type=str, help="Path to historical_cases.json")
     parser.add_argument("--report", "-r", type=str, help="Path to output Markdown report")
+    parser.add_argument("--dashboard", "-d", type=str, help="Path to generate static dashboard HTML")
     parser.add_argument("--json", action="store_true", help="Output raw JSON format")
     parser.add_argument("--verbose", "-v", action="store_true", help="Show verbose indicator output")
 
@@ -171,6 +173,17 @@ def main(args: list[str] | None = None) -> None:
             with open(parsed.report, "w", encoding="utf-8") as f:
                 f.write(md_content)
             print(f"分析報告已儲存至: {parsed.report}")
+
+        if parsed.dashboard:
+            build_dashboard(scenario_path=scenario_path, output_html_path=parsed.dashboard, model=model)
+            print(f"靜態儀表板 HTML 已生成: {parsed.dashboard}")
+        return
+
+    # Case 4: Dashboard generation standalone without --scenario (defaults to baseline)
+    if parsed.dashboard:
+        default_scenario = Path("scenarios/baseline_2026.json")
+        build_dashboard(scenario_path=default_scenario, output_html_path=parsed.dashboard, model=model)
+        print(f"靜態儀表板 HTML 已生成: {parsed.dashboard}")
         return
 
     # Default if no arguments provided
