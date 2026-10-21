@@ -47,3 +47,9 @@ htmlcov/
 out.md
 *.tmp.json
 *.tmp
+staging/
+
+# Node & Cloudflare
+node_modules/
+.cloudflare/
+

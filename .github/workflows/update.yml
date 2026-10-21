@@ -17,6 +17,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_D1_DATABASE_ID: "614ee93b-e679-4b1b-a874-7a8b7260d6d6"
+      WW3_API_BASE: ${{ vars.WW3_API_BASE || 'https://ww3-risk-api.whymeymmy.workers.dev' }}
       PYTHONPATH: "src"
 
     steps:
@@ -73,13 +74,24 @@ jobs:
 
       - name: Build dynamic dashboard HTML with API base
         run: |
-          python -m ww3_risk.cli --scenario scenarios/baseline_2026.json --dashboard ui/dashboard.html --api-base "https://ww3-risk-api.whypuss.workers.dev"
+          API_BASE="${WW3_API_BASE:-https://ww3-risk-api.whymeymmy.workers.dev}"
+          echo "Building dashboard with api-base: $API_BASE"
+          python -m ww3_risk.cli --scenario scenarios/baseline_2026.json --dashboard ui/dashboard.html --api-base "$API_BASE"
+
+      - name: Prepare Pages staging deployment directory
+        run: |
+          mkdir -p staging
+          cp ui/dashboard.html staging/index.html
+          cp ui/dashboard.html staging/dashboard.html
+          if [ -f "ui/dashboard_data.json" ]; then
+            cp ui/dashboard_data.json staging/dashboard_data.json
+          fi
 
       - name: Deploy dynamic dashboard to Cloudflare Pages
         run: |
           if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "Deploying ui/ directory to Cloudflare Pages project 'ww3-risk-model'..."
-            npx wrangler pages deploy ui --project-name=ww3-risk-model
+            echo "Deploying staging/ directory to Cloudflare Pages project 'ww3-risk-model'..."
+            npx wrangler pages deploy staging --project-name=ww3-risk-model
           else
             echo "::notice ::Skipping Pages deployment: CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID secret is not set."
           fi
