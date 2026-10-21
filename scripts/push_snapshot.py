@@ -91,7 +91,7 @@ def build_sql_statements(snapshot_data: Dict[str, Any]) -> Tuple[Tuple[str, List
     obs_list = snapshot_data.get("observations", [])
 
     snap_sql = (
-        "INSERT INTO index_snapshots ("
+        "INSERT OR REPLACE INTO index_snapshots ("
         "id, computed_at, model_version, scenario_id, total_index, stage, "
         "base_score, interaction_bonus, gate_multiplier, peace_capacity, "
         "band_1y, band_5y, band_10y, layers_json, drivers_json"
@@ -116,8 +116,8 @@ def build_sql_statements(snapshot_data: Dict[str, Any]) -> Tuple[Tuple[str, List
     ]
 
     obs_statements: List[Tuple[str, List[Any]]] = []
-    # Batch observations in chunks of 10 to stay well within SQL parameter limits
-    chunk_size = 10
+    # Batch observations in chunks of 5 so statement parameter count (5 * 14 = 70) is <= 90
+    chunk_size = 5
     cols = (
         "snapshot_id, indicator_id, layer, raw_value, raw_unit, "
         "normalized_score, evidence_level, source_name, source_url, "
@@ -155,10 +155,12 @@ def build_sql_statements(snapshot_data: Dict[str, Any]) -> Tuple[Tuple[str, List
 def push_to_sqlite(db_path: str | Path, snapshot_data: Dict[str, Any]) -> None:
     """Execute parameterized SQL insertion into a local SQLite database (for testing/verification)."""
     (snap_sql, snap_params), obs_statements = build_sql_statements(snapshot_data)
+    snap = snapshot_data["snapshot"]
     conn = sqlite3.connect(db_path)
     try:
         with conn:
             conn.execute(snap_sql, snap_params)
+            conn.execute("DELETE FROM indicator_observations WHERE snapshot_id = ?", (snap["id"],))
             for obs_sql, obs_params in obs_statements:
                 conn.execute(obs_sql, obs_params)
     finally:
@@ -192,11 +194,20 @@ def push_snapshot(
 
     print(f"Pushing snapshot {snap['id']} to Cloudflare D1 ({database_id})...")
 
-    # 1. Insert snapshot record
+    # 1. Insert or replace snapshot record
     res_snap = execute_d1_query(account_id, database_id, api_token, snap_sql, snap_params)
     print("  ✓ index_snapshots record inserted")
 
-    # 2. Insert observations in batches
+    # 2. Delete existing observations for this snapshot to prevent duplicates
+    execute_d1_query(
+        account_id,
+        database_id,
+        api_token,
+        "DELETE FROM indicator_observations WHERE snapshot_id = ?",
+        [snap["id"]],
+    )
+
+    # 3. Insert observations in batches (chunk_size=5, <= 90 params per statement)
     for idx, (obs_sql, obs_params) in enumerate(obs_statements, 1):
         execute_d1_query(account_id, database_id, api_token, obs_sql, obs_params)
         print(f"  ✓ indicator_observations batch {idx}/{len(obs_statements)} inserted")

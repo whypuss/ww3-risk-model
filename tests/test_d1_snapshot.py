@@ -166,3 +166,31 @@ def test_cli_export_snapshot_flag(tmp_path):
     assert "observations" in data
     assert len(data["observations"]) == 34
     assert round(data["snapshot"]["total_index"], 1) == 83.1
+
+
+def test_sql_statement_parameter_limit_regression():
+    """Regression test: Ensure all generated SQL statements have <= 90 parameters.
+
+    Cloudflare D1 enforces a maximum parameter limit (resulting in HTTP 400
+    'too many SQL variables' if exceeded). This test asserts that both the snapshot
+    statement and all chunked observation statements adhere to <= 90 parameters.
+    """
+    scenario = load_scenario_from_file("scenarios/baseline_2026.json")
+    model = WW3RiskModel()
+    snap_data = create_snapshot(scenario, model=model)
+
+    from scripts.push_snapshot import build_sql_statements
+
+    (snap_sql, snap_params), obs_statements = build_sql_statements(snap_data)
+
+    max_params_limit = 90
+    assert len(snap_params) <= max_params_limit, (
+        f"snap_params count {len(snap_params)} exceeds {max_params_limit}"
+    )
+
+    assert len(obs_statements) > 0, "Expected non-empty obs_statements"
+    for idx, (sql, params) in enumerate(obs_statements, 1):
+        assert len(params) <= max_params_limit, (
+            f"Observation statement {idx} has {len(params)} parameters, which exceeds D1 limit of {max_params_limit}"
+        )
+
