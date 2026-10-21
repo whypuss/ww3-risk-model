@@ -74,6 +74,10 @@ def test_generate_dashboard_data_matches_cli_and_model():
         assert "level" in reg
         assert "note" in reg
         assert "示意拆分" in reg["note"]
+        assert "components" in reg
+        assert len(reg["components"]) >= 3
+        assert "formula" in reg
+        assert "示意拆分（指標原始平均）：" in reg["formula"]
 
     # Unconnected data sources check
     assert len(data["unconnected_sources"]) >= 5
@@ -355,6 +359,96 @@ def test_dashboard_api_base_and_offline_fallback(tmp_path):
     assert "● 100% 本地離線運行 (ZERO CDN)" in offline_content
     assert "戰爭風險指數" in offline_content
     assert "WW3_MODEL_DATA" in offline_content
+
+
+def test_regional_pressures_raw_average_and_formula_regression():
+    """Verify v0.4.1 regional pressure card fixes:
+    - base_weight multiplier is removed from all mappings
+    - all indicator IDs exist in baseline scenario
+    - card score strictly equals arithmetic mean of components
+    - components field has {id, name, value}
+    - formula string contains '示意拆分（指標原始平均）：', Chinese short names and values
+    - exact expected baseline scores match calibrated targets:
+        east_asia: 79.5 (HIGH)
+        eastern_europe: 74.0 (HIGH)
+        middle_east: 66.5 (ELEVATED)
+        south_central_asia: 63.0 (ELEVATED)
+        global_chokepoints: 72.0 (HIGH)
+    """
+    scenario_path = Path("scenarios/baseline_2026.json")
+    scenario = load_scenario_from_file(scenario_path)
+
+    # 1. Assert base_weight is removed from all mappings
+    for reg_id, conf in REGIONAL_INDICATOR_MAPPINGS.items():
+        assert "base_weight" not in conf, f"base_weight still present in mapping '{reg_id}'"
+
+    # 2. Assert every primary indicator ID exists in baseline scenario
+    all_indicator_ids = set()
+    for layer in scenario.layers.values():
+        for ind in layer.indicators:
+            all_indicator_ids.add(ind.id)
+
+    for reg_id, conf in REGIONAL_INDICATOR_MAPPINGS.items():
+        for iid in conf["primary_indicators"]:
+            assert iid in all_indicator_ids, f"Indicator '{iid}' in region '{reg_id}' not in baseline scenario!"
+
+    # 3. Calculate regional pressures and verify arithmetic mean & components
+    cards = calculate_regional_pressures(scenario)
+    assert len(cards) == 5
+
+    expected_scores = {
+        "east_asia": (79.5, "HIGH"),
+        "eastern_europe": (74.0, "HIGH"),
+        "middle_east": (66.5, "ELEVATED"),
+        "south_central_asia": (63.0, "ELEVATED"),
+        "global_chokepoints": (72.0, "HIGH"),
+    }
+
+    card_dict = {c["id"]: c for c in cards}
+    for reg_id, (expected_score, expected_level) in expected_scores.items():
+        assert reg_id in card_dict
+        card = card_dict[reg_id]
+
+        # Score and level match
+        assert card["score"] == expected_score, f"{reg_id} score {card['score']} != {expected_score}"
+        assert card["level"] == expected_level, f"{reg_id} level {card['level']} != {expected_level}"
+
+        # Arithmetic mean assertion using real baseline component values
+        components = card["components"]
+        assert len(components) == len(REGIONAL_INDICATOR_MAPPINGS[reg_id]["primary_indicators"])
+        for comp in components:
+            assert "id" in comp
+            assert "name" in comp
+            assert "value" in comp
+            assert isinstance(comp["value"], (int, float))
+
+        mean_val = round(sum(c["value"] for c in components) / len(components), 1)
+        assert card["score"] == mean_val
+
+        # Formula assertion
+        formula = card["formula"]
+        assert "示意拆分（指標原始平均）：" in formula
+        assert f"= {expected_score:.1f}" in formula
+        for comp in components:
+            assert f"{comp['value']:.1f} {comp['name']}" in formula
+
+
+def test_regional_pressures_raises_on_missing_indicator_regression():
+    """Verify that calculate_regional_pressures immediately raises KeyError if any mapped indicator is missing."""
+    import copy
+    import pytest
+
+    scenario_path = Path("scenarios/baseline_2026.json")
+    scenario = load_scenario_from_file(scenario_path)
+
+    # Corrupt scenario by removing one indicator needed by regional mappings
+    corrupted = copy.deepcopy(scenario)
+    for lid, layer in corrupted.layers.items():
+        layer.indicators = [ind for ind in layer.indicators if ind.id != "l4_military_expenditure_growth"]
+
+    with pytest.raises(KeyError, match="l4_military_expenditure_growth"):
+        calculate_regional_pressures(corrupted)
+
 
 
 

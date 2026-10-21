@@ -18,43 +18,100 @@ from .indicators import ScenarioData, load_scenario_from_file
 from .model import WW3RiskModel, RiskResult
 
 
+# Chinese short names for indicators used in regional formula displays and breakdowns
+INDICATOR_SHORT_NAMES = {
+    # L1: 生存 / 資源
+    "l1_food_security": "糧食儲備",
+    "l1_water_stress": "水資源壓力",
+    "l1_energy_vulnerability": "能源脆弱性",
+    "l1_critical_minerals": "關鍵礦物管制",
+    "l1_climate_impact": "氣候衝擊",
+    "l1_maritime_chokepoints": "海運咽喉風險",
+    # L2: 分配失衡
+    "l2_wealth_gini": "財富差距",
+    "l2_compute_monopoly": "算力壟斷",
+    "l2_land_housing_concentration": "土地資產集中",
+    "l2_social_mobility": "社會流動停滯",
+    "l2_institutional_fairness": "制度公平赤字",
+    "l2_peaceful_redistribution": "再分配失靈",
+    # L3: 工作 / 生計
+    "l3_unemployment_underemployment": "就業不足",
+    "l3_youth_unemployment": "青年失業",
+    "l3_wage_vs_living_cost": "工資生活成本夾擊",
+    "l3_housing_affordability": "房價所得比",
+    "l3_ai_displacement_rate": "AI 勞動取代",
+    "l3_effort_reward_breakdown": "努力回報崩塌",
+    # L4: 權力 / 安全困境
+    "l4_military_expenditure_growth": "軍費擴張",
+    "l4_arms_race_hypersonic": "高超音速軍備競賽",
+    "l4_bloc_polarization": "陣營極化",
+    "l4_weaponized_interdependence": "相互依賴武器化",
+    "l4_nuclear_breakout": "核門檻鬆動",
+    "l4_territorial_flashpoints": "領土引信點",
+    # L5: 未來恐懼 / 預防邏輯
+    "l5_relative_decline_anxiety": "霸權衰落焦慮",
+    "l5_demographic_cliff": "人口老齡斷崖",
+    "l5_economic_stagnation": "長期停滯預期",
+    "l5_tech_supremacy_fear": "技術霸權恐懼",
+    "l5_miscalculation_risk": "決策誤判風險",
+    "l5_leadership_time_horizon": "政治短視焦慮",
+}
+
 # Regional pressure mapping definition (derived from existing scenario indicators)
 # Explicitly noted as illustrative mapping to comply with transparency requirements.
 REGIONAL_INDICATOR_MAPPINGS = {
     "eastern_europe": {
         "name": "東歐（烏克蘭 / 北約東翼前線）",
         "name_en": "Eastern Europe / NATO Eastern Flank",
-        "primary_indicators": ["l4_territorial_flashpoints", "l4_bloc_polarization", "l4_military_spending", "l4_nuclear_posture"],
-        "base_weight": 1.1,
-        "note": "示意拆分：加權映射指標 [l4_territorial_flashpoints, l4_bloc_polarization, l4_military_spending, l4_nuclear_posture]，反映陸權對峙與前沿引信摩擦。",
+        "primary_indicators": [
+            "l4_territorial_flashpoints",
+            "l4_bloc_polarization",
+            "l4_military_expenditure_growth",
+            "l4_nuclear_breakout",
+        ],
+        "note": "示意拆分：指標原始平均映射 [l4_territorial_flashpoints, l4_bloc_polarization, l4_military_expenditure_growth, l4_nuclear_breakout]，反映陸權對峙與前沿引信摩擦。",
     },
     "middle_east": {
         "name": "中東（紅海 / 波斯灣 / 霍爾木茲咽喉）",
         "name_en": "Middle East / Persian Gulf & Red Sea Chokepoints",
-        "primary_indicators": ["l1_maritime_chokepoints", "l1_energy_vulnerability", "l4_territorial_flashpoints", "l1_water_stress"],
-        "base_weight": 1.1,
-        "note": "示意拆分：加權映射指標 [l1_maritime_chokepoints, l1_energy_vulnerability, l4_territorial_flashpoints, l1_water_stress]，反映航道封鎖與能源外溢風險。",
+        "primary_indicators": [
+            "l1_maritime_chokepoints",
+            "l1_energy_vulnerability",
+            "l4_territorial_flashpoints",
+            "l1_water_stress",
+        ],
+        "note": "示意拆分：指標原始平均映射 [l1_maritime_chokepoints, l1_energy_vulnerability, l4_territorial_flashpoints, l1_water_stress]，反映航道封鎖與能源外溢風險。",
     },
     "east_asia": {
         "name": "東亞（台海 / 南海 / 第一島鏈）",
         "name_en": "East Asia / Taiwan Strait & South China Sea",
-        "primary_indicators": ["l2_compute_monopoly", "l4_territorial_flashpoints", "l5_tech_supremacy_fear", "l4_bloc_polarization"],
-        "base_weight": 1.2,
-        "note": "示意拆分：加權映射指標 [l2_compute_monopoly, l4_territorial_flashpoints, l5_tech_supremacy_fear, l4_bloc_polarization]，反映算力晶圓代工壟斷與預防性技術爭霸。",
+        "primary_indicators": [
+            "l2_compute_monopoly",
+            "l4_territorial_flashpoints",
+            "l5_tech_supremacy_fear",
+            "l4_bloc_polarization",
+        ],
+        "note": "示意拆分：指標原始平均映射 [l2_compute_monopoly, l4_territorial_flashpoints, l5_tech_supremacy_fear, l4_bloc_polarization]，反映算力晶圓代工壟斷與預防性技術爭霸。",
     },
     "south_central_asia": {
         "name": "南亞與中亞（印巴 / 喜馬拉雅跨界水資源）",
         "name_en": "South & Central Asia / Transboundary Basins",
-        "primary_indicators": ["l1_water_stress", "l1_climate_impact", "l4_nuclear_posture"],
-        "base_weight": 0.9,
-        "note": "示意拆分：加權映射指標 [l1_water_stress, l1_climate_impact, l4_nuclear_posture]，反映高山冰川消融引致水資源爭奪與核門檻壓力。",
+        "primary_indicators": [
+            "l1_water_stress",
+            "l1_climate_impact",
+            "l4_nuclear_breakout",
+        ],
+        "note": "示意拆分：指標原始平均映射 [l1_water_stress, l1_climate_impact, l4_nuclear_breakout]，反映高山冰川消融引致水資源爭奪與核門檻壓力。",
     },
     "global_chokepoints": {
         "name": "全球戰略咽喉與關鍵礦物網",
         "name_en": "Global Chokepoints & Strategic Critical Mineral Webs",
-        "primary_indicators": ["l1_maritime_chokepoints", "l1_critical_minerals", "l4_trade_weaponization"],
-        "base_weight": 1.0,
-        "note": "示意拆分：加權映射指標 [l1_maritime_chokepoints, l1_critical_minerals, l4_trade_weaponization]，反映關鍵礦物禁運與全球海運供應鏈梗阻。",
+        "primary_indicators": [
+            "l1_maritime_chokepoints",
+            "l1_critical_minerals",
+            "l4_weaponized_interdependence",
+        ],
+        "note": "示意拆分：指標原始平均映射 [l1_maritime_chokepoints, l1_critical_minerals, l4_weaponized_interdependence]，反映關鍵礦物禁運與全球海運供應鏈梗阻。",
     },
 }
 
@@ -114,25 +171,33 @@ UNCONNECTED_DATA_SOURCES = [
 
 
 def calculate_regional_pressures(scenario: ScenarioData) -> List[Dict[str, Any]]:
-    """Compute regional pressure scores from scenario indicators."""
+    """Compute regional pressure scores from scenario indicators as raw arithmetic mean."""
     indicator_dict = {}
     for lid, layer in scenario.layers.items():
         for ind in layer.indicators:
-            indicator_dict[ind.id] = ind.value
+            indicator_dict[ind.id] = ind
 
     regional_cards = []
     for reg_id, conf in REGIONAL_INDICATOR_MAPPINGS.items():
-        matched_values = []
+        components = []
         for iid in conf["primary_indicators"]:
-            if iid in indicator_dict:
-                matched_values.append(indicator_dict[iid])
+            if iid not in indicator_dict:
+                raise KeyError(
+                    f"Regional mapping '{reg_id}' references unknown indicator '{iid}'"
+                )
+            ind = indicator_dict[iid]
+            short_name = INDICATOR_SHORT_NAMES.get(iid, ind.name)
+            components.append({
+                "id": iid,
+                "name": short_name,
+                "value": float(ind.value),
+            })
 
-        if matched_values:
-            raw_avg = sum(matched_values) / len(matched_values)
-            # Apply slight regional sensitivity calibration
-            score = min(100.0, max(0.0, raw_avg * conf["base_weight"]))
-        else:
-            score = 50.0
+        if not components:
+            raise ValueError(f"Regional mapping '{reg_id}' has no primary indicators defined")
+
+        raw_avg = sum(c["value"] for c in components) / len(components)
+        score = round(raw_avg, 1)
 
         if score >= 85.0:
             level = "CRITICAL"
@@ -151,15 +216,20 @@ def calculate_regional_pressures(scenario: ScenarioData) -> List[Dict[str, Any]]
             level_label = "溫和可控 (Moderate)"
             color_class = "success"
 
+        formula_terms = " ＋ ".join([f"{c['value']:.1f} {c['name']}" for c in components])
+        formula_str = f"示意拆分（指標原始平均）：({formula_terms}) ÷ {len(components)} = {score:.1f}"
+
         regional_cards.append({
             "id": reg_id,
             "name": conf["name"],
             "name_en": conf["name_en"],
-            "score": round(score, 1),
+            "score": score,
             "level": level,
             "level_label": level_label,
             "color_class": color_class,
             "indicators_used": conf["primary_indicators"],
+            "components": components,
+            "formula": formula_str,
             "note": conf["note"],
         })
 
@@ -998,6 +1068,9 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
               <div class="reg-disclaimer-tag">
                 [示意拆分 · 模型指標映射]
               </div>
+              <div class="reg-formula">
+                {reg['formula']}
+              </div>
               <div class="reg-indicators-list">
                 映射來源：{indicators_tags}
               </div>
@@ -1034,7 +1107,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
           <span class="panel-tag">ILLUSTRATIVE DECOMPOSITION · MAPPED FROM CORE INDICATORS</span>
         </div>
         <div style="background:rgba(234, 179, 8, 0.08);border:1px solid rgba(234, 179, 8, 0.25);border-radius:6px;padding:8px 12px;margin-bottom:16px;font-size:0.76rem;color:#fef08a;">
-          <strong>透明度說明 (Transparency Standard)：</strong>區域分數為「<strong>示意拆分 (Illustrative Mapping)</strong>」，由模型中既有之客觀指標（如海運咽喉受阻、領土引信點摩擦、算力壟斷等）加權合成，非獨立地理感測器實測，特此標註以防誤導。
+          <strong>透明度說明 (Transparency Standard)：</strong>區域分數為「<strong>示意拆分 (Illustrative Mapping)</strong>」，由模型中既有之客觀指標（如海運咽喉受阻、領土引信點摩擦、算力壟斷等）指標原始平均合成，非獨立地理感測器實測，特此標註以防誤導。
         </div>
         <div class="regions-grid">
           {regions_html}
@@ -2093,6 +2166,20 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       font-size: 0.68rem;
       color: #f59e0b;
       font-weight: 600;
+      font-family: var(--font-mono);
+    }
+    .reg-formula {
+      font-size: 0.72rem;
+      color: #cbd5e1;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 4px;
+      padding: 6px 8px;
+      line-height: 1.45;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+      margin: 4px 0;
       font-family: var(--font-mono);
     }
     .reg-indicators-list {
