@@ -1,0 +1,17 @@
+{
+  "name": "ww3-risk-api",
+  "version": "0.4.0",
+  "type": "module",
+  "description": "WW3 Risk Model Cloudflare Worker API",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node --test tests/index.test.js"
+  },
+  "keywords": [
+    "cloudflare-worker",
+    "d1",
+    "ww3-risk-model"
+  ],
+  "author": "",
+  "license": "MIT"
+}

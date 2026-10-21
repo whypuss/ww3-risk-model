@@ -1,0 +1,8 @@
+name = "ww3-risk-api"
+main = "src/index.js"
+compatibility_date = "2024-10-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ww3-risk"
+database_id = "614ee93b-e679-4b1b-a874-7a8b7260d6d6"
