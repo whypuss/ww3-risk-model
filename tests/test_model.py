@@ -407,19 +407,90 @@ def test_markdown_report_generation(baseline_scenario: ScenarioData, model: WW3R
     md = generate_markdown_report(res)
 
     assert "# WW3 結構風險評估報告" in md
-    assert "全球大戰風險指數 (WW3 Risk Index)" in md
+    assert "戰爭風險指數 (War Risk Index)" in md
     assert "五層結構風險明細" in md
     assert "和平機制閘門分析" in md
     assert "系統互動加成效應" in md
-    assert "情境概率帶" in md
+    assert "結構風險情境帶" in md
     assert "免責聲明" in md
 
 
 def test_cli_single_scenario(capsys):
     cli_main(["--scenario", str(BASELINE_FILE)])
     captured = capsys.readouterr()
-    assert "全球大戰風險指數" in captured.out
+    assert "戰爭風險指數" in captured.out
     assert "危機升級階段" in captured.out
+
+
+def test_cli_data_quality_report(capsys):
+    """Test P3 data quality CLI feature."""
+    cli_main(["--data-quality", "--scenario", str(BASELINE_FILE)])
+    captured = capsys.readouterr()
+    assert "WW3 風險模型 - 數據品質與更新新鮮度報告" in captured.out
+    assert "整體數據完整度 (Completeness)" in captured.out
+    assert "[STALE]" in captured.out
+    assert "[FRESH]" in captured.out
+    assert "l1_food_security" in captured.out
+
+
+def test_cli_data_quality_json(capsys):
+    """Test P3 data quality CLI JSON output."""
+    import json
+    cli_main(["--data-quality", "--scenario", str(BASELINE_FILE), "--json"])
+    captured = capsys.readouterr()
+    data = json.loads(captured.out)
+    assert data["total_indicators"] == 34
+    assert data["completeness_pct"] == 100.0
+    assert data["fresh_count"] >= 1
+    assert data["missing_count"] == 0
+    assert len(data["items"]) == 34
+
+
+def test_indicator_staleness_and_missing_detection():
+    """Verify that Indicator correctly evaluates fresh, stale, and missing statuses."""
+    from ww3_risk.indicators import Indicator
+
+    # 1. Fresh indicator
+    ind_fresh = Indicator(
+        id="test_fresh",
+        name="Fresh Test",
+        name_en="Fresh Test",
+        value=50.0,
+        raw_value=100,
+        source="Test Source",
+        publication_date="2026-10-01",
+        stale_after="365d",
+        normalization_method="Linear",
+        evidence_level="verified",
+    )
+    assert ind_fresh.get_quality_status("2026-10-21") == "fresh"
+
+    # 2. Stale indicator (published 2024 with 365d threshold)
+    ind_stale = Indicator(
+        id="test_stale",
+        name="Stale Test",
+        name_en="Stale Test",
+        value=50.0,
+        raw_value=100,
+        source="Test Source",
+        publication_date="2024-01-01",
+        stale_after="365d",
+        normalization_method="Linear",
+        evidence_level="verified",
+    )
+    assert ind_stale.get_quality_status("2026-10-21") == "stale"
+
+    # 3. Missing raw value
+    ind_missing = Indicator(
+        id="test_missing",
+        name="Missing Test",
+        name_en="Missing Test",
+        value=50.0,
+        raw_value="",
+        source="Test Source",
+        evidence_level="verified",
+    )
+    assert ind_missing.get_quality_status("2026-10-21") == "missing"
 
 
 def test_cli_comparison_and_report(tmp_path, capsys):

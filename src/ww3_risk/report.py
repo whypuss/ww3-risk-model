@@ -2,17 +2,18 @@
 
 from __future__ import annotations
 
-from typing import List
+from typing import List, Optional
 from .model import RiskResult
+from .indicators import ScenarioData
 
 
-def generate_markdown_report(result: RiskResult) -> str:
-    """Generate a comprehensive Markdown analysis report."""
+def generate_markdown_report(result: RiskResult, scenario: Optional[ScenarioData] = None) -> str:
+    """Generate a comprehensive Markdown analysis report adhering to v0.3 standards."""
     lines: List[str] = []
 
     lines.append(f"# WW3 結構風險評估報告：{result.scenario_title}")
     lines.append("")
-    lines.append(f"> **情境識別碼**：`{result.scenario_id}` | **年份**：{result.scenario_year} | **模型版本**：v0.1.0")
+    lines.append(f"> **情境識別碼**：`{result.scenario_id}` | **年份**：{result.scenario_year} | **模型版本**：v0.3.0")
     lines.append("")
 
     # 1. 核心評估摘要
@@ -20,7 +21,7 @@ def generate_markdown_report(result: RiskResult) -> str:
     lines.append("")
     lines.append("| 指標項目 | 數值 / 狀態 | 解讀說明 |")
     lines.append("| :--- | :--- | :--- |")
-    lines.append(f"| **全球大戰風險指數 (WW3 Risk Index)** | **{result.global_risk_index:.1f} / 100** | 綜合五層結構壓力、互動效應與和平閘門後之總體風險 |")
+    lines.append(f"| **戰爭風險指數 (War Risk Index)** | **{result.global_risk_index:.1f} / 100** | 綜合五層結構壓力、互動效應與和平閘門後之總體風險（非經驗證開戰概率） |")
     lines.append(f"| **當前危機階段 (Stage)** | **{result.stage.title}** (`{result.stage.code}`) | {result.stage.description} |")
     lines.append(f"| **基礎五層結構分 (Base Score)** | {result.base_structural_score:.1f} / 100 | 五層指標加權平均（未計互動與閘門） |")
     lines.append(f"| **互動放大加成 (Interaction Bonus)** | +{result.interactions['total']:.2f} (上限 {result.interactions.get('is_capped', False) and '已達上限' or '未達上限'}) | 複合危機之超線性耦合效應 |")
@@ -78,12 +79,12 @@ def generate_markdown_report(result: RiskResult) -> str:
     lines.append(f"| **合計互動加成** | 綜合共振項（上限受防護保護） | **+{result.interactions['total']:.2f}** | {'已觸及上限' if result.interactions.get('is_capped') else '正常累積'} |")
     lines.append("")
 
-    # 5. 情境概率帶
-    lines.append("## 五、情境概率帶 (Scenario Probability Bands)")
+    # 5. 結構風險情境帶
+    lines.append("## 五、結構風險情境帶（非經驗證概率） (Scenario Structural Risk Bands)")
     lines.append("")
-    lines.append("> ⚠️ **重要說明**：本機率為基於結構壓力所推導之**情境推演區間（Scenario Probability Band）**，用於評估體系脆弱性，**並非已驗證之高精度統計預測**。實際衝突爆發仍受隨機突發事件（Black Swan）、決策者個人意志及突發微觀危機所左右。")
+    lines.append("> ⚠️ **重要說明**：本情境帶為基於結構壓力所推導之**結構風險情境帶（非經驗證概率）**，用於評估大國體系易燃度，**並非已驗證之高精度統計預測或開戰概率**。大國全面戰爭歷史基率極低，實際衝突爆發仍受隨機突發事件（Black Swan）、決策者個人意志及突發微觀危機所左右。")
     lines.append("")
-    lines.append("| 時間跨度 (Horizon) | 估算區間 (Band) | 中位估值 (Central) | 跨度特徵與動力學說明 |")
+    lines.append("| 時間跨度 (Horizon) | 結構情境帶 (Band) | 中位估值 (Central) | 跨度特徵與動力學說明 |")
     lines.append("| :--- | :--- | :--- | :--- |")
     for hid in ["1y", "5y", "10y"]:
         b = result.probability_bands[hid]
@@ -108,13 +109,21 @@ def generate_markdown_report(result: RiskResult) -> str:
             lines.append(f"- **{buf['name']}** (`{buf['id']}`): 緩衝容量 `{buf['capacity']:.1f}/100`（尚具穩定作用）")
     lines.append("")
 
-    # 7. 證據質量與免責聲明
-    lines.append("## 七、證據質量評級與免責聲明")
+    # 7. 證據質量與數據品質
+    lines.append("## 七、證據質量評級與數據品質監測 (Data Quality & Evidence)")
     lines.append("")
-    lines.append(f"- **已驗證數據 (Verified)**: {result.evidence_counts.get('verified', 0)} 項")
-    lines.append(f"- **模型推論數據 (Inference)**: {result.evidence_counts.get('inference', 0)} 項")
-    lines.append(f"- **示範情境數值 (Illustrative)**: {result.evidence_counts.get('illustrative', 0)} 項")
+    lines.append(f"- **已驗證統計數據 (Verified)**: {result.evidence_counts.get('verified', 0)} 項 (官方權威公開統計)")
+    lines.append(f"- **客觀代理推論數據 (Inference)**: {result.evidence_counts.get('inference', 0)} 項 (透明量化折算)")
+    lines.append(f"- **結構推演示範數據 (Illustrative)**: {result.evidence_counts.get('illustrative', 0)} 項 (公開評分量表)")
     lines.append("")
+
+    if scenario is not None:
+        q = scenario.calculate_data_quality()
+        lines.append(f"- **數據整體完整度**: `{q['completeness_pct']:.1f}%`")
+        lines.append(f"- **新鮮度監測**: Fresh: {q['fresh_count']} 項 | Stale: {q['stale_count']} 項 | Missing: {q['missing_count']} 項")
+        lines.append("- **即時性聲明**: 無即時自動 API 串接之指標均如實顯示最後觀測與發布年份，嚴禁聲稱即時監控。")
+        lines.append("")
+
     lines.append("### 免責聲明 (Disclaimer)")
     lines.append("本模型僅供學術研究、系統動力學探討及戰略推演使用。本報告內容不構成任何國防、外交、政策或投資建議。模型不包含任何武器製造、戰術攻擊或鼓吹戰爭之內容，旨在識別系統性風險積累節點，促進和平機制的維護與改良。")
     lines.append("")
