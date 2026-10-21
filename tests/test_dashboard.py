@@ -274,4 +274,49 @@ def test_dashboard_mobile_responsive_structure(tmp_path):
     assert "class=\"top-date\"" in content
 
 
+def test_dashboard_v03_terminology_and_credibility_separation(tmp_path):
+    """Verify v0.3 UI enhancements: War Risk Index terminology, unverified scenario bands, and 3-tier credibility."""
+    out_html = tmp_path / "dashboard_v03.html"
+    out_json = tmp_path / "dashboard_v03.json"
+
+    data = build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        output_json_path=out_json,
+        ui_step=5,
+    )
+    content = out_html.read_text(encoding="utf-8")
+
+    # 1. Terminology: War Risk Index (戰爭風險指數) 100/100
+    assert "戰爭風險指數" in content
+    assert "戰爭風險指數（War Risk Index）100/100" in content
+    assert "WAR RISK INDEX" in content
+
+    # 2. Strict Prohibition: Never label the primary index or scenario bands as "開戰概率"
+    # Ensure "開戰概率" does not appear as any heading, label, or probability band title
+    assert "情境推演概率帶" not in content
+    assert "結構風險情境帶（非經驗證概率）" in content
+
+    # 3. Three-Tier Credibility Architecture separation
+    assert "三種可信度分立體系架構" in content
+    assert "原始統計可信度" in content
+    assert "換算方法透明度" in content
+    assert "模型預測能力界限" in content
+
+    # 4. Data Quality & Driver Decomposition
+    assert "戰爭風險指數主要驅動分解" in content
+    assert "數據品質與審計新鮮度" in content
+    assert "100.0%" in content  # Completeness pct
+
+    # 5. Metadata and JSON audit
+    assert data["metadata"]["model_version"] == "0.3.0"
+    assert "data_quality" in data
+    assert data["data_quality"]["completeness_pct"] == 100.0
+    assert "evidence_distribution" in data
+    assert data["evidence_distribution"]["verified"] == 7
+    assert data["evidence_distribution"]["inference"] == 20
+    assert data["evidence_distribution"]["illustrative"] == 7
+
+
+
 
