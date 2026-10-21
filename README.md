@@ -1,9 +1,9 @@
 # WW3 風險預估模型 (WW3 Risk Model)
 
-[![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-blue.svg)](pyproject.toml)
+[![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-blue.svg)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python: 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
-[![Tests: Pytest](https://img.shields.io/badge/Tests-28%20Passed-brightgreen.svg)](tests/)
+[![Tests: Pytest](https://img.shields.io/badge/Tests-37%20Passed-brightgreen.svg)](tests/)
 
 > **五層結構風險指數 × 和平機制失效閘門 × 超線性互動效應 × 四階段衝突定位**  
 > *Five-layer structural risk index: resources, distribution, labor/AI displacement, power/security dilemma, future fear, gated by peace-mechanism failure.*
@@ -347,6 +347,27 @@ print(f"風險指數: {result.global_risk_index:.1f}, 階段: {result.stage.titl
 ---
 
 ## 版本變更記錄 (Changelog)
+
+### v0.3.0 (2026-10-21) — 可追溯、可解釋、可逐步校準之風險模型升級
+- **P0 全面審核 34 項指標**：
+  * 核實原始報告、統計定義與資料期間，產出全量審核文件 `docs/indicator-audit-v03.md`。
+  * 審核結論：34 項全部 `confirmed`（核實無誤，0 項 corrected，0 項 unverifiable）。
+- **P1/P2 數據分級升級與推論透明化**：
+  * 15 項可量化指標由 `illustrative` 升級為客觀觀測代理之 `inference` 等級（覆蓋 WRI 水資源、WMO 氣候、UNCTAD 海運、SemiAnalysis 算力壟斷、OECD 住房、Edelman 信任赤字、V-Dem 政治極化、ILO 薪資缺口、Demographia 房價、Stanford HAI AI取代率、Gallup 職場無助感、IISS 軍備、GTA 武器化依賴、SCSP 技術霸權、Crisis Group 多邊機制）。
+  * 7 項不可直接量化指標（外交互信、誤判風險、同盟剛性等）保留 `illustrative` 並補齊嚴格評分量表（Scoring Rubrics），絕不虛構標記為 verified。
+  * 最新證據分佈：verified 7 項 (20.6%)、inference 20 項 (58.8%)、illustrative 7 項 (20.6%)。
+- **P3 數據品質與過期偵測機制**：
+  * 指標 Schema 擴充：`observation_date`, `publication_date`, `source_url`, `source_name`, `evidence_level`, `last_checked`, `update_frequency`, `stale_after`, `raw_value`, `normalized_score`, `normalization_method`, `scoring_rubric`。
+  * CLI 新增 `--data-quality` 報告，即時偵測各項指標新鮮度狀態（fresh/stale/missing）與完整度（當前基準情境完整度 100%）。
+- **P4 敏感度分析、閘門行為與回測紀律驗證**：
+  * 完成全量 34 項指標 $\pm 10 / \pm 20$ 敏感度微擾分析與全域影響力排序（產出 `docs/sensitivity-analysis-v03.md`）。
+  * 全域最關鍵前五位指標：`gate_nuclear_deterrence_stability` (1.708)、`gate_diplomatic_trust` (1.464)、`gate_trade_interdependence` (1.464)、`gate_international_institutions` (1.221)、`l3_ai_displacement_rate` (0.486)。
+  * 驗證和平機制閘門方向性（改善 $\to$ 風險下降、失效 $\to$ 風險上升）、極端邊界（全零、全滿輸出合理）及歷史回測紀律（嚴禁事後調權迎合）。
+- **P5 儀表板 UI 全面升級**：
+  * 稱謂修正：主指標定名「戰爭風險指數 (War Risk Index) 100/100」，概率帶清晰標明為「結構風險情境帶（非經驗證概率）」，嚴格禁止聲稱統計開戰概率。
+  * 視覺升級：三種可信度分開獨立呈現、新增驅動因素分解（Driver Decomposition）、數據完整度與新鮮度卡片、歷史趨勢時間軸。
+  * 保持手機版（390px / 360px）零橫向溢出與響應式規格。
+- **測試擴充**：全套單元與整合測試擴增至 37 項，覆蓋數據品質、敏感度方向、極端邊界與 UI 結構，全數通過。
 
 ### v0.2.0 (2026-10-20) — 模型校準與數據實數化升級
 - **概率帶錨點重映射（校準目標 A）**：

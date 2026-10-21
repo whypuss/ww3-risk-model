@@ -13,7 +13,7 @@ from .model import WW3RiskModel, RiskResult, StageInfo, ProbabilityBand
 from .scenarios import compare_scenarios
 from .report import generate_markdown_report
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __all__ = [
     "Indicator",
     "LayerData",
