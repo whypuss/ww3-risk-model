@@ -8,7 +8,7 @@ Core components:
 - Scenario probability bands (1y, 5y, 10y)
 """
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 from .indicators import Indicator, LayerData, GateBuffer, ScenarioData, load_scenario_from_file
 from .model import WW3RiskModel, RiskResult, StageInfo, ProbabilityBand

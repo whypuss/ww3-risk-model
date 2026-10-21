@@ -1,9 +1,9 @@
 # WW3 風險預估模型 (WW3 Risk Model)
 
-[![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-blue.svg)](pyproject.toml)
+[![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-blue.svg)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python: 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
-[![Tests: Pytest](https://img.shields.io/badge/Tests-37%20Passed-brightgreen.svg)](tests/)
+[![Tests: Pytest](https://img.shields.io/badge/Tests-45%20Passed%20(Python)%20%2B%208%20(Node)-brightgreen.svg)](tests/)
 
 > **五層結構風險指數 × 和平機制失效閘門 × 超線性互動效應 × 四階段衝突定位**  
 > *Five-layer structural risk index: resources, distribution, labor/AI displacement, power/security dilemma, future fear, gated by peace-mechanism failure.*
@@ -347,6 +347,33 @@ print(f"風險指數: {result.global_risk_index:.1f}, 階段: {result.stage.titl
 ---
 
 ## 版本變更記錄 (Changelog)
+
+### v0.4.0 (2026-10-21) — Cloudflare D1 歷史庫、Worker API、動態 UI 與更新管線升級
+- **C2a D1 Schema 與快照寫入**：
+  * 設計並落地 `cloudflare/schema.sql`：包含 `index_snapshots`（核心指數、五層得分、閘門、驅動分解與情境帶）與 `indicator_observations`（34 項全量指標觀測、數據品質與過期狀態追蹤，支援級聯刪除）。
+  * CLI 新增 `--export-snapshot <path>`，支援單一指令導出符合 D1 結構之完整快照 JSON。
+  * 撰寫 `scripts/push_snapshot.py`（純 Python 標準庫，零額外依賴），經 Cloudflare D1 HTTP API 執行全參數化安全寫入，並提供 `--dry-run` 預覽與 local SQLite 測試。
+- **C2b Worker API 服務**：
+  * 於 `worker/` 目錄建立純 JS 零依賴、零 build 之邊緣 Worker API（`ww3-risk-api`，綁定 D1 `DB`）。
+  * 實現 4 個公開唯讀 REST 端點（CORS `*`、短快取 `max-age=60`）：
+    - `/api/risk/latest`：最新結構風險總分、四階段定義、五層分、閘門乘數、推動因素與情境帶。
+    - `/api/risk/history`：全量快照歷史時序＋歷史對照案例（1913/1938/1962/1990/2025，標註 `retrospective_estimate: true`）。
+    - `/api/risk/layers`：五層維度＋和平閘門逐層明細與 34 項指標即時觀測。
+    - `/api/data-status`：數據完整度 %、新鮮/過期計數與審計狀態。
+  * 數據庫未初始化時回傳清晰 503 Service Unavailable，未知路徑回傳 404 JSON。
+  * 採用 Node 原生測試器（`node --test`）實現 8 項無依賴單元測試。
+  * 嚴格恪守鐵律：未經拍板之「社會動盪指數」明文不予實作。
+- **C3 儀表板動態 API 獲取與離線回退**：
+  * 生成器新增 `--api-base <url>` 參數。配置 API 基準網址時，前端透過 `AbortController` 發起 3 秒超時之非同步 fetch。
+  * 成功：即時重繪儀表盤 Gauge 指針、維度平衡橫條、驅動分解與品質卡，頂欄呈現 `● 即時 API` 綠色徽章與時間戳。
+  * 失敗或超時：自動無縫回退至內嵌 JSON 數據，徽章顯示 `● 離線快照（內嵌數據）`，保持 100% 離線可用。
+  * 嚴格維持手機版響應式、`<style>` 平衡閉合、稱謂紀律與三種可信度分開。
+- **C4 Fetcher 框架與 GitHub Actions 更新管線**：
+  * `scripts/fetchers/worldbank.py`：對齊 World Bank v2 API 5 項宏觀數據系列（軍費佔 GDP、失業率、青年失業率、化石能源、基尼系數），輸出至 `data/candidates/`，絕對不自動覆寫 `baseline_2026.json`。
+  * `scripts/fetchers/publication_checker.py`：對 SIPRI、IMF、ILO、FAO、IEA 等官方年報進行 HEAD/GET 審計與 ETag 變更偵測，輸出發布監測報告。
+  * `.github/workflows/update.yml`：排程每日（00:00 UTC / 08:00 Asia/Macau）自動測試、導出快照、推送 D1、執行抓取、提交候選集、生成動態 UI 並部署 Pages。
+  * `docs/cloudflare-architecture.md`：齊備完整架構圖、數據流向、Secrets 權限指南、免費額度分析與日常運維指南。
+- **測試驗證**：Python pytest 45 項全綠 + Worker Node 8 項測試全綠，模型數學與基準分數嚴格保持 83.1 不變。
 
 ### v0.3.0 (2026-10-21) — 可追溯、可解釋、可逐步校準之風險模型升級
 - **P0 全面審核 34 項指標**：
