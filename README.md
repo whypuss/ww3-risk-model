@@ -1,9 +1,9 @@
 # WW3 風險預估模型 (WW3 Risk Model)
 
-[![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-blue.svg)](pyproject.toml)
+[![Version: 0.4.1](https://img.shields.io/badge/Version-0.4.1-blue.svg)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python: 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
-[![Tests: Pytest](https://img.shields.io/badge/Tests-45%20Passed%20(Python)%20%2B%208%20(Node)-brightgreen.svg)](tests/)
+[![Tests: Pytest](https://img.shields.io/badge/Tests-48%20Passed%20(Python)%20%2B%208%20(Node)-brightgreen.svg)](tests/)
 
 > **五層結構風險指數 × 和平機制失效閘門 × 超線性互動效應 × 四階段衝突定位**  
 > *Five-layer structural risk index: resources, distribution, labor/AI displacement, power/security dilemma, future fear, gated by peace-mechanism failure.*
@@ -347,6 +347,19 @@ print(f"風險指數: {result.global_risk_index:.1f}, 階段: {result.stage.titl
 ---
 
 ## 版本變更記錄 (Changelog)
+
+### v0.4.1 (2026-10-22) — 地區壓力卡修復（取消地區倍率＋標明公式＋修復失效指標 ID）
+- **修復原因**：用戶質疑東亞地區壓力卡 95.4 分過高；經查明係舊代碼包含未校準之 `base_weight` 地區倍率（東亞 1.2 令原始平均 79.5 膨脹至 95.4）；另發現其他地區卡引用 v0.3 改名前之失效指標 ID（如 `l4_military_spending`、`l4_nuclear_posture`、`l4_trade_weaponization`）導致被靜默跳過、平均指標數失真。
+- **取消地區倍率**：`calculate_regional_pressures` 改為純原始算術平均 `score = round(mean(values), 1)`；自 `REGIONAL_INDICATOR_MAPPINGS` 徹底移除 `base_weight` 欄位並清理未校準註釋。
+- **修正失效指標 ID 並嚴格報錯**：
+  * 東歐（`eastern_europe`）：`l4_military_spending` $\to$ `l4_military_expenditure_growth`；`l4_nuclear_posture` $\to$ `l4_nuclear_breakout`。
+  * 南亞與中亞（`south_central_asia`）：`l4_nuclear_posture` $\to$ `l4_nuclear_breakout`。
+  * 全球戰略咽喉（`global_chokepoints`）：`l4_trade_weaponization` $\to$ `l4_weaponized_interdependence`。
+  * 禁止靜默跳過：若 mapping 引用不存在之指標 ID 即刻拋出 `KeyError`。
+- **卡面顯示公式與組成明細**：
+  * 每張地區卡輸出新增 `components`（`[{id, name, value}]`）與 `formula` 公式行（如 `示意拆分（指標原始平均）：(82.0 算力壟斷 ＋ 80.0 領土引信點 ＋ 78.0 技術霸權恐懼 ＋ 78.0 陣營極化) ÷ 4 = 79.5`）。
+  * 完整保留「示意拆分」透明度標示，支援手機版響應式自動換行。
+- **回歸測試與數值驗證**：新增指標存在性、算術平均一致性與缺失 ID 報錯回歸測試；5 張卡基準分數精確對齊：東亞 79.5 (HIGH)、東歐 74.0 (HIGH)、中東 66.5 (ELEVATED)、南中亞 63.0 (ELEVATED)、戰略咽喉 72.0 (HIGH)。模型五層數學、34 項指標分數及總指數 83.1 嚴格保持不變。
 
 ### v0.4.0 (2026-10-21) — Cloudflare D1 歷史庫、Worker API、動態 UI 與更新管線升級
 - **C2a D1 Schema 與快照寫入**：

@@ -746,6 +746,20 @@
       font-weight: 600;
       font-family: var(--font-mono);
     }
+    .reg-formula {
+      font-size: 0.72rem;
+      color: #cbd5e1;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 4px;
+      padding: 6px 8px;
+      line-height: 1.45;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+      margin: 4px 0;
+      font-family: var(--font-mono);
+    }
     .reg-indicators-list {
       font-size: 0.68rem;
       color: var(--text-dim);
@@ -1719,7 +1733,7 @@
       <div class="radar-icon"></div>
       <div>
         <div class="brand-title">WW3 戰爭風險指數儀表板 <span class="brand-title-en" style="font-weight:400;font-size:0.85rem;color:var(--text-dim);">WW3 War Risk Index</span></div>
-        <div class="brand-sub">DEFENSE INTELLIGENCE &amp; SYSTEMIC CRISIS TERMINAL · v0.4.0</div>
+        <div class="brand-sub">DEFENSE INTELLIGENCE &amp; SYSTEMIC CRISIS TERMINAL · v0.4.1</div>
       </div>
     </div>
     <div class="top-meta">
@@ -2484,82 +2498,91 @@
           <span class="panel-tag">ILLUSTRATIVE DECOMPOSITION · MAPPED FROM CORE INDICATORS</span>
         </div>
         <div style="background:rgba(234, 179, 8, 0.08);border:1px solid rgba(234, 179, 8, 0.25);border-radius:6px;padding:8px 12px;margin-bottom:16px;font-size:0.76rem;color:#fef08a;">
-          <strong>透明度說明 (Transparency Standard)：</strong>區域分數為「<strong>示意拆分 (Illustrative Mapping)</strong>」，由模型中既有之客觀指標（如海運咽喉受阻、領土引信點摩擦、算力壟斷等）加權合成，非獨立地理感測器實測，特此標註以防誤導。
+          <strong>透明度說明 (Transparency Standard)：</strong>區域分數為「<strong>示意拆分 (Illustrative Mapping)</strong>」，由模型中既有之客觀指標（如海運咽喉受阻、領土引信點摩擦、算力壟斷等）指標原始平均合成，非獨立地理感測器實測，特此標註以防誤導。
         </div>
         <div class="regions-grid">
           
-            <div class="region-card danger">
+            <div class="region-card warning">
               <div class="reg-head">
                 <div class="reg-title-wrap">
                   <span class="reg-name">東歐（烏克蘭 / 北約東翼前線）</span>
                   <span class="reg-en">Eastern Europe / NATO Eastern Flank</span>
                 </div>
-                <span class="reg-badge badge-danger">極度高壓 (Critical)</span>
+                <span class="reg-badge badge-warning">高度緊張 (High)</span>
               </div>
               <div class="reg-score-wrap">
-                <span class="reg-score">86.9</span>
+                <span class="reg-score">74.0</span>
                 <span class="reg-max">/100 區域綜合壓力</span>
               </div>
               <div class="progress-track" style="margin: 8px 0;">
-                <div class="progress-fill" style="width: 86.9%; background: var(--color-danger);"></div>
+                <div class="progress-fill" style="width: 74.0%; background: var(--color-warning);"></div>
               </div>
               <div class="reg-disclaimer-tag">
                 [示意拆分 · 模型指標映射]
               </div>
-              <div class="reg-indicators-list">
-                映射來源：<code>l4_territorial_flashpoints</code> <code>l4_bloc_polarization</code> <code>l4_military_spending</code> <code>l4_nuclear_posture</code>
+              <div class="reg-formula">
+                示意拆分（指標原始平均）：(80.0 領土引信點 ＋ 78.0 陣營極化 ＋ 72.0 軍費擴張 ＋ 66.0 核門檻鬆動) ÷ 4 = 74.0
               </div>
-              <div class="reg-note">示意拆分：加權映射指標 [l4_territorial_flashpoints, l4_bloc_polarization, l4_military_spending, l4_nuclear_posture]，反映陸權對峙與前沿引信摩擦。</div>
+              <div class="reg-indicators-list">
+                映射來源：<code>l4_territorial_flashpoints</code> <code>l4_bloc_polarization</code> <code>l4_military_expenditure_growth</code> <code>l4_nuclear_breakout</code>
+              </div>
+              <div class="reg-note">示意拆分：指標原始平均映射 [l4_territorial_flashpoints, l4_bloc_polarization, l4_military_expenditure_growth, l4_nuclear_breakout]，反映陸權對峙與前沿引信摩擦。</div>
+            </div>
+            
+
+            <div class="region-card elevated">
+              <div class="reg-head">
+                <div class="reg-title-wrap">
+                  <span class="reg-name">中東（紅海 / 波斯灣 / 霍爾木茲咽喉）</span>
+                  <span class="reg-en">Middle East / Persian Gulf & Red Sea Chokepoints</span>
+                </div>
+                <span class="reg-badge badge-elevated">顯著升級 (Elevated)</span>
+              </div>
+              <div class="reg-score-wrap">
+                <span class="reg-score">66.5</span>
+                <span class="reg-max">/100 區域綜合壓力</span>
+              </div>
+              <div class="progress-track" style="margin: 8px 0;">
+                <div class="progress-fill" style="width: 66.5%; background: var(--color-elevated);"></div>
+              </div>
+              <div class="reg-disclaimer-tag">
+                [示意拆分 · 模型指標映射]
+              </div>
+              <div class="reg-formula">
+                示意拆分（指標原始平均）：(68.0 海運咽喉風險 ＋ 60.0 能源脆弱性 ＋ 80.0 領土引信點 ＋ 58.0 水資源壓力) ÷ 4 = 66.5
+              </div>
+              <div class="reg-indicators-list">
+                映射來源：<code>l1_maritime_chokepoints</code> <code>l1_energy_vulnerability</code> <code>l4_territorial_flashpoints</code> <code>l1_water_stress</code>
+              </div>
+              <div class="reg-note">示意拆分：指標原始平均映射 [l1_maritime_chokepoints, l1_energy_vulnerability, l4_territorial_flashpoints, l1_water_stress]，反映航道封鎖與能源外溢風險。</div>
             </div>
             
 
             <div class="region-card warning">
               <div class="reg-head">
                 <div class="reg-title-wrap">
-                  <span class="reg-name">中東（紅海 / 波斯灣 / 霍爾木茲咽喉）</span>
-                  <span class="reg-en">Middle East / Persian Gulf & Red Sea Chokepoints</span>
+                  <span class="reg-name">東亞（台海 / 南海 / 第一島鏈）</span>
+                  <span class="reg-en">East Asia / Taiwan Strait & South China Sea</span>
                 </div>
                 <span class="reg-badge badge-warning">高度緊張 (High)</span>
               </div>
               <div class="reg-score-wrap">
-                <span class="reg-score">73.2</span>
+                <span class="reg-score">79.5</span>
                 <span class="reg-max">/100 區域綜合壓力</span>
               </div>
               <div class="progress-track" style="margin: 8px 0;">
-                <div class="progress-fill" style="width: 73.2%; background: var(--color-warning);"></div>
+                <div class="progress-fill" style="width: 79.5%; background: var(--color-warning);"></div>
               </div>
               <div class="reg-disclaimer-tag">
                 [示意拆分 · 模型指標映射]
               </div>
-              <div class="reg-indicators-list">
-                映射來源：<code>l1_maritime_chokepoints</code> <code>l1_energy_vulnerability</code> <code>l4_territorial_flashpoints</code> <code>l1_water_stress</code>
-              </div>
-              <div class="reg-note">示意拆分：加權映射指標 [l1_maritime_chokepoints, l1_energy_vulnerability, l4_territorial_flashpoints, l1_water_stress]，反映航道封鎖與能源外溢風險。</div>
-            </div>
-            
-
-            <div class="region-card danger">
-              <div class="reg-head">
-                <div class="reg-title-wrap">
-                  <span class="reg-name">東亞（台海 / 南海 / 第一島鏈）</span>
-                  <span class="reg-en">East Asia / Taiwan Strait & South China Sea</span>
-                </div>
-                <span class="reg-badge badge-danger">極度高壓 (Critical)</span>
-              </div>
-              <div class="reg-score-wrap">
-                <span class="reg-score">95.4</span>
-                <span class="reg-max">/100 區域綜合壓力</span>
-              </div>
-              <div class="progress-track" style="margin: 8px 0;">
-                <div class="progress-fill" style="width: 95.4%; background: var(--color-danger);"></div>
-              </div>
-              <div class="reg-disclaimer-tag">
-                [示意拆分 · 模型指標映射]
+              <div class="reg-formula">
+                示意拆分（指標原始平均）：(82.0 算力壟斷 ＋ 80.0 領土引信點 ＋ 78.0 技術霸權恐懼 ＋ 78.0 陣營極化) ÷ 4 = 79.5
               </div>
               <div class="reg-indicators-list">
                 映射來源：<code>l2_compute_monopoly</code> <code>l4_territorial_flashpoints</code> <code>l5_tech_supremacy_fear</code> <code>l4_bloc_polarization</code>
               </div>
-              <div class="reg-note">示意拆分：加權映射指標 [l2_compute_monopoly, l4_territorial_flashpoints, l5_tech_supremacy_fear, l4_bloc_polarization]，反映算力晶圓代工壟斷與預防性技術爭霸。</div>
+              <div class="reg-note">示意拆分：指標原始平均映射 [l2_compute_monopoly, l4_territorial_flashpoints, l5_tech_supremacy_fear, l4_bloc_polarization]，反映算力晶圓代工壟斷與預防性技術爭霸。</div>
             </div>
             
 
@@ -2572,19 +2595,22 @@
                 <span class="reg-badge badge-elevated">顯著升級 (Elevated)</span>
               </div>
               <div class="reg-score-wrap">
-                <span class="reg-score">55.4</span>
+                <span class="reg-score">63.0</span>
                 <span class="reg-max">/100 區域綜合壓力</span>
               </div>
               <div class="progress-track" style="margin: 8px 0;">
-                <div class="progress-fill" style="width: 55.4%; background: var(--color-elevated);"></div>
+                <div class="progress-fill" style="width: 63.0%; background: var(--color-elevated);"></div>
               </div>
               <div class="reg-disclaimer-tag">
                 [示意拆分 · 模型指標映射]
               </div>
-              <div class="reg-indicators-list">
-                映射來源：<code>l1_water_stress</code> <code>l1_climate_impact</code> <code>l4_nuclear_posture</code>
+              <div class="reg-formula">
+                示意拆分（指標原始平均）：(58.0 水資源壓力 ＋ 65.0 氣候衝擊 ＋ 66.0 核門檻鬆動) ÷ 3 = 63.0
               </div>
-              <div class="reg-note">示意拆分：加權映射指標 [l1_water_stress, l1_climate_impact, l4_nuclear_posture]，反映高山冰川消融引致水資源爭奪與核門檻壓力。</div>
+              <div class="reg-indicators-list">
+                映射來源：<code>l1_water_stress</code> <code>l1_climate_impact</code> <code>l4_nuclear_breakout</code>
+              </div>
+              <div class="reg-note">示意拆分：指標原始平均映射 [l1_water_stress, l1_climate_impact, l4_nuclear_breakout]，反映高山冰川消融引致水資源爭奪與核門檻壓力。</div>
             </div>
             
 
@@ -2597,19 +2623,22 @@
                 <span class="reg-badge badge-warning">高度緊張 (High)</span>
               </div>
               <div class="reg-score-wrap">
-                <span class="reg-score">70.0</span>
+                <span class="reg-score">72.0</span>
                 <span class="reg-max">/100 區域綜合壓力</span>
               </div>
               <div class="progress-track" style="margin: 8px 0;">
-                <div class="progress-fill" style="width: 70.0%; background: var(--color-warning);"></div>
+                <div class="progress-fill" style="width: 72.0%; background: var(--color-warning);"></div>
               </div>
               <div class="reg-disclaimer-tag">
                 [示意拆分 · 模型指標映射]
               </div>
-              <div class="reg-indicators-list">
-                映射來源：<code>l1_maritime_chokepoints</code> <code>l1_critical_minerals</code> <code>l4_trade_weaponization</code>
+              <div class="reg-formula">
+                示意拆分（指標原始平均）：(68.0 海運咽喉風險 ＋ 72.0 關鍵礦物管制 ＋ 76.0 相互依賴武器化) ÷ 3 = 72.0
               </div>
-              <div class="reg-note">示意拆分：加權映射指標 [l1_maritime_chokepoints, l1_critical_minerals, l4_trade_weaponization]，反映關鍵礦物禁運與全球海運供應鏈梗阻。</div>
+              <div class="reg-indicators-list">
+                映射來源：<code>l1_maritime_chokepoints</code> <code>l1_critical_minerals</code> <code>l4_weaponized_interdependence</code>
+              </div>
+              <div class="reg-note">示意拆分：指標原始平均映射 [l1_maritime_chokepoints, l1_critical_minerals, l4_weaponized_interdependence]，反映關鍵礦物禁運與全球海運供應鏈梗阻。</div>
             </div>
             
         </div>
@@ -4555,7 +4584,7 @@
 
   <footer class="dash-footer">
     <div>WW3 Risk Model · 零框架純靜態離線架構 · 嚴格由模型公式計算</div>
-    <div>Model Version: 0.4.0 · File: ui/dashboard.html</div>
+    <div>Model Version: 0.4.1 · File: ui/dashboard.html</div>
   </footer>
 
   <!-- Embedded Model Output (Guarantees 100% offline file:// rendering without CORS errors) -->
@@ -4564,7 +4593,7 @@
   "metadata": {
     "title": "WW3 戰爭風險指數儀表板",
     "title_en": "WW3 War Risk Index Dashboard",
-    "model_version": "0.4.0",
+    "model_version": "0.4.1",
     "generated_at": "2026-10-21",
     "active_scenario_id": "baseline_2026",
     "active_scenario_title": "2026 全球結構風險基準情境",
@@ -5010,79 +5039,184 @@
       "id": "eastern_europe",
       "name": "東歐（烏克蘭 / 北約東翼前線）",
       "name_en": "Eastern Europe / NATO Eastern Flank",
-      "score": 86.9,
-      "level": "CRITICAL",
-      "level_label": "極度高壓 (Critical)",
-      "color_class": "danger",
+      "score": 74.0,
+      "level": "HIGH",
+      "level_label": "高度緊張 (High)",
+      "color_class": "warning",
       "indicators_used": [
         "l4_territorial_flashpoints",
         "l4_bloc_polarization",
-        "l4_military_spending",
-        "l4_nuclear_posture"
+        "l4_military_expenditure_growth",
+        "l4_nuclear_breakout"
       ],
-      "note": "示意拆分：加權映射指標 [l4_territorial_flashpoints, l4_bloc_polarization, l4_military_spending, l4_nuclear_posture]，反映陸權對峙與前沿引信摩擦。"
+      "components": [
+        {
+          "id": "l4_territorial_flashpoints",
+          "name": "領土引信點",
+          "value": 80.0
+        },
+        {
+          "id": "l4_bloc_polarization",
+          "name": "陣營極化",
+          "value": 78.0
+        },
+        {
+          "id": "l4_military_expenditure_growth",
+          "name": "軍費擴張",
+          "value": 72.0
+        },
+        {
+          "id": "l4_nuclear_breakout",
+          "name": "核門檻鬆動",
+          "value": 66.0
+        }
+      ],
+      "formula": "示意拆分（指標原始平均）：(80.0 領土引信點 ＋ 78.0 陣營極化 ＋ 72.0 軍費擴張 ＋ 66.0 核門檻鬆動) ÷ 4 = 74.0",
+      "note": "示意拆分：指標原始平均映射 [l4_territorial_flashpoints, l4_bloc_polarization, l4_military_expenditure_growth, l4_nuclear_breakout]，反映陸權對峙與前沿引信摩擦。"
     },
     {
       "id": "middle_east",
       "name": "中東（紅海 / 波斯灣 / 霍爾木茲咽喉）",
       "name_en": "Middle East / Persian Gulf & Red Sea Chokepoints",
-      "score": 73.2,
-      "level": "HIGH",
-      "level_label": "高度緊張 (High)",
-      "color_class": "warning",
+      "score": 66.5,
+      "level": "ELEVATED",
+      "level_label": "顯著升級 (Elevated)",
+      "color_class": "elevated",
       "indicators_used": [
         "l1_maritime_chokepoints",
         "l1_energy_vulnerability",
         "l4_territorial_flashpoints",
         "l1_water_stress"
       ],
-      "note": "示意拆分：加權映射指標 [l1_maritime_chokepoints, l1_energy_vulnerability, l4_territorial_flashpoints, l1_water_stress]，反映航道封鎖與能源外溢風險。"
+      "components": [
+        {
+          "id": "l1_maritime_chokepoints",
+          "name": "海運咽喉風險",
+          "value": 68.0
+        },
+        {
+          "id": "l1_energy_vulnerability",
+          "name": "能源脆弱性",
+          "value": 60.0
+        },
+        {
+          "id": "l4_territorial_flashpoints",
+          "name": "領土引信點",
+          "value": 80.0
+        },
+        {
+          "id": "l1_water_stress",
+          "name": "水資源壓力",
+          "value": 58.0
+        }
+      ],
+      "formula": "示意拆分（指標原始平均）：(68.0 海運咽喉風險 ＋ 60.0 能源脆弱性 ＋ 80.0 領土引信點 ＋ 58.0 水資源壓力) ÷ 4 = 66.5",
+      "note": "示意拆分：指標原始平均映射 [l1_maritime_chokepoints, l1_energy_vulnerability, l4_territorial_flashpoints, l1_water_stress]，反映航道封鎖與能源外溢風險。"
     },
     {
       "id": "east_asia",
       "name": "東亞（台海 / 南海 / 第一島鏈）",
       "name_en": "East Asia / Taiwan Strait & South China Sea",
-      "score": 95.4,
-      "level": "CRITICAL",
-      "level_label": "極度高壓 (Critical)",
-      "color_class": "danger",
+      "score": 79.5,
+      "level": "HIGH",
+      "level_label": "高度緊張 (High)",
+      "color_class": "warning",
       "indicators_used": [
         "l2_compute_monopoly",
         "l4_territorial_flashpoints",
         "l5_tech_supremacy_fear",
         "l4_bloc_polarization"
       ],
-      "note": "示意拆分：加權映射指標 [l2_compute_monopoly, l4_territorial_flashpoints, l5_tech_supremacy_fear, l4_bloc_polarization]，反映算力晶圓代工壟斷與預防性技術爭霸。"
+      "components": [
+        {
+          "id": "l2_compute_monopoly",
+          "name": "算力壟斷",
+          "value": 82.0
+        },
+        {
+          "id": "l4_territorial_flashpoints",
+          "name": "領土引信點",
+          "value": 80.0
+        },
+        {
+          "id": "l5_tech_supremacy_fear",
+          "name": "技術霸權恐懼",
+          "value": 78.0
+        },
+        {
+          "id": "l4_bloc_polarization",
+          "name": "陣營極化",
+          "value": 78.0
+        }
+      ],
+      "formula": "示意拆分（指標原始平均）：(82.0 算力壟斷 ＋ 80.0 領土引信點 ＋ 78.0 技術霸權恐懼 ＋ 78.0 陣營極化) ÷ 4 = 79.5",
+      "note": "示意拆分：指標原始平均映射 [l2_compute_monopoly, l4_territorial_flashpoints, l5_tech_supremacy_fear, l4_bloc_polarization]，反映算力晶圓代工壟斷與預防性技術爭霸。"
     },
     {
       "id": "south_central_asia",
       "name": "南亞與中亞（印巴 / 喜馬拉雅跨界水資源）",
       "name_en": "South & Central Asia / Transboundary Basins",
-      "score": 55.4,
+      "score": 63.0,
       "level": "ELEVATED",
       "level_label": "顯著升級 (Elevated)",
       "color_class": "elevated",
       "indicators_used": [
         "l1_water_stress",
         "l1_climate_impact",
-        "l4_nuclear_posture"
+        "l4_nuclear_breakout"
       ],
-      "note": "示意拆分：加權映射指標 [l1_water_stress, l1_climate_impact, l4_nuclear_posture]，反映高山冰川消融引致水資源爭奪與核門檻壓力。"
+      "components": [
+        {
+          "id": "l1_water_stress",
+          "name": "水資源壓力",
+          "value": 58.0
+        },
+        {
+          "id": "l1_climate_impact",
+          "name": "氣候衝擊",
+          "value": 65.0
+        },
+        {
+          "id": "l4_nuclear_breakout",
+          "name": "核門檻鬆動",
+          "value": 66.0
+        }
+      ],
+      "formula": "示意拆分（指標原始平均）：(58.0 水資源壓力 ＋ 65.0 氣候衝擊 ＋ 66.0 核門檻鬆動) ÷ 3 = 63.0",
+      "note": "示意拆分：指標原始平均映射 [l1_water_stress, l1_climate_impact, l4_nuclear_breakout]，反映高山冰川消融引致水資源爭奪與核門檻壓力。"
     },
     {
       "id": "global_chokepoints",
       "name": "全球戰略咽喉與關鍵礦物網",
       "name_en": "Global Chokepoints & Strategic Critical Mineral Webs",
-      "score": 70.0,
+      "score": 72.0,
       "level": "HIGH",
       "level_label": "高度緊張 (High)",
       "color_class": "warning",
       "indicators_used": [
         "l1_maritime_chokepoints",
         "l1_critical_minerals",
-        "l4_trade_weaponization"
+        "l4_weaponized_interdependence"
       ],
-      "note": "示意拆分：加權映射指標 [l1_maritime_chokepoints, l1_critical_minerals, l4_trade_weaponization]，反映關鍵礦物禁運與全球海運供應鏈梗阻。"
+      "components": [
+        {
+          "id": "l1_maritime_chokepoints",
+          "name": "海運咽喉風險",
+          "value": 68.0
+        },
+        {
+          "id": "l1_critical_minerals",
+          "name": "關鍵礦物管制",
+          "value": 72.0
+        },
+        {
+          "id": "l4_weaponized_interdependence",
+          "name": "相互依賴武器化",
+          "value": 76.0
+        }
+      ],
+      "formula": "示意拆分（指標原始平均）：(68.0 海運咽喉風險 ＋ 72.0 關鍵礦物管制 ＋ 76.0 相互依賴武器化) ÷ 3 = 72.0",
+      "note": "示意拆分：指標原始平均映射 [l1_maritime_chokepoints, l1_critical_minerals, l4_weaponized_interdependence]，反映關鍵礦物禁運與全球海運供應鏈梗阻。"
     }
   ],
   "indicators": [

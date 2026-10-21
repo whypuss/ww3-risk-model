@@ -313,7 +313,7 @@ def test_dashboard_v03_terminology_and_credibility_separation(tmp_path):
     assert "100.0%" in content  # Completeness pct
 
     # 5. Metadata and JSON audit
-    assert data["metadata"]["model_version"] == "0.4.0"
+    assert data["metadata"]["model_version"] == "0.4.1"
     assert "data_quality" in data
     assert data["data_quality"]["completeness_pct"] == 100.0
     assert "evidence_distribution" in data
