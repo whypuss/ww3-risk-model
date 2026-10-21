@@ -1,0 +1,85 @@
+name: Daily Update & Model Recalculation Pipeline
+
+on:
+  schedule:
+    # 00:00 UTC = 08:00 Asia/Macau morning daily calculation run
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_D1_DATABASE_ID: "614ee93b-e679-4b1b-a874-7a8b7260d6d6"
+      PYTHONPATH: "src"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
+      - name: Run test suite
+        run: |
+          python -m pytest
+
+      - name: Generate D1 snapshot JSON
+        run: |
+          python -m ww3_risk.cli --scenario scenarios/baseline_2026.json --export-snapshot current_snapshot.json
+
+      - name: Push snapshot to Cloudflare D1
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "Pushing snapshot to Cloudflare D1..."
+            python scripts/push_snapshot.py current_snapshot.json
+          else
+            echo "::notice ::Skipping D1 push: CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID secret is not set."
+          fi
+
+      - name: Run World Bank fetcher and Publication checker
+        run: |
+          echo "Running World Bank fetcher..."
+          python scripts/fetchers/worldbank.py --baseline data/baseline_2026.json --output data/candidates/worldbank_candidates.json
+          echo "Running publication release checker..."
+          python scripts/fetchers/publication_checker.py --output data/candidates/publication-check.json
+
+      - name: Commit updated candidates if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet data/candidates; then
+            echo "Detected changes in data/candidates, committing..."
+            git add data/candidates
+            git commit -m "chore(data): update candidate observations and publication status [skip ci]"
+            git push
+          else
+            echo "No changes in candidate observations."
+          fi
+
+      - name: Build dynamic dashboard HTML with API base
+        run: |
+          python -m ww3_risk.cli --scenario scenarios/baseline_2026.json --dashboard ui/dashboard.html --api-base "https://ww3-risk-api.whypuss.workers.dev"
+
+      - name: Deploy dynamic dashboard to Cloudflare Pages
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "Deploying ui/ directory to Cloudflare Pages project 'ww3-risk-model'..."
+            npx wrangler pages deploy ui --project-name=ww3-risk-model
+          else
+            echo "::notice ::Skipping Pages deployment: CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID secret is not set."
+          fi

@@ -1,0 +1,78 @@
+{
+  "generated_at": "2026-10-21T06:57:08Z",
+  "source": "World Bank Open Data API v2 (api.worldbank.org)",
+  "disclaimer": "Candidate values generated for expert review. Not applied to baseline without manual rubric calibration.",
+  "series_count": 5,
+  "candidates": [
+    {
+      "wb_code": "MS.MIL.XPND.GD.ZS",
+      "wb_name": "Military expenditure (% of GDP)",
+      "target_indicator_id": "l4_military_expenditure_growth",
+      "target_indicator_name": "全球軍費實質增長率與GDP佔比",
+      "applicability_rationale": "世銀全球軍費佔GDP比率提供全球宏觀軍事化負擔之客觀量化基準，反映體系資源轉移至安全困境之程度。",
+      "candidate_year": "2025",
+      "candidate_raw_value": 2.47893026852095,
+      "current_model_raw_value": "24,430 億美元 (+6.8% 實質年增)",
+      "current_model_score": 72.0,
+      "current_evidence_level": "verified",
+      "fetch_status": "success",
+      "diff_analysis": "Candidate WB value: 2.47893026852095 (2025) vs. current baseline: 24,430 億美元 (+6.8% 實質年增) (score: 72.0)"
+    },
+    {
+      "wb_code": "SL.UEM.TOTL.ZS",
+      "wb_name": "Unemployment, total (% of total labor force)",
+      "target_indicator_id": "l3_unemployment_underemployment",
+      "target_indicator_name": "全球結構性失業與不充分就業率",
+      "applicability_rationale": "ILO/World Bank全球總體失業率統計，提供勞工階層就業脆弱度基礎實數，衡量經濟邊緣化潛力。",
+      "candidate_year": "2025",
+      "candidate_raw_value": 4.7913330740211,
+      "current_model_raw_value": 11.1,
+      "current_model_score": 56.0,
+      "current_evidence_level": "inference",
+      "fetch_status": "success",
+      "diff_analysis": "Candidate WB value: 4.7913330740211 (2025) vs. current baseline: 11.1 (score: 56.0)"
+    },
+    {
+      "wb_code": "SL.UEM.1524.ZS",
+      "wb_name": "Unemployment, youth total (% of total labor force ages 15-24)",
+      "target_indicator_id": "l3_youth_unemployment",
+      "target_indicator_name": "青年失業率與社會挫折階層規模",
+      "applicability_rationale": "15-24歲青年失業率直接對應社會動員挫折感與衝突激化潛在群體規模。",
+      "candidate_year": "2025",
+      "candidate_raw_value": 13.4088192694713,
+      "current_model_raw_value": 20.4,
+      "current_model_score": 68.0,
+      "current_evidence_level": "verified",
+      "fetch_status": "success",
+      "diff_analysis": "Candidate WB value: 13.4088192694713 (2025) vs. current baseline: 20.4 (score: 68.0)"
+    },
+    {
+      "wb_code": "EG.USE.COMM.FO.ZS",
+      "wb_name": "Fossil fuel energy consumption (% of total)",
+      "target_indicator_id": "l1_energy_vulnerability",
+      "target_indicator_name": "化石能源與電網供應鏈脆弱性",
+      "applicability_rationale": "全球化石能源消費佔比反映對碳氫化合物戰略航道（霍爾木茲/曼德海峽）之剛性依賴度。",
+      "candidate_year": "2024",
+      "candidate_raw_value": 80.0586496363126,
+      "current_model_raw_value": 80.2,
+      "current_model_score": 60.0,
+      "current_evidence_level": "inference",
+      "fetch_status": "success",
+      "diff_analysis": "Candidate WB value: 80.0586496363126 (2024) vs. current baseline: 80.2 (score: 60.0)"
+    },
+    {
+      "wb_code": "SI.POV.GINI",
+      "wb_name": "Gini index",
+      "target_indicator_id": "l2_wealth_gini",
+      "target_indicator_name": "全球前 1% 財富佔有率與跨國基尼系數",
+      "applicability_rationale": "世銀跨國基尼系數反映財富與收入分配不平等宏觀趨勢，對應體系內部與跨國分配正義裂痕。",
+      "candidate_year": null,
+      "candidate_raw_value": null,
+      "current_model_raw_value": 37.8,
+      "current_model_score": 74.0,
+      "current_evidence_level": "verified",
+      "fetch_status": "fetch_failed_or_empty",
+      "diff_analysis": "No remote value retrieved; baseline unchanged."
+    }
+  ]
+}
