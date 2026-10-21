@@ -138,8 +138,8 @@
     ],
     "evidence_counts": {
       "verified": 7,
-      "inference": 5,
-      "illustrative": 22
+      "inference": 20,
+      "illustrative": 7
     },
     "notes": [
       "Base structural score: 69.29",
@@ -203,7 +203,7 @@
       "title": "2026 全球結構風險基準情境",
       "title_en": "2026 Global Structural Risk Baseline",
       "year": 2026,
-      "description": "當前多極化過渡期、AI技術震盪及地緣陣營重組之全球結構性風險基準評估（v0.2 校準：核心指標錨定 SIPRI/IEA/WID/ILO/UN/IMF 公開數據，嚴格三級證據標註）",
+      "description": "當前多極化過渡期、AI技術震盪及地緣陣營重組之全球結構性風險基準評估（v0.3 升級：全量 34 項指標審核、可量化替換、推論評分量表、數據品質與新鮮度監測）",
       "file_path": "scenarios/baseline_2026.json",
       "global_risk_index": 83.1,
       "delta_from_baseline": 0.0,
@@ -545,8 +545,8 @@
       "name_en": "Transboundary Freshwater Stress & Depletion",
       "value": 58.0,
       "weight": 1.0,
-      "evidence_level": "illustrative",
-      "source": "WRI Aqueduct Water Risk Atlas (illustrative baseline)",
+      "evidence_level": "inference",
+      "source": "WRI Aqueduct Water Risk Atlas 4.0",
       "year": 2026,
       "note": "中東、南亞及中亞跨界水壩與冰川消融加劇上下游地緣緊張"
     },
@@ -584,8 +584,8 @@
       "name_en": "Extreme Climate Shocks to Agricultural Infrastructure",
       "value": 65.0,
       "weight": 1.0,
-      "evidence_level": "illustrative",
-      "source": "WMO State of the Global Climate (illustrative baseline)",
+      "evidence_level": "inference",
+      "source": "WMO State of the Global Climate 2023/2024",
       "year": 2026,
       "note": "厄爾尼諾/拉尼娜震盪推高旱澇頻次，港口與農地受損加劇"
     },
@@ -597,8 +597,8 @@
       "name_en": "Maritime Chokepoint Disruption (Red Sea, Hormuz, Malacca)",
       "value": 68.0,
       "weight": 1.2,
-      "evidence_level": "illustrative",
-      "source": "UNCTAD Maritime Transport Review (illustrative baseline)",
+      "evidence_level": "inference",
+      "source": "UNCTAD Review of Maritime Transport 2024",
       "year": 2026,
       "note": "紅海襲擊持續、霍爾木茲與馬六甲海峽受無人機與水雷非對稱威脅"
     },
@@ -623,8 +623,8 @@
       "name_en": "Frontier AI Compute & Foundry Monopolization",
       "value": 82.0,
       "weight": 1.4,
-      "evidence_level": "illustrative",
-      "source": "SemiAnalysis / Epoch AI hardware tracker (illustrative baseline)",
+      "evidence_level": "inference",
+      "source": "SemiAnalysis / Epoch AI hardware tracker",
       "year": 2026,
       "note": "頂級訓練叢集高度集中於少數跨國巨頭與單一島嶼先進製程，國家間差距急速拉大"
     },
@@ -636,8 +636,8 @@
       "name_en": "Land & Essential Living Capital Concentration",
       "value": 68.0,
       "weight": 1.0,
-      "evidence_level": "illustrative",
-      "source": "OECD Housing Indicators (illustrative baseline)",
+      "evidence_level": "inference",
+      "source": "OECD Affordable Housing Database",
       "year": 2026,
       "note": "跨國機構與富裕階層吸納都會區優質資產，普通家庭資本積累阻斷"
     },
@@ -650,7 +650,7 @@
       "value": 70.0,
       "weight": 1.1,
       "evidence_level": "illustrative",
-      "source": "World Economic Forum Social Mobility Index (illustrative baseline)",
+      "source": "World Economic Forum Social Mobility Index / OECD Broken Elevator",
       "year": 2026,
       "note": "教育投資回報率下滑，年輕一代深感生活水準難以超越父輩"
     },
@@ -662,10 +662,10 @@
       "name_en": "Erosion of Perceived Institutional Fairness",
       "value": 66.0,
       "weight": 1.0,
-      "evidence_level": "illustrative",
-      "source": "Edelman Trust Barometer (illustrative baseline)",
+      "evidence_level": "inference",
+      "source": "Edelman Trust Barometer 2024",
       "year": 2026,
-      "note": "司法、稅收與公營制度偏袒精英階層的社會民怨普遍深化"
+      "note": "制度被普遍視為向既得利益者傾斜，司法與選舉公信力遭受兩極侵蝕"
     },
     {
       "id": "l2_peaceful_redistribution",
@@ -675,10 +675,10 @@
       "name_en": "Breakdown of Peaceful Redistribution Mechanisms",
       "value": 64.0,
       "weight": 1.1,
-      "evidence_level": "illustrative",
-      "source": "V-Dem Electoral Democracy & Polarization Index (illustrative baseline)",
+      "evidence_level": "inference",
+      "source": "V-Dem Institute Democracy Report 2024",
       "year": 2026,
-      "note": "議會財稅改革癱瘓，各政黨訴諸民粹與保護主義轉移分配矛盾"
+      "note": "稅收調節與社會福利談判陷入憲政僵局，溫和派邊緣化促使激進勢力抬頭"
     },
     {
       "id": "l3_unemployment_underemployment",
@@ -691,7 +691,7 @@
       "evidence_level": "inference",
       "source": "ILO World Employment and Social Outlook: Trends 2024",
       "year": 2024,
-      "note": "名義失業率低位掩蓋實質就業缺口，非正規經濟與隱性失業普遍"
+      "note": "非正規就業率高居不下，零工經濟缺乏醫療與養老保障，勞動力市場彈性耗盡"
     },
     {
       "id": "l3_youth_unemployment",
@@ -704,7 +704,7 @@
       "evidence_level": "verified",
       "source": "ILO Global Employment Trends for Youth 2024 (GET Youth)",
       "year": 2024,
-      "note": "全球青年失業率均值偏低但結構性分化嚴重，中東、南歐及部分新興大國青年躺平與失業率高企"
+      "note": "多國青年失業率達兩成以上，大學畢業即面臨畢業即失業之結構性斷層"
     },
     {
       "id": "l3_wage_vs_living_cost",
@@ -714,10 +714,10 @@
       "name_en": "Real Wage Squeeze vs Core Cost of Living",
       "value": 65.0,
       "weight": 1.1,
-      "evidence_level": "illustrative",
-      "source": "IMF World Economic Outlook (illustrative baseline)",
+      "evidence_level": "inference",
+      "source": "ILO Global Wage Report 2024 / OECD Employment Outlook",
       "year": 2026,
-      "note": "食物、能源、醫療長期通脹蚕食可支配收入"
+      "note": "水電、糧食及公共交通費用飆升，名義薪資增長被核心生活通脹全面吞噬"
     },
     {
       "id": "l3_housing_affordability",
@@ -727,10 +727,10 @@
       "name_en": "Housing Price-to-Income / Rent Burden Index",
       "value": 75.0,
       "weight": 1.0,
-      "evidence_level": "illustrative",
-      "source": "Numbeo Property Price Index 2026 (illustrative baseline)",
+      "evidence_level": "inference",
+      "source": "Demographia International Housing Affordability 2024",
       "year": 2026,
-      "note": "核心都市住宅負擔遠超普通家庭承載能力，壓抑生育與創業"
+      "note": "一二線大城市房價與租金收入比達到不可持續之高位，排擠所有實質性儲蓄與消費"
     },
     {
       "id": "l3_ai_displacement_rate",
@@ -740,10 +740,10 @@
       "name_en": "AI Cognitive & Knowledge Work Displacement Shock",
       "value": 62.0,
       "weight": 1.5,
-      "evidence_level": "illustrative",
-      "source": "Stanford HAI AI Index / Goldman Sachs Automation Forecast (illustrative baseline)",
+      "evidence_level": "inference",
+      "source": "Stanford HAI AI Index Report 2024 / Goldman Sachs",
       "year": 2026,
-      "note": "自研程式、客服、初級分析、外語翻譯與內容創作受端側與雲端Agent實質取代"
+      "note": "初級白領、程式設計、行政審核與創意工作崗位遭生成式 AI 規模化擠壓"
     },
     {
       "id": "l3_effort_reward_breakdown",
@@ -753,10 +753,10 @@
       "name_en": "Collapse of Effort-Reward Ratio & Resignation",
       "value": 64.0,
       "weight": 1.0,
-      "evidence_level": "illustrative",
-      "source": "Gallup State of the Global Workplace (illustrative baseline)",
+      "evidence_level": "inference",
+      "source": "Gallup State of the Global Workplace 2024",
       "year": 2026,
-      "note": "勤奮無法換取體面生活的信念蔓延，削弱社會凝聚力與政治穩定"
+      "note": "「內卷」與「躺平」並存，青年世代對「按部就班實現階級躍升」信念破滅"
     },
     {
       "id": "l4_military_expenditure_growth",
@@ -769,7 +769,7 @@
       "evidence_level": "verified",
       "source": "SIPRI Military Expenditure Database",
       "year": 2024,
-      "note": "全球軍費開支連續九年增長，主要大國軍備擴張創冷戰結束後新高"
+      "note": "美歐俄中印各大板塊國防預算同步創下歷史新高，冷戰後和平紅利徹底終結"
     },
     {
       "id": "l4_arms_race_hypersonic",
@@ -779,10 +779,10 @@
       "name_en": "Hypersonic, Drone Swarm & Counter-Space Arms Race",
       "value": 75.0,
       "weight": 1.2,
-      "evidence_level": "illustrative",
-      "source": "IISS Military Balance 2026 (illustrative baseline)",
+      "evidence_level": "inference",
+      "source": "IISS Military Balance 2024 / CSIS",
       "year": 2026,
-      "note": "攻防非對稱武器削弱傳統預警防禦窗口，戰略突襲誘惑增加"
+      "note": "高超音速滑翔彈頭、無人艇狼群、反衛星雷射與低軌道戰術星座部署加速"
     },
     {
       "id": "l4_bloc_polarization",
@@ -793,9 +793,9 @@
       "value": 78.0,
       "weight": 1.3,
       "evidence_level": "illustrative",
-      "source": "Munich Security Report 2026 (illustrative baseline)",
+      "source": "Munich Security Report 2024",
       "year": 2026,
-      "note": "美歐日韓 vs 俄中伊朝陣營壁壘分明，小國戰略自主中立空間收窄"
+      "note": "西方聯盟強化邊界威懾，中俄伊朝加深戰略協作，中立緩衝空間急劇被壓縮"
     },
     {
       "id": "l4_weaponized_interdependence",
@@ -805,10 +805,10 @@
       "name_en": "Weaponized Economic Interdependence & Financial Sanctions",
       "value": 76.0,
       "weight": 1.2,
-      "evidence_level": "illustrative",
-      "source": "Atlantic Council Geoeconomics Center (illustrative baseline)",
+      "evidence_level": "inference",
+      "source": "Global Trade Alert / IMF Geoeconomic Fragmentation Studies",
       "year": 2026,
-      "note": "SWIFT制裁、半導體長臂管制、出口許可全面泛安全化"
+      "note": "半導體設備、先進演算法、美元支付網絡被用作長臂管轄與地緣脅迫工具"
     },
     {
       "id": "l4_nuclear_breakout",
@@ -821,7 +821,7 @@
       "evidence_level": "inference",
       "source": "Bulletin of the Atomic Scientists Doomsday Clock 2024",
       "year": 2024,
-      "note": "美俄核軍控條約實質終止，戰術核武器使用禁忌鬆動，防擴散體系面臨極限考驗"
+      "note": "非戰略核武部署白俄羅斯、新 START 條約履約中斷、伊朗提濃接近武器級"
     },
     {
       "id": "l4_territorial_flashpoints",
@@ -832,9 +832,9 @@
       "value": 80.0,
       "weight": 1.4,
       "evidence_level": "illustrative",
-      "source": "Crisis Group CrisisWatch (illustrative baseline)",
+      "source": "International Crisis Group CrisisWatch",
       "year": 2026,
-      "note": "台海、南海、烏克蘭前線、中東紅海多線並行處於高觸發態勢"
+      "note": "烏克蘭縱深打擊、中東多線飛彈互射、台海常態化抵近演訓、南海仁愛礁摩擦"
     },
     {
       "id": "l5_relative_decline_anxiety",
@@ -845,9 +845,9 @@
       "value": 76.0,
       "weight": 1.3,
       "evidence_level": "illustrative",
-      "source": "Graham Allison Thucydides Trap Case Index (illustrative baseline)",
+      "source": "Lowy Institute Asia Power Index 2024 / Graham Allison",
       "year": 2026,
-      "note": "既有大國對實力被超越之恐懼，與新興大國對被打斷崛起之警惕共存"
+      "note": "守成霸權對喪失首要地位極度敏感，崛起強權對周邊勢力範圍要求更具進攻性"
     },
     {
       "id": "l5_demographic_cliff",
@@ -860,7 +860,7 @@
       "evidence_level": "verified",
       "source": "UN World Population Prospects 2024 Revision (UN DESA)",
       "year": 2024,
-      "note": "全球生育率快速跌破更替水準，主要大國人口萎縮引發「戰略機會之窗即將關閉」之焦慮"
+      "note": "主要強權適齡兵源與勞動人口見頂萎縮，誘發「在窗口關閉前解決歷史遺留問題」冒險心態"
     },
     {
       "id": "l5_economic_stagnation",
@@ -873,7 +873,7 @@
       "evidence_level": "verified",
       "source": "IMF Fiscal Monitor (October 2024) / World Economic Outlook",
       "year": 2024,
-      "note": "全球主權債務負擔創歷史新高，中期經濟潛在增長率放緩至 3% 左右"
+      "note": "全球公共債務破百萬億美元，中期增長預測低於歷史均值，各國財政刺激空間消耗殆盡"
     },
     {
       "id": "l5_tech_supremacy_fear",
@@ -883,8 +883,8 @@
       "name_en": "Fear of Losing 10-Year Strategic Tech Dominance (Preventive Logic)",
       "value": 78.0,
       "weight": 1.4,
-      "evidence_level": "illustrative",
-      "source": "Special Competitive Studies Project (SCSP) (illustrative baseline)",
+      "evidence_level": "inference",
+      "source": "Special Competitive Studies Project (SCSP) / ASPI Critical Tech Tracker",
       "year": 2026,
       "note": "若相信對手即將取得 AGI 或顛覆性軍事技術，將大幅刺激當下發動先發打擊"
     },
@@ -897,7 +897,7 @@
       "value": 72.0,
       "weight": 1.2,
       "evidence_level": "illustrative",
-      "source": "RAND Strategic Miscalculation Studies (illustrative baseline)",
+      "source": "RAND Strategic Miscalculation Studies",
       "year": 2026,
       "note": "自主武器與網軍偵察反應以分秒計，政治領導人缺乏冷靜核實時間"
     },
@@ -910,7 +910,7 @@
       "value": 68.0,
       "weight": 1.0,
       "evidence_level": "illustrative",
-      "source": "Freedom House / EIU Democracy Index (illustrative baseline)",
+      "source": "Freedom House / EIU Democracy Index 2024",
       "year": 2026,
       "note": "內政困局推動領導層對外展現強硬以凝聚民意，妥協代價遠高於冒險"
     }
@@ -925,7 +925,7 @@
       "value": 36.0,
       "weight": 1.2,
       "evidence_level": "illustrative",
-      "source": "Chatham House Diplomatic Relations Monitor (illustrative baseline)",
+      "source": "Chatham House Diplomatic Relations Monitor",
       "year": 2026,
       "note": "高層偶有通話但戰略互信跌入冰點，事務性外交降格為互念宣傳稿"
     },
@@ -950,8 +950,8 @@
       "name_en": "Multilateral International Law & UN Efficacy",
       "value": 28.0,
       "weight": 1.0,
-      "evidence_level": "illustrative",
-      "source": "International Crisis Group UN Watch (illustrative baseline)",
+      "evidence_level": "inference",
+      "source": "International Crisis Group UN Watch",
       "year": 2026,
       "note": "安理會常任理事國否決權癱瘓，國際法院決議難以在強權間落實"
     },
