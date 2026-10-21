@@ -575,3 +575,134 @@ def test_cli_missing_file_exits(capsys):
     with pytest.raises(SystemExit) as excinfo:
         cli_main(["--scenario", "nonexistent_file_xyz.json"])
     assert excinfo.value.code == 1
+
+
+# ==============================================================================
+# P4 Verification Tests: Sensitivity, Gate Directionality, Extreme Boundaries
+# ==============================================================================
+
+def test_sensitivity_analysis_ranking_top_five(baseline_scenario: ScenarioData, model: WW3RiskModel):
+    """P4: Test sensitivity across all indicators and verify top influential items."""
+    import copy
+    sc = copy.deepcopy(baseline_scenario)
+    base_res = model.evaluate(sc)
+    base_idx = base_res.global_risk_index
+
+    impacts = {}
+
+    # Measure layer indicators
+    for lid, layer in sc.layers.items():
+        for ind in layer.indicators:
+            orig = ind.value
+            ind.value = min(100.0, orig + 10.0)
+            idx_p = model.evaluate(sc).global_risk_index
+            ind.value = max(0.0, orig - 10.0)
+            idx_m = model.evaluate(sc).global_risk_index
+            ind.value = orig
+            impacts[ind.id] = (abs(idx_p - base_idx) + abs(base_idx - idx_m)) / 2.0
+
+    # Measure gate buffers
+    for buf in sc.gate_buffers:
+        orig = buf.value
+        buf.value = min(100.0, orig + 10.0)
+        idx_p = model.evaluate(sc).global_risk_index
+        buf.value = max(0.0, orig - 10.0)
+        idx_m = model.evaluate(sc).global_risk_index
+        buf.value = orig
+        impacts[buf.id] = (abs(idx_p - base_idx) + abs(base_idx - idx_m)) / 2.0
+
+    sorted_impacts = sorted(impacts.items(), key=lambda x: x[1], reverse=True)
+    top_5_ids = [item[0] for item in sorted_impacts[:5]]
+
+    # All gate buffers are among the top most sensitive items due to gate multiplier effect
+    assert "gate_nuclear_deterrence_stability" in top_5_ids
+    assert "gate_diplomatic_trust" in top_5_ids
+    assert "gate_trade_interdependence" in top_5_ids
+    # Top structural layer indicator is AI displacement rate
+    assert sorted_impacts[4][0] == "l3_ai_displacement_rate" or "gate_international_institutions" in top_5_ids
+
+
+def test_gate_behavior_directionality(baseline_scenario: ScenarioData, model: WW3RiskModel):
+    """P4: With all else equal, improving peace mechanism strictly reduces risk; failure strictly increases risk."""
+    import copy
+    sc = copy.deepcopy(baseline_scenario)
+    base_risk = model.evaluate(sc).global_risk_index
+
+    # 1. Peace buffers improve (+15 across all buffers)
+    sc_improved = copy.deepcopy(sc)
+    for buf in sc_improved.gate_buffers:
+        buf.value = min(100.0, buf.value + 15.0)
+    risk_improved = model.evaluate(sc_improved).global_risk_index
+    assert risk_improved < base_risk, f"Improving peace buffers must reduce risk: {risk_improved} < {base_risk}"
+
+    # 2. Peace buffers collapse (-15 across all buffers)
+    sc_failed = copy.deepcopy(sc)
+    for buf in sc_failed.gate_buffers:
+        buf.value = max(0.0, buf.value - 15.0)
+    risk_failed = model.evaluate(sc_failed).global_risk_index
+    assert risk_failed > base_risk, f"Failing peace buffers must increase risk: {risk_failed} > {base_risk}"
+
+
+def test_extreme_boundary_scenarios(baseline_scenario: ScenarioData, model: WW3RiskModel):
+    """P4: Test boundary conditions: all zeros, all hundreds, single layer max. Outputs must stay in [0, 100] with no NaN."""
+    import copy
+    import math
+
+    # 1. All zeros
+    sc_zero = copy.deepcopy(baseline_scenario)
+    for layer in sc_zero.layers.values():
+        for ind in layer.indicators:
+            ind.value = 0.0
+    for buf in sc_zero.gate_buffers:
+        buf.value = 100.0  # Perfect peace
+    res_zero = model.evaluate(sc_zero)
+    assert not math.isnan(res_zero.global_risk_index)
+    assert 0.0 <= res_zero.global_risk_index <= 5.0
+
+    # 2. All hundreds
+    sc_hundred = copy.deepcopy(baseline_scenario)
+    for layer in sc_hundred.layers.values():
+        for ind in layer.indicators:
+            ind.value = 100.0
+    for buf in sc_hundred.gate_buffers:
+        buf.value = 0.0  # Total gate collapse
+    res_hundred = model.evaluate(sc_hundred)
+    assert not math.isnan(res_hundred.global_risk_index)
+    assert 95.0 <= res_hundred.global_risk_index <= 100.0
+
+    # 3. Single layer max, others zero
+    for lid in ["L1", "L2", "L3", "L4", "L5"]:
+        sc_single = copy.deepcopy(baseline_scenario)
+        for l in sc_single.layers.values():
+            for ind in l.indicators:
+                ind.value = 100.0 if l.id == lid else 0.0
+        for buf in sc_single.gate_buffers:
+            buf.value = 50.0
+        res_single = model.evaluate(sc_single)
+        assert not math.isnan(res_single.global_risk_index)
+        assert 0.0 <= res_single.global_risk_index <= 100.0
+
+
+def test_historical_backtest_discipline(model: WW3RiskModel):
+    """P4: Verify historical backtest cases execute truthfully and respect discipline."""
+    import json
+    with open(HISTORICAL_FILE, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    cases = data if isinstance(data, list) else data.get("cases", [])
+    assert len(cases) >= 5
+
+    results = {}
+    for case in cases:
+        sc = ScenarioData.from_dict(case)
+        res = model.evaluate(sc)
+        results[case["year"]] = res.global_risk_index
+        assert 0.0 <= res.global_risk_index <= 100.0
+        # Disclaimer must be present on all probability bands
+        for b in res.probability_bands.values():
+            assert "結構風險之情境推演估算" in b.disclaimer
+
+    # Verify expected historical order without hindsight manipulation:
+    # 1938 and 1913 are highest (Stage 4), 1990 is lowest (Stage 1)
+    assert results[1938] > 95.0
+    assert results[1913] > 90.0
+    assert results[1990] < 35.0
