@@ -14,6 +14,7 @@ from .indicators import ScenarioData, load_scenario_from_file
 from .model import WW3RiskModel
 from .report import generate_markdown_report
 from .scenarios import compare_scenarios, format_comparison_ascii_table
+from .snapshot import export_snapshot_to_file
 
 
 def format_data_quality_report(quality_dict: dict) -> str:
@@ -140,6 +141,7 @@ def main(args: list[str] | None = None) -> None:
     parser.add_argument("--historical", "-H", type=str, help="Path to historical_cases.json")
     parser.add_argument("--report", "-r", type=str, help="Path to output Markdown report")
     parser.add_argument("--dashboard", "-d", type=str, help="Path to generate static dashboard HTML")
+    parser.add_argument("--export-snapshot", type=str, help="Export D1-compatible baseline calculation snapshot JSON")
     parser.add_argument("--data-quality", "-q", action="store_true", help="Output comprehensive data quality and staleness report")
     parser.add_argument("--as-of-date", type=str, default="2026-10-21", help="Reference date for staleness evaluation (YYYY-MM-DD)")
     parser.add_argument("--json", action="store_true", help="Output raw JSON format")
@@ -165,6 +167,25 @@ def main(args: list[str] | None = None) -> None:
             print(json.dumps(quality, ensure_ascii=False, indent=2))
         else:
             print(format_data_quality_report(quality))
+        return
+
+    # Case 0.5: Export D1 snapshot JSON
+    if parsed.export_snapshot:
+        scenario_file = Path(parsed.scenario) if parsed.scenario else Path("scenarios/baseline_2026.json")
+        if not scenario_file.exists():
+            scenario_file = Path("data/baseline_2026.json")
+        if not scenario_file.exists():
+            print(f"Error: Baseline scenario file not found: {scenario_file}", file=sys.stderr)
+            sys.exit(1)
+
+        scenario = load_scenario_from_file(scenario_file)
+        snap = export_snapshot_to_file(
+            output_path=parsed.export_snapshot,
+            scenario=scenario,
+            model=model,
+            as_of_date=parsed.as_of_date,
+        )
+        print(f"D1 快照 JSON 已導出: {parsed.export_snapshot} (Snapshot ID: {snap['snapshot']['id']}, 指標數: {len(snap['observations'])})")
         return
 
     # Case 1: Historical comparison
