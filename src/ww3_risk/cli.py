@@ -141,6 +141,7 @@ def main(args: list[str] | None = None) -> None:
     parser.add_argument("--historical", "-H", type=str, help="Path to historical_cases.json")
     parser.add_argument("--report", "-r", type=str, help="Path to output Markdown report")
     parser.add_argument("--dashboard", "-d", type=str, help="Path to generate static dashboard HTML")
+    parser.add_argument("--api-base", type=str, default=None, help="Base URL of Cloudflare Worker API for dynamic dashboard")
     parser.add_argument("--export-snapshot", type=str, help="Export D1-compatible baseline calculation snapshot JSON")
     parser.add_argument("--data-quality", "-q", action="store_true", help="Output comprehensive data quality and staleness report")
     parser.add_argument("--as-of-date", type=str, default="2026-10-21", help="Reference date for staleness evaluation (YYYY-MM-DD)")
@@ -262,14 +263,24 @@ def main(args: list[str] | None = None) -> None:
             print(f"分析報告已儲存至: {parsed.report}")
 
         if parsed.dashboard:
-            build_dashboard(scenario_path=scenario_path, output_html_path=parsed.dashboard, model=model)
+            build_dashboard(
+                scenario_path=scenario_path,
+                output_html_path=parsed.dashboard,
+                model=model,
+                api_base=parsed.api_base,
+            )
             print(f"靜態儀表板 HTML 已生成: {parsed.dashboard}")
         return
 
     # Case 4: Dashboard generation standalone without --scenario (defaults to baseline)
     if parsed.dashboard:
         default_scenario = Path("scenarios/baseline_2026.json")
-        build_dashboard(scenario_path=default_scenario, output_html_path=parsed.dashboard, model=model)
+        build_dashboard(
+            scenario_path=default_scenario,
+            output_html_path=parsed.dashboard,
+            model=model,
+            api_base=parsed.api_base,
+        )
         print(f"靜態儀表板 HTML 已生成: {parsed.dashboard}")
         return
 

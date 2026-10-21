@@ -318,5 +318,45 @@ def test_dashboard_v03_terminology_and_credibility_separation(tmp_path):
     assert data["evidence_distribution"]["illustrative"] == 7
 
 
+def test_dashboard_api_base_and_offline_fallback(tmp_path):
+    """Verify C3: dashboard dynamic API fetch mode and offline fallback preservation."""
+    # 1. With --api-base provided
+    out_live_html = tmp_path / "dashboard_live.html"
+    build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_live_html,
+        api_base="https://ww3-risk-api.whypuss.workers.dev",
+        ui_step=5,
+    )
+    live_content = out_live_html.read_text(encoding="utf-8")
+
+    assert "https://ww3-risk-api.whypuss.workers.dev" in live_content
+    assert "const apiBase = \"https://ww3-risk-api.whypuss.workers.dev\";" in live_content
+    assert "AbortController()" in live_content
+    assert "3000" in live_content  # 3-second timeout
+    assert "/api/risk/latest" in live_content
+    assert "/api/risk/layers" in live_content
+    assert "/api/data-status" in live_content
+    assert "● 離線快照（內嵌數據）" in live_content
+    assert "badge-live" in live_content
+    assert "applyApiData" in live_content
+
+    # 2. Without api-base (v0.3 offline behavior)
+    out_offline_html = tmp_path / "dashboard_offline.html"
+    build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_offline_html,
+        api_base=None,
+        ui_step=5,
+    )
+    offline_content = out_offline_html.read_text(encoding="utf-8")
+
+    assert "const apiBase = \"\";" in offline_content
+    assert "● 100% 本地離線運行 (ZERO CDN)" in offline_content
+    assert "戰爭風險指數" in offline_content
+    assert "WW3_MODEL_DATA" in offline_content
+
+
+
 
 

@@ -417,13 +417,19 @@ def render_gauge_svg(score: float, width: int = 320, height: int = 180) -> str:
     """
 
 
-def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
+def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optional[str] = None) -> str:
     """Render the dashboard HTML for a specific UI Step (1 to 5)."""
+    api_base_val = (api_base or "").strip().rstrip("/")
     main = data["main_result"]
     risk_score = main["global_risk_index"]
     stage = main["stage"]
     gauge_svg = render_gauge_svg(risk_score)
     data_json_str = json.dumps(data, ensure_ascii=False, indent=2)
+
+    if api_base_val:
+        source_badge_html = '<span class="meta-badge badge-offline" id="top-data-source-badge">● 離線快照（內嵌數據）</span>'
+    else:
+        source_badge_html = '<span class="meta-badge badge-offline" id="top-data-source-badge">● 100% 本地離線運行 (ZERO CDN)</span>'
 
     # Escalation stages definitions for tracker
     stages_info = [
@@ -497,7 +503,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
             <div class="driver-step-head">
               <span class="driver-step-num">01</span>
               <span class="driver-step-name">基礎結構加權分 (Base Structural)</span>
-              <span class="driver-step-val">{main['base_structural_score']:.1f}</span>
+              <span class="driver-step-val" id="driver-base-val">{main['base_structural_score']:.1f}</span>
             </div>
             <div class="driver-step-desc">
               五層結構維度加權均值：L1 ({main['layer_scores']['L1']:.1f}) + L2 ({main['layer_scores']['L2']:.1f}) + L3 ({main['layer_scores']['L3']:.1f}×1.1) + L4 ({main['layer_scores']['L4']:.1f}×1.2) + L5 ({main['layer_scores']['L5']:.1f}×1.1) ÷ 5.4。
@@ -507,7 +513,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
             <div class="driver-step-head">
               <span class="driver-step-num">02</span>
               <span class="driver-step-name">非線性共振增益 (Interactions)</span>
-              <span class="driver-step-val">+{main['interactions']['total']:.2f}</span>
+              <span class="driver-step-val" id="driver-interaction-val">+{main['interactions']['total']:.2f}</span>
             </div>
             <div class="driver-step-desc">
               三組脆弱維度耦合：資源×分配 (+{main['interactions']['L1_x_L2']:.2f}) + AI失業×恐懼 (+{main['interactions']['L3_x_L5']:.2f}) + 安全困境×閘門失效 (+{main['interactions']['L4_x_GateFailure']:.2f})。
@@ -517,7 +523,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
             <div class="driver-step-head">
               <span class="driver-step-num">03</span>
               <span class="driver-step-name">和平機制安全閥乘數 (Gate Factor)</span>
-              <span class="driver-step-val">x{main['gate_factor']:.3f}</span>
+              <span class="driver-step-val" id="driver-gate-val">x{main['gate_factor']:.3f}</span>
             </div>
             <div class="driver-step-desc">
               四項和平緩衝容量均值 {main['peace_capacity']:.1f}/100（機制失效度 {main['gate_failure']:.1f}%）。公式：<code>1.4 - ({main['peace_capacity']:.1f}/100)×0.8 = {main['gate_factor']:.3f}</code>，對總體產生淨放大。
@@ -527,7 +533,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
             <div class="driver-step-head">
               <span class="driver-step-num">04</span>
               <span class="driver-step-name">高位平滑飽和映射 (Soft-Clamp)</span>
-              <span class="driver-step-val">{raw_unclamped:.1f} → {risk_score:.1f}</span>
+              <span class="driver-step-val" id="driver-clamp-val">{raw_unclamped:.1f} → {risk_score:.1f}</span>
             </div>
             <div class="driver-step-desc">
               未夾持得分 {raw_unclamped:.1f} 超越 70 閾值，經雙曲正切 Tanh 飽和函數平滑壓縮，防止無界發散，收斂為 {risk_score:.1f}（進入 Stage {stage['number']} {stage['title']}）。
@@ -548,17 +554,17 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
         <div class="quality-metric-row">
           <div class="quality-cell">
             <div class="q-label">資料完整度</div>
-            <div class="q-val" style="color:var(--color-green);">{comp_pct:.1f}%</div>
+            <div class="q-val" id="quality-comp-pct" style="color:var(--color-green);">{comp_pct:.1f}%</div>
             <div class="q-sub">{total_ind_cnt}/34 指標全齊全</div>
           </div>
           <div class="quality-cell">
             <div class="q-label">資料新鮮度</div>
-            <div class="q-val" style="color:var(--color-yellow);">{fresh_cnt} Fresh / {stale_cnt} Stale</div>
+            <div class="q-val" id="quality-freshness-val" style="color:var(--color-yellow);">{fresh_cnt} Fresh / {stale_cnt} Stale</div>
             <div class="q-sub">嚴格依週期過期標註</div>
           </div>
           <div class="quality-cell">
             <div class="q-label">缺失項 (Missing)</div>
-            <div class="q-val" style="color:#f8fafc;">{missing_cnt} 項</div>
+            <div class="q-val" id="quality-missing-val" style="color:#f8fafc;">{missing_cnt} 項</div>
             <div class="q-sub">無任何未定義欄位</div>
           </div>
         </div>
@@ -785,7 +791,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
             <span class="panel-tag">CRITICAL OBSERVATIONS</span>
           </div>
 
-          <div class="pushers-list">
+          <div class="pushers-list" id="pushers-list">
             {pushers_html}
           </div>
 
@@ -1469,6 +1475,11 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
       background: rgba(16, 185, 129, 0.12);
       border: 1px solid var(--color-green);
       color: #6ee7b7;
+    }
+    .badge-live {
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid #3b82f6;
+      color: #93c5fd;
     }
     .badge-step {
       background: rgba(6, 182, 212, 0.12);
@@ -3294,7 +3305,163 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
         }
       });
     }
+
+    // Dynamic Cloudflare Worker API fetch & offline fallback (C3)
+    const apiBase = "__API_BASE__";
+    if (apiBase) {
+      window.WW3_API_BASE = apiBase;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+      Promise.all([
+        fetch(apiBase + '/api/risk/latest', { signal: controller.signal }).then(r => {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        }),
+        fetch(apiBase + '/api/risk/layers', { signal: controller.signal }).then(r => {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        }),
+        fetch(apiBase + '/api/data-status', { signal: controller.signal }).then(r => {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+      ]).then(([latest, layersData, dataStatus]) => {
+        clearTimeout(timeoutId);
+        applyApiData(latest, layersData, dataStatus);
+      }).catch(err => {
+        console.warn('WW3 API fetch failed or timed out after 3s, using embedded offline snapshot:', err);
+        const badge = document.getElementById('top-data-source-badge');
+        if (badge) {
+          badge.textContent = '● 離線快照（內嵌數據）';
+          badge.className = 'meta-badge badge-offline';
+        }
+      });
+    }
+
+    function applyApiData(latest, layersData, dataStatus) {
+      // 1. Update Top Bar Data Source Badge and Date
+      const badge = document.getElementById('top-data-source-badge');
+      if (badge) {
+        badge.textContent = '● 即時 API · ' + (latest.computed_at || 'LIVE');
+        badge.className = 'meta-badge badge-live';
+      }
+      const topDate = document.getElementById('top-date-display');
+      if (topDate && latest.computed_at) {
+        topDate.textContent = latest.computed_at + ' · 即時 API 數據';
+      }
+
+      // 2. Update Gauge & Scores
+      const scoreEl = document.getElementById('score-display');
+      if (scoreEl && typeof latest.total_index === 'number') {
+        scoreEl.textContent = latest.total_index.toFixed(1);
+      }
+      const pillBase = document.getElementById('pill-base');
+      if (pillBase && typeof latest.base_score === 'number') {
+        pillBase.textContent = latest.base_score.toFixed(1);
+      }
+      const pillGate = document.getElementById('pill-gate');
+      if (pillGate && latest.gate && typeof latest.gate.multiplier === 'number') {
+        pillGate.textContent = 'x' + latest.gate.multiplier.toFixed(3);
+      }
+      const pillFail = document.getElementById('pill-fail');
+      if (pillFail && latest.gate && typeof latest.gate.peace_capacity === 'number') {
+        pillFail.textContent = (100 - latest.gate.peace_capacity).toFixed(1) + '%';
+      }
+
+      // 3. Update Gauge Needle (cx=160, cy=145, r=100)
+      const svg = document.querySelector('.gauge-svg');
+      if (svg && typeof latest.total_index === 'number') {
+        const needle = svg.querySelector('line');
+        if (needle) {
+          const clamped = Math.max(0, Math.min(100, latest.total_index));
+          const theta = Math.PI - (clamped / 100.0) * Math.PI;
+          const nx = 160 + 100 * Math.cos(theta);
+          const ny = 145 - 100 * Math.sin(theta);
+          needle.setAttribute('x2', nx.toFixed(1));
+          needle.setAttribute('y2', ny.toFixed(1));
+        }
+      }
+
+      // 4. Update Stage Progression Tracker & Top Stage Badge
+      if (latest.stage && latest.stage.number) {
+        document.querySelectorAll('.stage-card').forEach(el => el.classList.remove('active'));
+        const activeStageCard = document.getElementById('stage-card-' + latest.stage.number);
+        if (activeStageCard) activeStageCard.classList.add('active');
+        const stageBadge = document.getElementById('top-stage-badge');
+        if (stageBadge && latest.stage.title) {
+          stageBadge.textContent = '警戒級別：' + latest.stage.title + ' (STAGE ' + latest.stage.number + ')';
+        }
+      }
+
+      // 5. Update Five Layers bars
+      if (latest.layers) {
+        for (const [lid, val] of Object.entries(latest.layers)) {
+          const numVal = typeof val === 'number' ? val : (val && val.score ? val.score : 0);
+          const rows = document.querySelectorAll('.layer-row');
+          rows.forEach(r => {
+            const codeEl = r.querySelector('.layer-code');
+            if (codeEl && codeEl.textContent.trim() === lid) {
+              const scoreEl = r.querySelector('.layer-score');
+              const fillEl = r.querySelector('.progress-fill');
+              if (scoreEl) scoreEl.textContent = numVal.toFixed(1);
+              if (fillEl) {
+                fillEl.style.width = numVal + '%';
+                let color = "var(--color-green)";
+                if (numVal >= 85) color = "var(--color-red)";
+                else if (numVal >= 70) color = "var(--color-orange)";
+                else if (numVal >= 50) color = "var(--color-yellow)";
+                fillEl.style.background = color;
+                if (scoreEl) scoreEl.style.color = color;
+              }
+            }
+          });
+        }
+      }
+
+      // 6. Update Driver Decomposition Step Values
+      const dBase = document.getElementById('driver-base-val');
+      if (dBase && typeof latest.base_score === 'number') dBase.textContent = latest.base_score.toFixed(1);
+      const dInter = document.getElementById('driver-interaction-val');
+      if (dInter && typeof latest.interaction_bonus === 'number') dInter.textContent = '+' + latest.interaction_bonus.toFixed(2);
+      const dGate = document.getElementById('driver-gate-val');
+      if (dGate && latest.gate && typeof latest.gate.multiplier === 'number') dGate.textContent = 'x' + latest.gate.multiplier.toFixed(3);
+
+      // 7. Update Top Risk Drivers List
+      if (latest.drivers && Array.isArray(latest.drivers) && latest.drivers.length > 0) {
+        const pushersContainer = document.getElementById('pushers-list');
+        if (pushersContainer) {
+          pushersContainer.innerHTML = latest.drivers.slice(0, 3).map((drv, i) => `
+            <div class="pusher-item">
+              <div class="pusher-badge">#0${i + 1} · ${drv.layer || ''}</div>
+              <div class="pusher-content">
+                <div class="pusher-title">${drv.name || drv.id}</div>
+                <div class="pusher-meta">指標ID: <code>${drv.id}</code> · 權重 x${(drv.weight || 1.0).toFixed(1)}</div>
+              </div>
+              <div class="pusher-val">${(drv.value || 0).toFixed(1)}</div>
+            </div>
+          `).join('');
+        }
+      }
+
+      // 8. Update Data Quality Card
+      if (dataStatus) {
+        const qComp = document.getElementById('quality-comp-pct');
+        if (qComp && typeof dataStatus.completeness_pct === 'number') {
+          qComp.textContent = dataStatus.completeness_pct.toFixed(1) + '%';
+        }
+        const qFresh = document.getElementById('quality-freshness-val');
+        if (qFresh && dataStatus.fresh_count !== undefined && dataStatus.stale_count !== undefined) {
+          qFresh.textContent = dataStatus.fresh_count + ' Fresh / ' + dataStatus.stale_count + ' Stale';
+        }
+        const qMissing = document.getElementById('quality-missing-val');
+        if (qMissing && dataStatus.missing_count !== undefined) {
+          qMissing.textContent = dataStatus.missing_count + ' 項';
+        }
+      }
+    }
     """
+    js_script = js_script.replace("__API_BASE__", api_base_val)
 
     # HTML Skeleton
     html = f"""<!DOCTYPE html>
@@ -3317,9 +3484,9 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5) -> str:
     </div>
     <div class="top-meta">
       <span class="meta-badge badge-step">WAR RISK INDEX</span>
-      <span class="meta-badge badge-alert">警戒級別：{stage['title']} (STAGE {stage['number']})</span>
-      <span class="meta-badge badge-offline">● 100% 本地離線運行 (ZERO CDN)</span>
-      <span class="top-date" style="font-family:var(--font-mono);color:var(--text-dim);">{data['metadata']['generated_at']} · {data['metadata']['active_scenario_year']} 基準</span>
+      <span class="meta-badge badge-alert" id="top-stage-badge">警戒級別：{stage['title']} (STAGE {stage['number']})</span>
+      {source_badge_html}
+      <span class="top-date" id="top-date-display" style="font-family:var(--font-mono);color:var(--text-dim);">{data['metadata']['generated_at']} · {data['metadata']['active_scenario_year']} 基準</span>
     </div>
   </header>
 
@@ -3434,6 +3601,7 @@ def build_dashboard(
     output_json_path: Optional[str | Path] = "ui/dashboard_data.json",
     ui_step: int = 5,
     model: Optional[WW3RiskModel] = None,
+    api_base: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Compile scenario data and generate output HTML/JSON files."""
     scenario_p = Path(scenario_path)
@@ -3443,7 +3611,7 @@ def build_dashboard(
     output_html_p.parent.mkdir(parents=True, exist_ok=True)
 
     data = generate_dashboard_data(scenario_path=scenario_p, model=model)
-    html_content = build_dashboard_html(data, ui_step=ui_step)
+    html_content = build_dashboard_html(data, ui_step=ui_step, api_base=api_base)
 
     with open(output_html_p, "w", encoding="utf-8") as f:
         f.write(html_content)
@@ -3463,6 +3631,7 @@ def main() -> None:
     parser.add_argument("--output", "-o", type=str, default="ui/dashboard.html", help="Path to output dashboard HTML")
     parser.add_argument("--json", "-j", type=str, default="ui/dashboard_data.json", help="Path to output dashboard JSON")
     parser.add_argument("--step", type=int, default=5, help="UI Step version to render (1 to 5)")
+    parser.add_argument("--api-base", type=str, default=None, help="Base URL of Cloudflare Worker API for dynamic dashboard")
 
     parsed = parser.parse_args()
     data = build_dashboard(
@@ -3470,6 +3639,7 @@ def main() -> None:
         output_html_path=parsed.output,
         output_json_path=parsed.json,
         ui_step=parsed.step,
+        api_base=parsed.api_base,
     )
     print(f"WW3 Dashboard successfully generated for {data['metadata']['active_scenario_title']} (UI-Step {parsed.step})")
     print(f"HTML output: {parsed.output}")
