@@ -115,6 +115,37 @@ REGIONAL_INDICATOR_MAPPINGS = {
         ],
         "note": "示意拆分：指標原始平均映射 [l1_maritime_chokepoints, l1_critical_minerals, l4_weaponized_interdependence]，反映關鍵礦物禁運與全球海運供應鏈梗阻。",
     },
+    "africa_sudan": {
+        "name": "東非與薩赫勒（蘇丹內戰 / 政變帶 / 糧食與氣候危機）",
+        "name_en": "East Africa & Sahel / Sudan Conflict & Food-Climate Crisis",
+        "primary_indicators": [
+            "l4_active_war_intensity",
+            "l3_civil_unrest_intensity",
+            "l1_climate_impact",
+            "l1_water_stress",
+        ],
+        "note": "示意拆分：指標原始平均映射 [l4_active_war_intensity, l3_civil_unrest_intensity, l1_climate_impact, l1_water_stress]，反映活躍內戰衝突、政變動盪、極端乾旱與人道糧食危機之複合共振。",
+    },
+    "southeast_asia": {
+        "name": "東南亞（緬甸內戰 / 湄公河跨界摩擦）",
+        "name_en": "Southeast Asia / Myanmar Conflict & Mekong Flashpoints",
+        "primary_indicators": [
+            "l4_active_war_intensity",
+            "l4_territorial_flashpoints",
+            "l3_civil_unrest_intensity",
+        ],
+        "note": "示意拆分：指標原始平均映射 [l4_active_war_intensity, l4_territorial_flashpoints, l3_civil_unrest_intensity]，反映緬甸全境多方內戰、跨界地緣摩擦與內部社會動盪。",
+    },
+    "western_europe": {
+        "name": "西歐（法意社會動盪 / 生活成本 / 勞工罷工）",
+        "name_en": "Western Europe / Civil Unrest & Cost-of-Living Stagnation",
+        "primary_indicators": [
+            "l3_civil_unrest_intensity",
+            "l5_economic_stagnation",
+            "l3_youth_unemployment",
+        ],
+        "note": "示意拆分：指標原始平均映射 [l3_civil_unrest_intensity, l5_economic_stagnation, l3_youth_unemployment]，反映主要經濟體生活成本危機、勞工總罷工、青年就業困境與城市騷亂。",
+    },
 }
 
 # Unconnected live data sources (stubs/placeholders - offline v1)
@@ -1104,7 +1135,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       <div class="panel-card">
         <div class="panel-header">
           <div class="panel-title">
-            <span>全球五大關鍵地緣戰區壓力卡列 (Regional Crisis Pressures)</span>
+            <span>全球關鍵地緣戰區壓力卡列 (Regional Crisis Pressures)</span>
           </div>
           <span class="panel-tag">ILLUSTRATIVE DECOMPOSITION · MAPPED FROM CORE INDICATORS</span>
         </div>

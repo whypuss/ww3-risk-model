@@ -66,8 +66,8 @@ def test_generate_dashboard_data_matches_cli_and_model():
     assert "hist_1990" in hist_ids
     assert "hist_2025" in hist_ids
 
-    # Regional pressures check
-    assert len(data["regional_pressures"]) == 5
+    # Regional pressures check (8 key regional crisis cards)
+    assert len(data["regional_pressures"]) == 8
     for reg in data["regional_pressures"]:
         assert "score" in reg
         assert 0.0 <= reg["score"] <= 100.0
@@ -362,7 +362,7 @@ def test_dashboard_api_base_and_offline_fallback(tmp_path):
 
 
 def test_regional_pressures_raw_average_and_formula_regression():
-    """Verify v0.4.1 regional pressure card fixes:
+    """Verify regional pressure card disciplines (expanded to 8 regions in v0.5.0):
     - base_weight multiplier is removed from all mappings
     - all indicator IDs exist in baseline scenario
     - card score strictly equals arithmetic mean of components
@@ -374,6 +374,9 @@ def test_regional_pressures_raw_average_and_formula_regression():
         middle_east: 66.5 (ELEVATED)
         south_central_asia: 63.0 (ELEVATED)
         global_chokepoints: 72.0 (HIGH)
+        africa_sudan: 69.5 (ELEVATED)
+        southeast_asia: 78.3 (HIGH)
+        western_europe: 68.3 (ELEVATED)
     """
     scenario_path = Path("scenarios/baseline_2026.json")
     scenario = load_scenario_from_file(scenario_path)
@@ -394,7 +397,7 @@ def test_regional_pressures_raw_average_and_formula_regression():
 
     # 3. Calculate regional pressures and verify arithmetic mean & components
     cards = calculate_regional_pressures(scenario)
-    assert len(cards) == 5
+    assert len(cards) == 8
 
     expected_scores = {
         "east_asia": (79.5, "HIGH"),
@@ -402,6 +405,9 @@ def test_regional_pressures_raw_average_and_formula_regression():
         "middle_east": (66.5, "ELEVATED"),
         "south_central_asia": (63.0, "ELEVATED"),
         "global_chokepoints": (72.0, "HIGH"),
+        "africa_sudan": (69.5, "ELEVATED"),
+        "southeast_asia": (78.3, "HIGH"),
+        "western_europe": (68.3, "ELEVATED"),
     }
 
     card_dict = {c["id"]: c for c in cards}
@@ -448,6 +454,39 @@ def test_regional_pressures_raises_on_missing_indicator_regression():
 
     with pytest.raises(KeyError, match="l4_military_expenditure_growth"):
         calculate_regional_pressures(corrupted)
+
+
+def test_regional_8_cards_id_integrity_and_discipline():
+    """Regression test: v0.5.0 8 regional cards ID integrity and arithmetic mean discipline."""
+    scenario_path = Path("scenarios/baseline_2026.json")
+    scenario = load_scenario_from_file(scenario_path)
+
+    expected_ids = {
+        "east_asia",
+        "eastern_europe",
+        "middle_east",
+        "south_central_asia",
+        "global_chokepoints",
+        "africa_sudan",
+        "southeast_asia",
+        "western_europe",
+    }
+    assert set(REGIONAL_INDICATOR_MAPPINGS.keys()) == expected_ids
+
+    cards = calculate_regional_pressures(scenario)
+    assert len(cards) == 8
+    assert {c["id"] for c in cards} == expected_ids
+
+    for c in cards:
+        # Card score strictly equals arithmetic mean of components
+        comp_vals = [comp["value"] for comp in c["components"]]
+        expected_avg = round(sum(comp_vals) / len(comp_vals), 1)
+        assert c["score"] == expected_avg
+        # Card formula printed
+        assert "示意拆分（指標原始平均）：" in c["formula"]
+        assert f"= {c['score']:.1f}" in c["formula"]
+        # Valid level
+        assert c["level"] in {"CRITICAL", "HIGH", "ELEVATED", "MODERATE"}
 
 
 
