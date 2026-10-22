@@ -39,6 +39,11 @@ jobs:
         run: |
           python -m pytest
 
+      - name: Run real-time pulse fetcher
+        run: |
+          echo "Running real-time pulse fetcher..."
+          python scripts/fetchers/pulse.py --output data/pulse_latest.json
+
       - name: Generate D1 snapshot JSON
         run: |
           python -m ww3_risk.cli --scenario scenarios/baseline_2026.json --export-snapshot current_snapshot.json
@@ -59,17 +64,17 @@ jobs:
           echo "Running publication release checker..."
           python scripts/fetchers/publication_checker.py --output data/candidates/publication-check.json
 
-      - name: Commit updated candidates if changed
+      - name: Commit updated pulse and candidates if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if ! git diff --quiet data/candidates; then
-            echo "Detected changes in data/candidates, committing..."
-            git add data/candidates
-            git commit -m "chore(data): update candidate observations and publication status [skip ci]"
+          if ! git diff --quiet data/candidates data/pulse_latest.json 2>/dev/null; then
+            echo "Detected changes in pulse or candidates, committing..."
+            git add data/candidates data/pulse_latest.json
+            git commit -m "chore(data): update pulse signals and candidate observations [skip ci]"
             git push
           else
-            echo "No changes in candidate observations."
+            echo "No changes in pulse or candidate observations."
           fi
 
       - name: Build dynamic dashboard HTML with API base
