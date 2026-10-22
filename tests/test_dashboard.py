@@ -7,6 +7,7 @@ import json
 import re
 from pathlib import Path
 
+from ww3_risk import __version__
 from ww3_risk.dashboard import (
     build_dashboard,
     build_dashboard_html,
@@ -313,7 +314,7 @@ def test_dashboard_v03_terminology_and_credibility_separation(tmp_path):
     assert "100.0%" in content  # Completeness pct
 
     # 5. Metadata and JSON audit
-    assert data["metadata"]["model_version"] in {"0.5.0", "0.6.0"}
+    assert data["metadata"]["model_version"] == __version__
     assert "data_quality" in data
     assert data["data_quality"]["completeness_pct"] == 100.0
     assert "evidence_distribution" in data
@@ -529,6 +530,31 @@ def test_pulse_layer_card_and_trend_svg_rendering(tmp_path):
     # 4. Zero external CDN scripts or stylesheets
     external_links = re.findall(r'(src|href)=["\']https?://[^"\']+["\']', content)
     assert len(external_links) == 0, f"Found external web dependencies: {external_links}"
+
+
+def test_dashboard_header_version_matches_package_version(tmp_path):
+    """Regression test: dashboard header brand subtitle and metadata dynamically reflect package __version__."""
+    out_html = tmp_path / "dashboard.html"
+    out_json = tmp_path / "dashboard_data.json"
+    build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        output_json_path=out_json,
+        ui_step=5,
+    )
+    content = out_html.read_text(encoding="utf-8")
+    data = json.loads(out_json.read_text(encoding="utf-8"))
+
+    # Assert model_version in JSON metadata matches __version__
+    assert data["metadata"]["model_version"] == __version__
+
+    # Assert HTML header brand-sub dynamically reflects __version__
+    expected_brand_sub = f"DEFENSE INTELLIGENCE &amp; SYSTEMIC CRISIS TERMINAL · v{__version__}"
+    assert expected_brand_sub in content
+
+    # Assert footer / offline model version reflects __version__
+    assert f"Model Version: {__version__}" in content
+
 
 
 

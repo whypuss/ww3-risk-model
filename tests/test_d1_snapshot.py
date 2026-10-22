@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from ww3_risk import __version__
 from ww3_risk.indicators import load_scenario_from_file
 from ww3_risk.model import WW3RiskModel
 from ww3_risk.snapshot import create_snapshot, export_snapshot_to_file
@@ -58,7 +59,7 @@ def test_snapshot_structure_integrity():
     assert "pulse_json" in snap
     assert snap["stage"] == 3
     assert snap["computed_at"] == "2026-10-21T14:38:00Z"
-    assert snap["model_version"] == "0.6.0"
+    assert snap["model_version"] == __version__
 
     # Check layers JSON inside snapshot
     layers = json.loads(snap["layers_json"])

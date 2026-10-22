@@ -14,6 +14,7 @@ import math
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from . import __version__
 from .indicators import ScenarioData, load_scenario_from_file
 from .model import WW3RiskModel, RiskResult
 
@@ -483,7 +484,7 @@ def generate_dashboard_data(
         "metadata": {
             "title": "WW3 戰爭風險指數儀表板",
             "title_en": "WW3 War Risk Index Dashboard",
-            "model_version": "0.6.0",
+            "model_version": __version__,
             "generated_at": "2026-10-22",
             "active_scenario_id": main_scenario.id,
             "active_scenario_title": main_scenario.title,
@@ -4023,7 +4024,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       <div class="radar-icon"></div>
       <div>
         <div class="brand-title">WW3 戰爭風險指數儀表板 <span class="brand-title-en" style="font-weight:400;font-size:0.85rem;color:var(--text-dim);">WW3 War Risk Index</span></div>
-        <div class="brand-sub">DEFENSE INTELLIGENCE &amp; SYSTEMIC CRISIS TERMINAL · v0.5.0</div>
+        <div class="brand-sub">DEFENSE INTELLIGENCE &amp; SYSTEMIC CRISIS TERMINAL · v{data['metadata']['model_version']}</div>
       </div>
     </div>
     <div class="top-meta">

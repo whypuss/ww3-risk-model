@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import List, Optional
+from . import __version__
 from .model import RiskResult
 from .indicators import ScenarioData
 
@@ -13,7 +14,7 @@ def generate_markdown_report(result: RiskResult, scenario: Optional[ScenarioData
 
     lines.append(f"# WW3 結構風險評估報告：{result.scenario_title}")
     lines.append("")
-    lines.append(f"> **情境識別碼**：`{result.scenario_id}` | **年份**：{result.scenario_year} | **模型版本**：v0.5.0")
+    lines.append(f"> **情境識別碼**：`{result.scenario_id}` | **年份**：{result.scenario_year} | **模型版本**：v{__version__}")
     lines.append("")
 
     # 1. 核心評估摘要

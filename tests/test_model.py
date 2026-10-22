@@ -19,6 +19,7 @@ import json
 from pathlib import Path
 import pytest
 
+from ww3_risk import __version__
 from ww3_risk.indicators import (
     Indicator,
     LayerData,
@@ -407,6 +408,7 @@ def test_markdown_report_generation(baseline_scenario: ScenarioData, model: WW3R
     md = generate_markdown_report(res)
 
     assert "# WW3 結構風險評估報告" in md
+    assert f"**模型版本**：v{__version__}" in md
     assert "戰爭風險指數 (War Risk Index)" in md
     assert "五層結構風險明細" in md
     assert "和平機制閘門分析" in md
