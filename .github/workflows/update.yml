@@ -2,8 +2,8 @@ name: Daily Update & Model Recalculation Pipeline
 
 on:
   schedule:
-    # 00:00 UTC = 08:00 Asia/Macau morning daily calculation run
-    - cron: '0 0 * * *'
+    # 測試階段：每小時；穩定後改回每日
+    - cron: '0 * * * *'
   workflow_dispatch:
 
 permissions:
