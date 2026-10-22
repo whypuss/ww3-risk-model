@@ -1,12 +1,12 @@
 # WW3 風險預估模型 (WW3 Risk Model)
 
-[![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-blue.svg)](pyproject.toml)
+[![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-blue.svg)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python: 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
-[![Tests: Pytest](https://img.shields.io/badge/Tests-48%20Passed%20(Python)%20%2B%208%20(Node)-brightgreen.svg)](tests/)
+[![Tests: Pytest](https://img.shields.io/badge/Tests-56%20Passed%20(Python)%20%2B%2011%20(Node)-brightgreen.svg)](tests/)
 
-> **五層結構風險指數 × 和平機制失效閘門 × 超線性互動效應 × 四階段衝突定位**  
-> *Five-layer structural risk index: resources, distribution, labor/AI displacement, power/security dilemma, future fear, gated by peace-mechanism failure.*
+> **五層結構風險指數 × 和平機制失效閘門 × 即時外生脈搏修正 × 四階段衝突定位**  
+> *Two-tier risk terminal: slow-moving five-layer structural index combined with fast-moving real-time geopolitical pulse (GDELT, Polymarket, Brent crude), gated by peace failure.*
 
 ---
 
@@ -60,6 +60,56 @@ flowchart TD
     Index --> Stage["四階段危機定位 (Stage 1 – 4)"]
     Index --> Bands["1年 / 5年 / 10年 情境概率帶"]
 ```
+
+---
+
+## 雙層指數架構：結構指數 ＋ 即時脈搏 (Two-Tier Index Architecture)
+
+為兼顧**「宏觀結構慢變數」**與**「地緣突發快變數」**，v0.6.0 起總指數拆為兩層公開呈現，拒絕黑箱混合：
+
+$$\text{綜合指數 (Composite Index)} = \text{clamp}(\text{結構指數 (Structural Index)} + \text{即時脈搏 (Pulse Adjustment)},\ 0,\ 100)$$
+
+```mermaid
+flowchart LR
+    subgraph Tier1 ["結構層 (Structural Tier · 慢變數)"]
+        S_Model["五層模型 + 和平閘門<br>(36項審核指標 · 慢變結構)"] --> S_Val["結構指數 Structural Index<br>例: 83.50 分"]
+    end
+
+    subgraph Tier2 ["脈搏層 (Pulse Tier · 快變數)"]
+        GDELT["GDELT 2.0 全球衝突聲量 (權重 40%)"]
+        POLY["Polymarket 戰爭市場機率 (權重 35%)"]
+        OIL["Brent 原油 24h 價格變動 (權重 25%)"]
+        GDELT & POLY & OIL --> Norm["標準化錨定 [-1, +1]"]
+        Norm --> Weighted["加權合成 × 10.0"]
+        Weighted --> Pulse_Val["即時脈搏 Pulse Adjustment<br>有界範圍 [-10.0, +10.0]"]
+    end
+
+    S_Val & Pulse_Val --> Composite["綜合指數 Composite Index<br>clamp(Structural + Pulse, 0, 100)"]
+```
+
+### 1. 誠實定性標記 (Epistemological Positioning)
+> **「綜合指數係情境合成值、唔係統計預測」**  
+> 結構指數（83.5 分）評估國際體系客觀易燃程度與承壓臨界點；即時脈搏（±10 分範圍內）反映全球突發軍事事件新聞聲量、大眾預測市場隱含賠率與能源市場即時恐慌。兩者於 API 與儀表板界面分開列明，各自可單獨查驗。
+
+### 2. 即時訊號來源、標準化公式與錨點
+所有即時來源均為**公開、免費、免金鑰、CI/CD 與 Actions 環境可直連**：
+
+| 即時訊號 (Signal) | 資料來源 (Source) | 監測對象與口徑 | 權重 | 標準化公式與固定錨點 | 備註與容錯 |
+| :--- | :--- | :--- | :---: | :--- | :--- |
+| **GDELT 衝突動盪聲量** | GDELT 2.0 Doc TimelineVol API | 過去 24h 全球衝突/戰爭/軍事新聞聲量強度佔比 | 40% (0.40) | $s_1 = \text{clamp}\left(\frac{\text{raw} - \text{baseline}}{1.75},\ -1.0,\ 1.0\right)$<br>動態取過去 30 天均值為 baseline（預設錨點 3.50%） | 5s 頻率限制，遇限流或逾時自動標註 UNAVAILABLE 且貢獻記 0 |
+| **Polymarket 戰爭機率籃子** | Polymarket Gamma API | 活躍重大軍事衝突預測市場 Yes 機率平均（美俄軍事衝突、俄羅斯入侵北約、北約/歐盟部隊烏克蘭參戰） | 35% (0.35) | $s_2 = \text{clamp}\left(\frac{P_{yes} - 0.05}{0.10},\ -1.0,\ 1.0\right)$<br>以當前地緣緊張下 5.0% 機率為中性基準，每增減 10.0% 對應 $\pm 1.0$ | 只採納高流動性真實戰爭市場，無相關市場時如實留空 |
+| **Brent 原油 24h 變動** | Stooq CSV / Yahoo Finance API | Brent 近月期貨 24 小時價格漲跌百分比 $\Delta P\%$ | 25% (0.25) | $s_3 = \text{clamp}\left(\frac{\Delta P\%}{10.0},\ -1.0,\ 1.0\right)$<br>每 $\pm 10.0\%$ 價格衝擊對應 $\pm 1.0$ 得分 | Stooq 優先嘗試（3s 逾時），遇斷線自動回退至 Yahoo Finance (BZ=F) |
+
+### 3. 合成與有界約束 (Bounded Clamp)
+- 各訊號貢獻分：$C_i = \text{round}(w_i \times s_i \times 10.0,\ 2)$。
+- 脈搏修正值：$\text{pulse\_adjustment} = \text{clamp}\left(\sum C_i,\ -10.0,\ +10.0\right)$。
+- **降級容錯紀律**：任一來源若遇網絡波動或數據未更新，該來源貢獻記 0 分並於明細標註 `UNAVAILABLE`，絕不讓管線崩潰，亦**嚴禁使用舊值冒充即時新值**。
+
+### 4. 分數歷史趨勢（日線／月線 SQL 聚合與嚴格歷史真實性）
+快照每小時入庫 Cloudflare D1，日／月趨勢序列直接由 Worker 執行 SQL 聚合，口徑寫死：
+- **日點 (Daily)**：當日最後一份快照（UTC 計）之綜合指數與結構指數。
+- **月點 (Monthly)**：當月所有日點 composite 之算術平均，附帶當月記錄日數 $n$（防範單日數據冒充成熟月度）。
+- **嚴禁補造歷史紀律**：真實快照自 **2026-10-21** 上線起老實記錄，儀表板 SVG 線性圖從當日畫起；1913/1938/1962/1990/2025 五個回溯基準情境保留獨立標記，不混入日／月線冒充連續序列。
 
 ---
 
@@ -347,6 +397,32 @@ print(f"風險指數: {result.global_risk_index:.1f}, 階段: {result.stage.titl
 ---
 
 ## 版本變更記錄 (Changelog)
+
+### v0.6.0 (2026-10-22) — 即時脈搏層（雙層指數合成）+ 即時訊號抓取（GDELT/Polymarket/Brent油價）+ 分數歷史趨勢（日/月線 SQL 聚合與 SVG 圖表）
+- **雙層總指數設計**：
+  * 指數正式拆分為慢變的「結構指數（Structural Index）」與每小時管線快變的「即時脈搏（Pulse Adjustment）」，合成「綜合指數（Composite Index = clamp(structural + pulse, 0, 100)）」。
+  * 嚴格定性標記：「綜合指數係情境合成值、唔係統計預測」。
+  * 脈搏修正值嚴格有界於 $[−10.0, +10.0]$ 分之內，每個外生訊號之原始值、來源、標準化得分與貢獻分逐項列明。
+- **三大免費公開外生訊號源（實測連通）**：
+  1. **GDELT 2.0 Doc TimelineVol API**（權重 40%）：全球衝突/動盪新聞聲量強度佔比，動態以過去 30 天均值為錨點（預設 3.50%），每 $\pm 1.75\%$ 偏差對應 $\pm 1.0$ 得分。
+  2. **Polymarket Gamma API**（權重 35%）：監測美俄直接軍事衝突、俄羅斯入侵北約國家、北約部隊烏克蘭參戰之活躍 Yes 機率，以 5.0% 機率為中性基準，每增減 10.0% 對應 $\pm 1.0$ 得分。
+  3. **Brent 原油 24h 價格變動**（權重 25%）：Stooq CSV 優先（3s 逾時），遇阻斷自動回退至 Yahoo Finance API（`BZ=F`），每 $\pm 10.0\%$ 價格衝擊對應 $\pm 1.0$ 得分。
+  * 容錯降級紀律：任一來源抓取失敗，該訊號貢獻記 0 分並標註 `UNAVAILABLE`，絕不讓管線中斷，嚴禁以舊值充當新值。
+- **管線與 D1 儲存向後兼容擴充**：
+  * 新增 `scripts/fetchers/pulse.py`，每小時排程產出 `data/pulse_latest.json` 並自動提交存檔（`[skip ci]`）。
+  * D1 `index_snapshots` 擴充 `structural_index`, `pulse_adjustment`, `composite_index`, `pulse_json` 欄位；舊欄位 `total_index` 保持與 `composite_index` 同值以保證既有客戶端 100% 向後相容。
+- **Worker API 擴充**：
+  * `GET /api/risk/latest`：回傳 `composite_index`, `structural_index`, `pulse_adjustment`, `pulse` 明細及 `total_index`。
+  * `GET /api/pulse/latest`：新增獨立脈搏查詢端點。
+  * `GET /api/risk/history?granularity=daily|monthly`：新增日線（每日最後快照，UTC 計）與月線（當月日點平均，附帶記錄日數 $n$）SQL 聚合查詢；無參數時保留原樣。
+- **儀表板升級（主 Gauge 綜合指數 + 即時脈搏卡 + 日/月線 SVG 趨勢圖）**：
+  * 主儀表盤大字改為顯示「綜合指數」，隔離並列顯示「結構基準（83.5）」與「即時脈搏（如 -0.12）」。
+  * 新增「即時脈搏層」卡片，以表格逐項呈現 3 大訊號之觀測值、權重、貢獻分與連通狀態。
+  * 歷史區新增零 CDN、純手寫 SVG 日/月線切換線性圖，實線畫綜合指數、虛線對照結構指數，點位具備 hover tooltip；真實歷史由 2026-10-21 正式上線日起算，**嚴禁補造歷史**。
+- **單元與模擬測試**：
+  * 新增 `tests/test_pulse_fetcher.py`（全 mock 測試、clamp 邊界、全滅降級、單源失效等情景）。
+  * 擴充 Worker Node 測試（覆蓋 daily/monthly SQL 聚合、最新脈搏端點等）。
+  * 測試總數升至 67 項（Python pytest 56 + Worker Node 11）全部 PASS。
 
 ### v0.5.0 (2026-10-22) — 每小時自動更新 + 關鍵戰區擴充（5→8） + 新增活躍戰爭與社會動盪指標
 - **驗收查證與口徑校正**：

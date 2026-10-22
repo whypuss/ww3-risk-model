@@ -58,7 +58,7 @@ def test_snapshot_structure_integrity():
     assert "pulse_json" in snap
     assert snap["stage"] == 3
     assert snap["computed_at"] == "2026-10-21T14:38:00Z"
-    assert snap["model_version"] == "0.5.0"
+    assert snap["model_version"] == "0.6.0"
 
     # Check layers JSON inside snapshot
     layers = json.loads(snap["layers_json"])
