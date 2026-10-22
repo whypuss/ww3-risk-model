@@ -1,9 +1,8 @@
 name: Daily Update & Model Recalculation Pipeline
 
 on:
-  schedule:
-    # 測試階段：每小時；穩定後改回每日（2026-10-22 重新註冊 scheduler 觸發）
-    - cron: '0 * * * *'
+  # 注意：GitHub schedule 觸發器於 2026-10-22 連續三輪未被 scheduler 認可（已嘗試重新註冊＋disable/enable 均無效），
+  # 現改由外部每小時觸發 workflow_dispatch；若日後 GitHub 修復 scheduler，勿同時恢復 schedule 以免重複跑。
   workflow_dispatch:
 
 permissions:
