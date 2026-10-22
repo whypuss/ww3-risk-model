@@ -439,11 +439,11 @@ def test_cli_data_quality_json(capsys):
     cli_main(["--data-quality", "--scenario", str(BASELINE_FILE), "--json"])
     captured = capsys.readouterr()
     data = json.loads(captured.out)
-    assert data["total_indicators"] == 34
+    assert data["total_indicators"] == 36
     assert data["completeness_pct"] == 100.0
     assert data["fresh_count"] >= 1
     assert data["missing_count"] == 0
-    assert len(data["items"]) == 34
+    assert len(data["items"]) == 36
 
 
 def test_indicator_staleness_and_missing_detection():
@@ -522,14 +522,55 @@ def test_cli_historical(capsys):
 
 def test_evidence_counts_breakdown(baseline_scenario: ScenarioData, model: WW3RiskModel):
     res = model.evaluate(baseline_scenario)
-    # v0.3: 7 verified, 20 inference, 7 illustrative (total 34)
-    assert res.evidence_counts["verified"] == 7
-    assert res.evidence_counts["inference"] == 20
+    # v0.5: 8 verified, 21 inference, 7 illustrative (total 36)
+    assert res.evidence_counts["verified"] == 8
+    assert res.evidence_counts["inference"] == 21
     assert res.evidence_counts["illustrative"] == 7
     assert res.evidence_counts["verified"] + res.evidence_counts["inference"] >= 25
     assert sum(res.evidence_counts.values()) == len(baseline_scenario.gate_buffers) + sum(
         len(layer.indicators) for layer in baseline_scenario.layers.values()
     )
+
+
+def test_new_v05_indicators_quality_and_fields(baseline_scenario: ScenarioData):
+    """Regression test: v0.5 new indicators (l4_active_war_intensity and l3_civil_unrest_intensity).
+
+    Must have complete v0.3 data-quality fields, traceable sources, valid evidence levels,
+    and non-empty normalization methods and scoring rubrics.
+    """
+    l4_inds = {ind.id: ind for ind in baseline_scenario.layers["L4"].indicators}
+    l3_inds = {ind.id: ind for ind in baseline_scenario.layers["L3"].indicators}
+
+    assert "l4_active_war_intensity" in l4_inds
+    assert "l3_civil_unrest_intensity" in l3_inds
+
+    war_ind = l4_inds["l4_active_war_intensity"]
+    assert war_ind.evidence_level == "verified"
+    assert "UCDP" in war_ind.source_name
+    assert war_ind.raw_value == 159800
+    assert "clamp" in war_ind.normalization_method
+    assert war_ind.scoring_rubric
+    assert war_ind.source_url.startswith("https://")
+    assert war_ind.value == 82.0
+
+    unrest_ind = l3_inds["l3_civil_unrest_intensity"]
+    assert unrest_ind.evidence_level == "inference"
+    assert "ACLED" in unrest_ind.source_name
+    assert unrest_ind.raw_value == 38500
+    assert "clamp" in unrest_ind.normalization_method
+    assert unrest_ind.scoring_rubric
+    assert unrest_ind.source_url.startswith("https://")
+    assert unrest_ind.value == 73.0
+
+    # Ensure full fields are non-empty for both
+    for ind in (war_ind, unrest_ind):
+        assert ind.applicability_note
+        assert ind.uncertainty_note
+        assert ind.retrieval_note
+        assert ind.raw_unit
+        assert ind.observation_date
+        assert ind.publication_date
+        assert ind.last_checked
 
 
 def test_interaction_cap_enforcement(model: WW3RiskModel):

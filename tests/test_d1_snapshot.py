@@ -52,7 +52,7 @@ def test_snapshot_structure_integrity():
 
     snap = snap_data["snapshot"]
     assert snap["scenario_id"] == "baseline_2026"
-    assert round(snap["total_index"], 1) == 83.1
+    assert round(snap["total_index"], 1) == 83.5
     assert snap["stage"] == 3
     assert snap["computed_at"] == "2026-10-21T14:38:00Z"
     assert snap["model_version"] == "0.4.1"
@@ -67,9 +67,9 @@ def test_snapshot_structure_integrity():
     drivers = json.loads(snap["drivers_json"])
     assert len(drivers) >= 3
 
-    # Check 34 observations (30 layer indicators + 4 gate buffers)
+    # Check 36 observations (32 layer indicators + 4 gate buffers)
     obs = snap_data["observations"]
-    assert len(obs) == 34
+    assert len(obs) == 36
     layers_seen = {o["layer"] for o in obs}
     assert layers_seen == {"L1", "L2", "L3", "L4", "L5", "Gate"}
 
@@ -109,15 +109,16 @@ def test_snapshot_sql_insert_and_roundtrip():
     row = cursor.fetchone()
     assert row is not None
     assert row[1] == "baseline_2026"
-    assert round(row[2], 1) == 83.1
+    assert round(row[2], 1) == 83.5
     assert row[3] == 3
     layers_back = json.loads(row[4])
-    assert round(layers_back["L4"], 1) == 74.5
+    assert round(layers_back["L4"], 1) == 75.5
+    assert round(layers_back["L3"], 1) == 66.0
 
     # Query observations count and staleness
     cursor.execute("SELECT COUNT(*), SUM(is_stale) FROM indicator_observations WHERE snapshot_id = ?", (row[0],))
     total_count, stale_count = cursor.fetchone()
-    assert total_count == 34
+    assert total_count == 36
     assert stale_count > 0
 
     # Query specific indicator
@@ -164,8 +165,8 @@ def test_cli_export_snapshot_flag(tmp_path):
         data = json.load(f)
     assert "snapshot" in data
     assert "observations" in data
-    assert len(data["observations"]) == 34
-    assert round(data["snapshot"]["total_index"], 1) == 83.1
+    assert len(data["observations"]) == 36
+    assert round(data["snapshot"]["total_index"], 1) == 83.5
 
 
 def test_sql_statement_parameter_limit_regression():

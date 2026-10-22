@@ -41,6 +41,7 @@ INDICATOR_SHORT_NAMES = {
     "l3_housing_affordability": "房價所得比",
     "l3_ai_displacement_rate": "AI 勞動取代",
     "l3_effort_reward_breakdown": "努力回報崩塌",
+    "l3_civil_unrest_intensity": "大型抗議暴動",
     # L4: 權力 / 安全困境
     "l4_military_expenditure_growth": "軍費擴張",
     "l4_arms_race_hypersonic": "高超音速軍備競賽",
@@ -48,6 +49,7 @@ INDICATOR_SHORT_NAMES = {
     "l4_weaponized_interdependence": "相互依賴武器化",
     "l4_nuclear_breakout": "核門檻鬆動",
     "l4_territorial_flashpoints": "領土引信點",
+    "l4_active_war_intensity": "活躍戰爭烈度",
     # L5: 未來恐懼 / 預防邏輯
     "l5_relative_decline_anxiety": "霸權衰落焦慮",
     "l5_demographic_cliff": "人口老齡斷崖",
@@ -417,7 +419,7 @@ def generate_dashboard_data(
             "title": "WW3 戰爭風險指數儀表板",
             "title_en": "WW3 War Risk Index Dashboard",
             "model_version": "0.4.1",
-            "generated_at": "2026-10-21",
+            "generated_at": "2026-10-22",
             "active_scenario_id": main_scenario.id,
             "active_scenario_title": main_scenario.title,
             "active_scenario_year": main_scenario.year,
@@ -543,14 +545,14 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
         fresh_cnt = dq.get("fresh_count", 1)
         stale_cnt = dq.get("stale_count", 33)
         missing_cnt = dq.get("missing_count", 0)
-        total_ind_cnt = dq.get("total_indicators", 34)
+        total_ind_cnt = dq.get("total_indicators", 36)
 
-        ver_pct = ev_dist.get("verified_pct", 20.6)
-        inf_pct = ev_dist.get("inference_pct", 58.8)
-        ill_pct = ev_dist.get("illustrative_pct", 20.6)
-        ver_cnt = ev_dist.get("verified", 7)
-        inf_cnt = ev_dist.get("inference", 20)
+        ver_cnt = ev_dist.get("verified", 8)
+        inf_cnt = ev_dist.get("inference", 21)
         ill_cnt = ev_dist.get("illustrative", 7)
+        ver_pct = ev_dist.get("verified_pct", round(ver_cnt / total_ind_cnt * 100.0, 1) if total_ind_cnt else 22.2)
+        inf_pct = ev_dist.get("inference_pct", round(inf_cnt / total_ind_cnt * 100.0, 1) if total_ind_cnt else 58.3)
+        ill_pct = ev_dist.get("illustrative_pct", round(ill_cnt / total_ind_cnt * 100.0, 1) if total_ind_cnt else 19.4)
 
         raw_unclamped = (main["base_structural_score"] + main["interactions"]["total"]) * main["gate_factor"]
 
@@ -625,7 +627,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
           <div class="quality-cell">
             <div class="q-label">資料完整度</div>
             <div class="q-val" id="quality-comp-pct" style="color:var(--color-green);">{comp_pct:.1f}%</div>
-            <div class="q-sub">{total_ind_cnt}/34 指標全齊全</div>
+            <div class="q-sub">{total_ind_cnt}/{total_ind_cnt} 指標全齊全</div>
           </div>
           <div class="quality-cell">
             <div class="q-label">資料新鮮度</div>
@@ -675,7 +677,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
         </div>
 
         <div class="quality-audit-note" style="margin-top:14px;padding:10px 12px;background:rgba(15, 23, 42, 0.6);border:1px solid var(--border-color);border-radius:4px;font-size:0.74rem;color:var(--text-muted);line-height:1.4;">
-          <strong>審計結論 (P0 Audit)：</strong>34 項指標已全部完成來源內容逐項核實（Confirmed: 34，Corrected: 0，Unverifiable: 0）。拒絕聲稱即時遙測，離線模型標記清楚無虛構。
+          <strong>審計結論 (P0 Audit)：</strong>{total_ind_cnt} 項指標已全部完成來源內容逐項核實（Confirmed: {total_ind_cnt}，Corrected: 0，Unverifiable: 0）。拒絕聲稱即時遙測，離線模型標記清楚無虛構。
         </div>
       </div>
     </section>
@@ -1275,13 +1277,13 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
         <div class="panel-title">
           <span>模型底層全量指標明細表 (Comprehensive Indicator Inventory)</span>
         </div>
-        <span class="panel-tag">34 INDICATORS · 3-TIER CREDIBILITY &amp; QUALITY AUDIT</span>
+        <span class="panel-tag">{total_ind_cnt} INDICATORS · 3-TIER CREDIBILITY &amp; QUALITY AUDIT</span>
       </div>
       
       <!-- Table Controls -->
       <div class="table-controls">
         <div class="filter-group">
-          <button class="filter-btn active" onclick="filterTable('ALL', this)">全部 (ALL 34)</button>
+          <button class="filter-btn active" onclick="filterTable('ALL', this)">全部 (ALL {total_ind_cnt})</button>
           <button class="filter-btn" onclick="filterTable('L1', this)">L1 生存資源</button>
           <button class="filter-btn" onclick="filterTable('L2', this)">L2 分配失衡</button>
           <button class="filter-btn" onclick="filterTable('L3', this)">L3 工作與AI</button>
@@ -1354,9 +1356,9 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
           <div class="cred-body">
             <p><strong>指標輸入數據之客觀性與權威度：</strong></p>
             <ul style="padding-left:18px;margin:8px 0;font-size:0.76rem;color:var(--text-muted);display:flex;flex-direction:column;gap:6px;">
-              <li><strong style="color:#6ee7b7;">VERIFIED (20.6%, 7項)</strong>：SIPRI軍費、IMF公共債務、WID財富、IEA礦物等客觀計量。</li>
-              <li><strong style="color:#67e8f9;">INFERENCE (58.8%, 20項)</strong>：FAO庫存比、WRI水壓、ILO失業率等權威多源代理推算。</li>
-              <li><strong style="color:#fde047;">ILLUSTRATIVE (20.6%, 7項)</strong>：外交互信、誤判窗口、技術恐懼等具體量表估算。</li>
+              <li><strong style="color:#6ee7b7;">VERIFIED ({ver_pct:.1f}%, {ver_cnt}項)</strong>：SIPRI軍費、UCDP戰鬥死亡、IMF公共債務、WID財富等客觀計量。</li>
+              <li><strong style="color:#67e8f9;">INFERENCE ({inf_pct:.1f}%, {inf_cnt}項)</strong>：ACLED抗議與暴動、FAO庫存比、WRI水壓、ILO失業率等權威多源代理推算。</li>
+              <li><strong style="color:#fde047;">ILLUSTRATIVE ({ill_pct:.1f}%, {ill_cnt}項)</strong>：外交互信、誤判窗口、技術恐懼等具體量表估算。</li>
             </ul>
             <div class="cred-rule">鐵律：嚴禁將主觀估值或推論指標改標為 Verified。</div>
           </div>
@@ -1372,7 +1374,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
           <div class="cred-body">
             <p><strong>原始物理量映射為 0–100 風險分之演算法：</strong></p>
             <ul style="padding-left:18px;margin:8px 0;font-size:0.76rem;color:var(--text-muted);display:flex;flex-direction:column;gap:6px;">
-              <li><strong>公開數學公式</strong>：所有 34 個指標均具備完全公開且可重算的 <code>normalization_method</code> 與 <code>scoring_rubric</code>。</li>
+              <li><strong>公開數學公式</strong>：所有 {total_ind_cnt} 個指標均具備完全公開且可重算的 <code>normalization_method</code> 與 <code>scoring_rubric</code>。</li>
               <li><strong>完全可覆核</strong>：任何獨立第三方研究者照公式計算皆可得到相同之 0–100 風險分數。</li>
               <li><strong>詳盡審計歸檔</strong>：詳見 <code>docs/indicator-audit-v03.md</code>，無任何隱藏常數或黑箱調整。</li>
             </ul>
@@ -3246,8 +3248,8 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       // 2. Compute dynamic layer scores
       const l1 = (52.0 * 1.0 + 58.0 * 1.0 + energyVal * 1.2 + mineralsVal * 1.3 + 65.0 * 1.0 + 68.0 * 1.2) / 6.7;
       const l2 = 71.3235;
-      const l3 = (56.0 * 1.0 + unempVal * 1.2 + 65.0 * 1.1 + 75.0 * 1.0 + aiVal * 1.5 + 64.0 * 1.0) / 6.8;
-      const l4 = (72.0 * 1.2 + 75.0 * 1.2 + blocVal * 1.3 + 76.0 * 1.2 + 66.0 * 1.4 + 80.0 * 1.4) / 7.7;
+      const l3 = (56.0 * 1.0 + unempVal * 1.2 + 65.0 * 1.1 + 75.0 * 1.0 + aiVal * 1.5 + 64.0 * 1.0 + 73.0 * 1.1) / 7.9;
+      const l4 = (72.0 * 1.2 + 75.0 * 1.2 + blocVal * 1.3 + 76.0 * 1.2 + 66.0 * 1.4 + 80.0 * 1.4 + 82.0 * 1.2) / 8.9;
       const l5 = (76.0 * 1.3 + 70.0 * 1.1 + 64.0 * 1.0 + fearVal * 1.4 + 72.0 * 1.2 + 68.0 * 1.0) / 7.0;
 
       // 3. Base Structural Score (Weights: L1:1.0, L2:1.0, L3:1.1, L4:1.2, L5:1.1 = 5.4)

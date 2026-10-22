@@ -36,7 +36,7 @@ def create_snapshot(
 
     Contains:
     - 'snapshot': Row dict for `index_snapshots` table
-    - 'observations': List of row dicts for `indicator_observations` table (34 total)
+    - 'observations': List of row dicts for `indicator_observations` table (36 total)
     """
     if model is None:
         model = WW3RiskModel()

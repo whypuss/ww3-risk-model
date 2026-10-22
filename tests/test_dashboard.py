@@ -34,7 +34,7 @@ def test_generate_dashboard_data_matches_cli_and_model():
     # Verify numbers match CLI and core model exactly
     main_res = data["main_result"]
     assert round(main_res["global_risk_index"], 1) == round(expected_result.global_risk_index, 1)
-    assert round(main_res["base_structural_score"], 1) == round(expected_result.base_structural_score, 1)
+    assert abs(main_res["base_structural_score"] - expected_result.base_structural_score) < 0.05
     assert main_res["stage"]["number"] == expected_result.stage.stage_number
     assert main_res["stage"]["title"] == expected_result.stage.title
     assert round(main_res["gate_factor"], 3) == round(expected_result.gate_factor, 3)
@@ -138,8 +138,8 @@ def test_simulator_formula_consistency():
 
     l1 = (52.0 * 1.0 + 58.0 * 1.0 + energy_val * 1.2 + minerals_val * 1.3 + 65.0 * 1.0 + 68.0 * 1.2) / 6.7
     l2 = 71.32352941176471
-    l3 = (56.0 * 1.0 + unemp_val * 1.2 + 65.0 * 1.1 + 75.0 * 1.0 + ai_val * 1.5 + 64.0 * 1.0) / 6.8
-    l4 = (72.0 * 1.2 + 75.0 * 1.2 + bloc_val * 1.3 + 76.0 * 1.2 + 66.0 * 1.4 + 80.0 * 1.4) / 7.7
+    l3 = (56.0 * 1.0 + unemp_val * 1.2 + 65.0 * 1.1 + 75.0 * 1.0 + ai_val * 1.5 + 64.0 * 1.0 + 73.0 * 1.1) / 7.9
+    l4 = (72.0 * 1.2 + 75.0 * 1.2 + bloc_val * 1.3 + 76.0 * 1.2 + 66.0 * 1.4 + 80.0 * 1.4 + 82.0 * 1.2) / 8.9
     l5 = (76.0 * 1.3 + 70.0 * 1.1 + 64.0 * 1.0 + fear_val * 1.4 + 72.0 * 1.2 + 68.0 * 1.0) / 7.0
 
     base_structural = (l1 * 1.0 + l2 * 1.0 + l3 * 1.1 + l4 * 1.2 + l5 * 1.1) / 5.4
@@ -317,8 +317,8 @@ def test_dashboard_v03_terminology_and_credibility_separation(tmp_path):
     assert "data_quality" in data
     assert data["data_quality"]["completeness_pct"] == 100.0
     assert "evidence_distribution" in data
-    assert data["evidence_distribution"]["verified"] == 7
-    assert data["evidence_distribution"]["inference"] == 20
+    assert data["evidence_distribution"]["verified"] == 8
+    assert data["evidence_distribution"]["inference"] == 21
     assert data["evidence_distribution"]["illustrative"] == 7
 
 
@@ -448,6 +448,7 @@ def test_regional_pressures_raises_on_missing_indicator_regression():
 
     with pytest.raises(KeyError, match="l4_military_expenditure_growth"):
         calculate_regional_pressures(corrupted)
+
 
 
 
