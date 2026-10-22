@@ -2,7 +2,7 @@ name: Daily Update & Model Recalculation Pipeline
 
 on:
   schedule:
-    # 測試階段：每小時；穩定後改回每日
+    # 測試階段：每小時；穩定後改回每日（2026-10-22 重新註冊 scheduler 觸發）
     - cron: '0 * * * *'
   workflow_dispatch:
 
