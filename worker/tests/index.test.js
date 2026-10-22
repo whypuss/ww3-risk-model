@@ -11,9 +11,19 @@ import worker from "../src/index.js";
 const MOCK_SNAPSHOT = {
   id: "snapshot_baseline_2026_test",
   computed_at: "2026-10-21T14:38:00Z",
-  model_version: "0.4.0",
+  model_version: "0.6.0",
   scenario_id: "baseline_2026",
   total_index: 83.1,
+  structural_index: 83.5,
+  pulse_adjustment: -0.4,
+  composite_index: 83.1,
+  pulse_json: JSON.stringify({
+    computed_at: "2026-10-21T14:38:00Z",
+    pulse_adjustment: -0.4,
+    signals: {
+      polymarket_war_risk: { contribution: -0.4 },
+    },
+  }),
   stage: 3,
   base_score: 68.8,
   interaction_bonus: 11.43,
@@ -98,11 +108,69 @@ function createMockDb({ snapshots = [], observations = [] } = {}) {
         },
         async first() {
           if (sql.includes("FROM index_snapshots")) {
-            return snapshots.length > 0 ? { ...snapshots[0] } : null;
+            return snapshots.length > 0 ? { ...snapshots[snapshots.length - 1] } : null;
           }
           return null;
         },
         async all() {
+          if (sql.includes("substr(computed_at, 1, 10)") && sql.includes("daily_points")) {
+            // monthly aggregation query
+            const dailyMap = new Map();
+            for (const s of snapshots) {
+              const day = s.computed_at.slice(0, 10);
+              const cur = dailyMap.get(day);
+              if (!cur || s.computed_at > cur.computed_at) {
+                dailyMap.set(day, s);
+              }
+            }
+            const monthMap = new Map();
+            for (const [day, s] of dailyMap.entries()) {
+              const month = day.slice(0, 7);
+              if (!monthMap.has(month)) {
+                monthMap.set(month, { days: [], composites: [], structurals: [] });
+              }
+              const comp = s.composite_index !== undefined ? s.composite_index : s.total_index;
+              const struct = s.structural_index !== undefined ? s.structural_index : s.total_index;
+              monthMap.get(month).days.push(day);
+              monthMap.get(month).composites.push(comp);
+              monthMap.get(month).structurals.push(struct);
+            }
+            const results = [];
+            for (const [month, data] of Array.from(monthMap.entries()).sort()) {
+              const avgComp = data.composites.reduce((a, b) => a + b, 0) / data.composites.length;
+              const avgStruct = data.structurals.reduce((a, b) => a + b, 0) / data.structurals.length;
+              results.push({
+                month,
+                n_days: data.days.length,
+                composite_index: Math.round(avgComp * 100) / 100,
+                structural_index: Math.round(avgStruct * 100) / 100,
+              });
+            }
+            return { results };
+          }
+          if (sql.includes("substr(computed_at, 1, 10)")) {
+            // daily aggregation query: group by day, take latest
+            const dailyMap = new Map();
+            for (const s of snapshots) {
+              const day = s.computed_at.slice(0, 10);
+              const cur = dailyMap.get(day);
+              if (!cur || s.computed_at > cur.computed_at) {
+                dailyMap.set(day, s);
+              }
+            }
+            const results = Array.from(dailyMap.values())
+              .sort((a, b) => a.computed_at.localeCompare(b.computed_at))
+              .map((s) => ({
+                id: s.id,
+                computed_at: s.computed_at,
+                date: s.computed_at.slice(0, 10),
+                composite_index: s.composite_index !== undefined ? s.composite_index : s.total_index,
+                structural_index: s.structural_index !== undefined ? s.structural_index : s.total_index,
+                pulse_adjustment: s.pulse_adjustment !== undefined ? s.pulse_adjustment : 0.0,
+                stage: s.stage,
+              }));
+            return { results };
+          }
           if (sql.includes("FROM index_snapshots")) {
             return { results: snapshots.map((s) => ({ ...s })) };
           }
@@ -179,6 +247,10 @@ describe("WW3 Risk Model Worker API", () => {
 
     const data = await res.json();
     assert.equal(data.total_index, 83.1);
+    assert.equal(data.composite_index, 83.1);
+    assert.equal(data.structural_index, 83.5);
+    assert.equal(data.pulse_adjustment, -0.4);
+    assert.ok(data.pulse);
     assert.equal(data.stage.number, 3);
     assert.equal(data.stage.code, "STAGE_3_PEACE_MECHANISM_FAILURE");
     assert.equal(data.layers.L1, 63.0);
@@ -187,6 +259,141 @@ describe("WW3 Risk Model Worker API", () => {
     assert.equal(data.gate.peace_capacity, 44.9);
     assert.equal(data.probability_bands["1y"].central_pct, 8.9);
     assert.equal(data.drivers.length, 3);
+  });
+
+  it("GET /api/pulse/latest returns latest pulse object", async () => {
+    const db = createMockDb({ snapshots: [MOCK_SNAPSHOT] });
+    const req = new Request("https://api.ww3risk.org/api/pulse/latest");
+    const res = await worker.fetch(req, { DB: db }, {});
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.pulse_adjustment, -0.4);
+    assert.deepEqual(data.range, [-10.0, 10.0]);
+    assert.ok(data.pulse);
+    assert.equal(data.pulse.pulse_adjustment, -0.4);
+  });
+
+  it("GET /api/risk/history?granularity=daily aggregates to latest snapshot of each day", async () => {
+    const multiSnapshots = [
+      {
+        id: "s1",
+        computed_at: "2026-10-21T08:00:00Z",
+        composite_index: 81.0,
+        structural_index: 83.5,
+        pulse_adjustment: -2.5,
+        stage: 3,
+      },
+      {
+        id: "s2",
+        computed_at: "2026-10-21T12:00:00Z",
+        composite_index: 82.0,
+        structural_index: 83.5,
+        pulse_adjustment: -1.5,
+        stage: 3,
+      },
+      {
+        id: "s3_last_of_day",
+        computed_at: "2026-10-21T22:00:00Z",  // Last snapshot of 2026-10-21
+        composite_index: 83.1,
+        structural_index: 83.5,
+        pulse_adjustment: -0.4,
+        stage: 3,
+      },
+      {
+        id: "s4",
+        computed_at: "2026-10-22T06:00:00Z",
+        composite_index: 83.4,
+        structural_index: 83.5,
+        pulse_adjustment: -0.1,
+        stage: 3,
+      },
+    ];
+    const db = createMockDb({ snapshots: multiSnapshots });
+    const req = new Request("https://api.ww3risk.org/api/risk/history?granularity=daily");
+    const res = await worker.fetch(req, { DB: db }, {});
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.granularity, "daily");
+    assert.equal(data.timezone, "UTC");
+    assert.equal(data.total_points, 2);
+    assert.equal(data.points.length, 2);
+
+    // Day 1 must select the last snapshot of the day (s3_last_of_day)
+    const day1 = data.points[0];
+    assert.equal(day1.date, "2026-10-21");
+    assert.equal(day1.computed_at, "2026-10-21T22:00:00Z");
+    assert.equal(day1.composite_index, 83.1);
+    assert.equal(day1.structural_index, 83.5);
+    assert.equal(day1.pulse_adjustment, -0.4);
+
+    // Day 2
+    const day2 = data.points[1];
+    assert.equal(day2.date, "2026-10-22");
+    assert.equal(day2.composite_index, 83.4);
+  });
+
+  it("GET /api/risk/history?granularity=monthly computes daily points average and verifies n_days", async () => {
+    const multiSnapshots = [
+      // Month 1 (2026-10): 2 distinct days
+      {
+        id: "m1_d1",
+        computed_at: "2026-10-21T10:00:00Z",
+        composite_index: 83.0,
+        structural_index: 83.5,
+        stage: 3,
+      },
+      {
+        id: "m1_d2",
+        computed_at: "2026-10-22T10:00:00Z",
+        composite_index: 84.0,
+        structural_index: 83.5,
+        stage: 3,
+      },
+      // Month 2 (2026-11): 3 distinct days
+      {
+        id: "m2_d1",
+        computed_at: "2026-11-01T10:00:00Z",
+        composite_index: 80.0,
+        structural_index: 82.0,
+        stage: 3,
+      },
+      {
+        id: "m2_d2",
+        computed_at: "2026-11-02T10:00:00Z",
+        composite_index: 82.0,
+        structural_index: 82.0,
+        stage: 3,
+      },
+      {
+        id: "m2_d3",
+        computed_at: "2026-11-03T10:00:00Z",
+        composite_index: 84.0,
+        structural_index: 82.0,
+        stage: 3,
+      },
+    ];
+    const db = createMockDb({ snapshots: multiSnapshots });
+    const req = new Request("https://api.ww3risk.org/api/risk/history?granularity=monthly");
+    const res = await worker.fetch(req, { DB: db }, {});
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.granularity, "monthly");
+    assert.equal(data.total_points, 2);
+
+    const oct = data.points[0];
+    assert.equal(oct.month, "2026-10");
+    assert.equal(oct.n_days, 2);
+    assert.equal(oct.composite_index, 83.5); // (83.0 + 84.0) / 2 = 83.5
+    assert.equal(oct.structural_index, 83.5);
+
+    const nov = data.points[1];
+    assert.equal(nov.month, "2026-11");
+    assert.equal(nov.n_days, 3);
+    assert.equal(nov.composite_index, 82.0); // (80.0 + 82.0 + 84.0) / 3 = 82.0
+    assert.equal(nov.structural_index, 82.0);
   });
 
   it("GET /api/risk/history returns snapshots and retrospective historical cases", async () => {

@@ -31,6 +31,8 @@ def create_snapshot(
     model: Optional[WW3RiskModel] = None,
     computed_at: Optional[str] = None,
     as_of_date: str = "2026-10-21",
+    pulse_data: Optional[Dict[str, Any]] = None,
+    pulse_path: Optional[Path | str] = "data/pulse_latest.json",
 ) -> Dict[str, Any]:
     """Generate a complete snapshot dictionary matching Cloudflare D1 schema.
 
@@ -49,12 +51,36 @@ def create_snapshot(
     clean_ts = re.sub(r"[^0-9a-zA-Z]", "", computed_at)
     snapshot_id = f"snapshot_{scenario.id}_{clean_ts}"
 
+    # Load pulse data if not explicitly provided
+    if pulse_data is None and pulse_path:
+        p_path = Path(pulse_path)
+        if p_path.exists():
+            try:
+                with open(p_path, "r", encoding="utf-8") as pf:
+                    pulse_data = json.load(pf)
+            except Exception:
+                pulse_data = None
+
+    structural_val = round(result.global_risk_index, 2)
+    if pulse_data and isinstance(pulse_data, dict):
+        pulse_val = round(float(pulse_data.get("pulse_adjustment", 0.0)), 2)
+        pulse_json_str = json.dumps(pulse_data, ensure_ascii=False)
+    else:
+        pulse_val = 0.0
+        pulse_json_str = "{}"
+
+    composite_val = round(max(0.0, min(100.0, structural_val + pulse_val)), 2)
+
     snapshot_row = {
         "id": snapshot_id,
         "computed_at": computed_at,
         "model_version": __version__,
         "scenario_id": scenario.id,
-        "total_index": round(result.global_risk_index, 2),
+        "structural_index": structural_val,
+        "pulse_adjustment": pulse_val,
+        "composite_index": composite_val,
+        "total_index": composite_val,  # total_index = composite_index for backward compatibility
+        "pulse_json": pulse_json_str,
         "stage": result.stage.stage_number,
         "base_score": round(result.base_structural_score, 2),
         "interaction_bonus": round(result.interactions["total"], 2),
@@ -141,6 +167,8 @@ def export_snapshot_to_file(
     model: Optional[WW3RiskModel] = None,
     computed_at: Optional[str] = None,
     as_of_date: str = "2026-10-21",
+    pulse_data: Optional[Dict[str, Any]] = None,
+    pulse_path: Optional[Path | str] = "data/pulse_latest.json",
 ) -> Dict[str, Any]:
     """Export snapshot JSON file ready for D1 upload."""
     data = create_snapshot(
@@ -148,6 +176,8 @@ def export_snapshot_to_file(
         model=model,
         computed_at=computed_at,
         as_of_date=as_of_date,
+        pulse_data=pulse_data,
+        pulse_path=pulse_path,
     )
     p = Path(output_path)
     p.parent.mkdir(parents=True, exist_ok=True)

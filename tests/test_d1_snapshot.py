@@ -52,7 +52,10 @@ def test_snapshot_structure_integrity():
 
     snap = snap_data["snapshot"]
     assert snap["scenario_id"] == "baseline_2026"
-    assert round(snap["total_index"], 1) == 83.5
+    assert round(snap["structural_index"], 1) == 83.5
+    assert "pulse_adjustment" in snap
+    assert "composite_index" in snap
+    assert "pulse_json" in snap
     assert snap["stage"] == 3
     assert snap["computed_at"] == "2026-10-21T14:38:00Z"
     assert snap["model_version"] == "0.5.0"
@@ -105,11 +108,12 @@ def test_snapshot_sql_insert_and_roundtrip():
     cursor = conn.cursor()
 
     # Query snapshot
-    cursor.execute("SELECT id, scenario_id, total_index, stage, layers_json, band_1y, band_5y, band_10y FROM index_snapshots")
+    cursor.execute("SELECT id, scenario_id, total_index, stage, layers_json, band_1y, band_5y, band_10y, structural_index, pulse_adjustment, composite_index FROM index_snapshots")
     row = cursor.fetchone()
     assert row is not None
     assert row[1] == "baseline_2026"
-    assert round(row[2], 1) == 83.5
+    assert round(row[2], 1) == round(row[10], 1)  # total_index == composite_index
+    assert round(row[8], 1) == 83.5  # structural_index
     assert row[3] == 3
     layers_back = json.loads(row[4])
     assert round(layers_back["L4"], 1) == 75.5
@@ -166,7 +170,10 @@ def test_cli_export_snapshot_flag(tmp_path):
     assert "snapshot" in data
     assert "observations" in data
     assert len(data["observations"]) == 36
-    assert round(data["snapshot"]["total_index"], 1) == 83.5
+    assert round(data["snapshot"]["structural_index"], 1) == 83.5
+    assert "composite_index" in data["snapshot"]
+    assert "pulse_adjustment" in data["snapshot"]
+    assert data["snapshot"]["total_index"] == data["snapshot"]["composite_index"]
 
 
 def test_sql_statement_parameter_limit_regression():

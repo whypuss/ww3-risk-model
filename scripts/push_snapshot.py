@@ -94,9 +94,15 @@ def build_sql_statements(snapshot_data: Dict[str, Any]) -> Tuple[Tuple[str, List
         "INSERT OR REPLACE INTO index_snapshots ("
         "id, computed_at, model_version, scenario_id, total_index, stage, "
         "base_score, interaction_bonus, gate_multiplier, peace_capacity, "
-        "band_1y, band_5y, band_10y, layers_json, drivers_json"
-        ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "band_1y, band_5y, band_10y, layers_json, drivers_json, "
+        "structural_index, pulse_adjustment, composite_index, pulse_json"
+        ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
+    structural_idx = float(snap.get("structural_index", snap["total_index"]))
+    pulse_adj = float(snap.get("pulse_adjustment", 0.0))
+    composite_idx = float(snap.get("composite_index", snap["total_index"]))
+    pulse_j = snap.get("pulse_json") if isinstance(snap.get("pulse_json"), str) else json.dumps(snap.get("pulse_json", {}), ensure_ascii=False)
+
     snap_params = [
         snap["id"],
         snap["computed_at"],
@@ -113,6 +119,10 @@ def build_sql_statements(snapshot_data: Dict[str, Any]) -> Tuple[Tuple[str, List
         float(snap["band_10y"]),
         snap["layers_json"] if isinstance(snap["layers_json"], str) else json.dumps(snap["layers_json"], ensure_ascii=False),
         snap["drivers_json"] if isinstance(snap["drivers_json"], str) else json.dumps(snap["drivers_json"], ensure_ascii=False),
+        structural_idx,
+        pulse_adj,
+        composite_idx,
+        pulse_j,
     ]
 
     obs_statements: List[Tuple[str, List[Any]]] = []

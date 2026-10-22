@@ -131,6 +131,7 @@ async function handleRiskLatest(db) {
 
   let layers = {};
   let drivers = [];
+  let pulse = {};
   try {
     layers = JSON.parse(row.layers_json || "{}");
   } catch (e) {
@@ -141,12 +142,34 @@ async function handleRiskLatest(db) {
   } catch (e) {
     drivers = [];
   }
+  try {
+    pulse = JSON.parse(row.pulse_json || "{}");
+  } catch (e) {
+    pulse = {};
+  }
+
+  const structuralIndex =
+    row.structural_index !== null && row.structural_index !== undefined
+      ? Number(row.structural_index)
+      : Number(row.total_index);
+  const pulseAdjustment =
+    row.pulse_adjustment !== null && row.pulse_adjustment !== undefined
+      ? Number(row.pulse_adjustment)
+      : 0.0;
+  const compositeIndex =
+    row.composite_index !== null && row.composite_index !== undefined
+      ? Number(row.composite_index)
+      : Number(row.total_index);
 
   return jsonResponse({
     model_version: row.model_version,
     scenario_id: row.scenario_id,
     computed_at: row.computed_at,
-    total_index: Number(row.total_index),
+    composite_index: compositeIndex,
+    structural_index: structuralIndex,
+    pulse_adjustment: pulseAdjustment,
+    pulse,
+    total_index: compositeIndex, // backward compatibility
     stage: getStageInfo(row.stage),
     base_score: Number(row.base_score),
     interaction_bonus: Number(row.interaction_bonus),
@@ -164,10 +187,119 @@ async function handleRiskLatest(db) {
   });
 }
 
-async function handleRiskHistory(db) {
+async function handlePulseLatest(db) {
+  const row = await db
+    .prepare("SELECT computed_at, pulse_adjustment, pulse_json FROM index_snapshots ORDER BY computed_at DESC LIMIT 1")
+    .first();
+
+  if (!row) {
+    return errorUnavailable();
+  }
+
+  let pulseObj = {};
+  try {
+    pulseObj = JSON.parse(row.pulse_json || "{}");
+  } catch (e) {
+    pulseObj = {};
+  }
+
+  const pulseAdj =
+    row.pulse_adjustment !== null && row.pulse_adjustment !== undefined
+      ? Number(row.pulse_adjustment)
+      : 0.0;
+
+  return jsonResponse({
+    computed_at: row.computed_at,
+    pulse_adjustment: pulseAdj,
+    range: [-10.0, 10.0],
+    pulse: pulseObj,
+  });
+}
+
+async function handleRiskHistory(db, granularity = null) {
+  if (granularity === "daily") {
+    const sql = `
+      SELECT s.id,
+             s.computed_at,
+             substr(s.computed_at, 1, 10) AS date,
+             COALESCE(s.composite_index, s.total_index) AS composite_index,
+             COALESCE(s.structural_index, s.total_index) AS structural_index,
+             COALESCE(s.pulse_adjustment, 0.0) AS pulse_adjustment,
+             s.stage
+      FROM index_snapshots s
+      INNER JOIN (
+          SELECT substr(computed_at, 1, 10) AS day, MAX(computed_at) AS max_computed_at
+          FROM index_snapshots
+          GROUP BY substr(computed_at, 1, 10)
+      ) d ON s.computed_at = d.max_computed_at
+      ORDER BY s.computed_at ASC
+    `;
+    const { results } = await db.prepare(sql).all();
+    if (!results || results.length === 0) {
+      return errorUnavailable();
+    }
+    const points = results.map((r) => ({
+      date: r.date,
+      computed_at: r.computed_at,
+      composite_index: Number(r.composite_index),
+      structural_index: Number(r.structural_index),
+      pulse_adjustment: Number(r.pulse_adjustment),
+      stage: Number(r.stage),
+    }));
+    return jsonResponse({
+      granularity: "daily",
+      timezone: "UTC",
+      definition: "當日最後一份快照（UTC 計）之綜合指數與結構指數",
+      total_points: points.length,
+      points,
+    });
+  }
+
+  if (granularity === "monthly") {
+    const sql = `
+      WITH daily_points AS (
+          SELECT s.computed_at,
+                 substr(s.computed_at, 1, 10) AS date,
+                 substr(s.computed_at, 1, 7) AS month,
+                 COALESCE(s.composite_index, s.total_index) AS composite_index,
+                 COALESCE(s.structural_index, s.total_index) AS structural_index
+          FROM index_snapshots s
+          INNER JOIN (
+              SELECT substr(computed_at, 1, 10) AS day, MAX(computed_at) AS max_computed_at
+              FROM index_snapshots
+              GROUP BY substr(computed_at, 1, 10)
+          ) d ON s.computed_at = d.max_computed_at
+      )
+      SELECT month,
+             COUNT(date) AS n_days,
+             ROUND(AVG(composite_index), 2) AS composite_index,
+             ROUND(AVG(structural_index), 2) AS structural_index
+      FROM daily_points
+      GROUP BY month
+      ORDER BY month ASC
+    `;
+    const { results } = await db.prepare(sql).all();
+    if (!results || results.length === 0) {
+      return errorUnavailable();
+    }
+    const points = results.map((r) => ({
+      month: r.month,
+      n_days: Number(r.n_days),
+      composite_index: Number(r.composite_index),
+      structural_index: Number(r.structural_index),
+    }));
+    return jsonResponse({
+      granularity: "monthly",
+      timezone: "UTC",
+      definition: "當月所有日點 composite 之算術平均，附帶當月記錄日數 n",
+      total_points: points.length,
+      points,
+    });
+  }
+
   const { results: snapshots } = await db
     .prepare(
-      "SELECT id, computed_at, model_version, scenario_id, total_index, stage, layers_json FROM index_snapshots ORDER BY computed_at ASC"
+      "SELECT id, computed_at, model_version, scenario_id, total_index, structural_index, pulse_adjustment, composite_index, stage, layers_json FROM index_snapshots ORDER BY computed_at ASC"
     )
     .all();
 
@@ -182,12 +314,28 @@ async function handleRiskHistory(db) {
     } catch (e) {
       parsedLayers = {};
     }
+    const structuralIndex =
+      s.structural_index !== null && s.structural_index !== undefined
+        ? Number(s.structural_index)
+        : Number(s.total_index);
+    const pulseAdjustment =
+      s.pulse_adjustment !== null && s.pulse_adjustment !== undefined
+        ? Number(s.pulse_adjustment)
+        : 0.0;
+    const compositeIndex =
+      s.composite_index !== null && s.composite_index !== undefined
+        ? Number(s.composite_index)
+        : Number(s.total_index);
+
     return {
       id: s.id,
       computed_at: s.computed_at,
       model_version: s.model_version,
       scenario_id: s.scenario_id,
-      total_index: Number(s.total_index),
+      composite_index: compositeIndex,
+      structural_index: structuralIndex,
+      pulse_adjustment: pulseAdjustment,
+      total_index: compositeIndex,
       stage: s.stage,
       layers: parsedLayers,
     };
@@ -340,12 +488,15 @@ export default {
 
     try {
       const pathname = url.pathname.replace(/\/+$/, "") || "/";
+      const granularity = url.searchParams.get("granularity");
 
       switch (pathname) {
         case "/api/risk/latest":
           return await handleRiskLatest(db);
+        case "/api/pulse/latest":
+          return await handlePulseLatest(db);
         case "/api/risk/history":
-          return await handleRiskHistory(db);
+          return await handleRiskHistory(db, granularity);
         case "/api/risk/layers":
           return await handleRiskLayers(db);
         case "/api/data-status":
@@ -355,7 +506,7 @@ export default {
             {
               error: "Not Found",
               status: 404,
-              message: `Endpoint '${pathname}' not found. Available: /api/risk/latest, /api/risk/history, /api/risk/layers, /api/data-status`,
+              message: `Endpoint '${pathname}' not found. Available: /api/risk/latest, /api/pulse/latest, /api/risk/history, /api/risk/layers, /api/data-status`,
             },
             404
           );

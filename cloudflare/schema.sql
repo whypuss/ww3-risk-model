@@ -1,5 +1,5 @@
 -- Cloudflare D1 Schema for WW3 Risk Model
--- Version: 0.4.0
+-- Version: 0.6.0
 
 CREATE TABLE IF NOT EXISTS index_snapshots (
     id TEXT PRIMARY KEY,
@@ -16,7 +16,11 @@ CREATE TABLE IF NOT EXISTS index_snapshots (
     band_5y REAL NOT NULL,
     band_10y REAL NOT NULL,
     layers_json TEXT NOT NULL,
-    drivers_json TEXT NOT NULL
+    drivers_json TEXT NOT NULL,
+    structural_index REAL,
+    pulse_adjustment REAL DEFAULT 0.0,
+    composite_index REAL,
+    pulse_json TEXT
 );
 
 CREATE TABLE IF NOT EXISTS indicator_observations (
