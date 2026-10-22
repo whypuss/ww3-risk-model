@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-22T15:27:39Z",
+  "generated_at": "2026-10-22T15:31:10Z",
   "source": "World Bank Open Data API v2 (api.worldbank.org)",
   "disclaimer": "Candidate values generated for expert review. Not applied to baseline without manual rubric calibration.",
   "series_count": 5,
@@ -24,13 +24,13 @@
       "target_indicator_id": "l3_unemployment_underemployment",
       "target_indicator_name": "全球結構性失業與不充分就業率",
       "applicability_rationale": "ILO/World Bank全球總體失業率統計，提供勞工階層就業脆弱度基礎實數，衡量經濟邊緣化潛力。",
-      "candidate_year": null,
-      "candidate_raw_value": null,
+      "candidate_year": "2025",
+      "candidate_raw_value": 4.7913330740211,
       "current_model_raw_value": 11.1,
       "current_model_score": 56.0,
       "current_evidence_level": "inference",
-      "fetch_status": "fetch_failed_or_empty",
-      "diff_analysis": "No remote value retrieved; baseline unchanged."
+      "fetch_status": "success",
+      "diff_analysis": "Candidate WB value: 4.7913330740211 (2025) vs. current baseline: 11.1 (score: 56.0)"
     },
     {
       "wb_code": "SL.UEM.1524.ZS",
