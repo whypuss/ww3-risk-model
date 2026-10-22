@@ -55,7 +55,7 @@ def test_snapshot_structure_integrity():
     assert round(snap["total_index"], 1) == 83.5
     assert snap["stage"] == 3
     assert snap["computed_at"] == "2026-10-21T14:38:00Z"
-    assert snap["model_version"] == "0.4.1"
+    assert snap["model_version"] == "0.5.0"
 
     # Check layers JSON inside snapshot
     layers = json.loads(snap["layers_json"])

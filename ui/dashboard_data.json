@@ -2,8 +2,8 @@
   "metadata": {
     "title": "WW3 戰爭風險指數儀表板",
     "title_en": "WW3 War Risk Index Dashboard",
-    "model_version": "0.4.1",
-    "generated_at": "2026-10-21",
+    "model_version": "0.5.0",
+    "generated_at": "2026-10-22",
     "active_scenario_id": "baseline_2026",
     "active_scenario_title": "2026 全球結構風險基準情境",
     "active_scenario_year": 2026
@@ -12,14 +12,14 @@
     "scenario_id": "baseline_2026",
     "scenario_title": "2026 全球結構風險基準情境",
     "scenario_year": 2026,
-    "global_risk_index": 83.07,
-    "base_structural_score": 69.29,
-    "raw_interacted_score": 80.72,
+    "global_risk_index": 83.55,
+    "base_structural_score": 69.75,
+    "raw_interacted_score": 81.3,
     "layer_scores": {
       "L1": 63.01,
       "L2": 71.32,
-      "L3": 64.87,
-      "L4": 74.47,
+      "L3": 66.0,
+      "L4": 75.48,
       "L5": 71.91
     },
     "layer_weights": {
@@ -34,10 +34,10 @@
     "gate_factor": 1.041,
     "interactions": {
       "L1_x_L2": 3.6,
-      "L3_x_L5": 3.73,
-      "L4_x_GateFailure": 4.1,
-      "raw_sum": 11.43,
-      "total": 11.43,
+      "L3_x_L5": 3.8,
+      "L4_x_GateFailure": 4.16,
+      "raw_sum": 11.55,
+      "total": 11.55,
       "is_capped": 0
     },
     "stage": {
@@ -50,26 +50,26 @@
     "probability_bands": {
       "1y": {
         "horizon_years": 1,
-        "central_pct": 9.3,
-        "lower_pct": 6.0,
-        "upper_pct": 13.4,
-        "band_str": "6.0% – 13.4% (中位: 9.3%)",
+        "central_pct": 9.5,
+        "lower_pct": 6.2,
+        "upper_pct": 13.8,
+        "band_str": "6.2% – 13.8% (中位: 9.5%)",
         "disclaimer": "結構風險之情境推演估算，非已驗證統計預測；大國全面戰爭歷史基率極低，結構指數係易燃度而非事件機率（Scenario Estimate, not verified statistical forecast）"
       },
       "5y": {
         "horizon_years": 5,
-        "central_pct": 31.7,
-        "lower_pct": 23.8,
-        "upper_pct": 41.2,
-        "band_str": "23.8% – 41.2% (中位: 31.7%)",
+        "central_pct": 32.3,
+        "lower_pct": 24.2,
+        "upper_pct": 42.0,
+        "band_str": "24.2% – 42.0% (中位: 32.3%)",
         "disclaimer": "結構風險之情境推演估算，非已驗證統計預測；大國全面戰爭歷史基率極低，結構指數係易燃度而非事件機率（Scenario Estimate, not verified statistical forecast）"
       },
       "10y": {
         "horizon_years": 10,
-        "central_pct": 49.8,
-        "lower_pct": 39.9,
-        "upper_pct": 62.3,
-        "band_str": "39.9% – 62.3% (中位: 49.8%)",
+        "central_pct": 50.5,
+        "lower_pct": 40.4,
+        "upper_pct": 63.1,
+        "band_str": "40.4% – 63.1% (中位: 50.5%)",
         "disclaimer": "結構風險之情境推演估算，非已驗證統計預測；大國全面戰爭歷史基率極低，結構指數係易燃度而非事件機率（Scenario Estimate, not verified statistical forecast）"
       }
     },
@@ -80,6 +80,13 @@
         "name": "前沿 AI 算力與先進晶圓代工極端壟斷",
         "value": 82.0,
         "weight": 1.4
+      },
+      {
+        "layer": "L4",
+        "id": "l4_active_war_intensity",
+        "name": "全球大型活躍戰爭與武裝衝突烈度",
+        "value": 82.0,
+        "weight": 1.2
       },
       {
         "layer": "L4",
@@ -101,13 +108,6 @@
         "name": "未來十年內喪失戰略技術霸權之預防性開戰邏輯",
         "value": 78.0,
         "weight": 1.4
-      },
-      {
-        "layer": "L4",
-        "id": "l4_weaponized_interdependence",
-        "name": "經貿金融相互依賴武器化與關鍵禁運",
-        "value": 76.0,
-        "weight": 1.2
       }
     ],
     "top_peace_buffers": [
@@ -137,15 +137,15 @@
       }
     ],
     "evidence_counts": {
-      "verified": 7,
-      "inference": 20,
+      "verified": 8,
+      "inference": 21,
       "illustrative": 7
     },
     "notes": [
-      "Base structural score: 69.29",
-      "Interaction bonus: +11.43 (cap: 25.0)",
+      "Base structural score: 69.75",
+      "Interaction bonus: +11.55 (cap: 25.0)",
       "Peace capacity: 44.92 -> Gate multiplier: x1.041",
-      "Gated score: 84.0 -> Index: 83.07"
+      "Gated score: 84.6 -> Index: 83.55"
     ]
   },
   "scenarios": [
@@ -157,8 +157,8 @@
       "description": "通用智慧與自主Agent突破加速，白領知識崗位大面積凍結或被取代，算力基礎設施極端集中於單一霸權陣營，引發前所未有的社會動盪與預防性技術封鎖",
       "file_path": "scenarios/ai_displacement_shock.json",
       "global_risk_index": 96.2,
-      "delta_from_baseline": 13.1,
-      "delta_str": "+13.1",
+      "delta_from_baseline": 12.7,
+      "delta_str": "+12.7",
       "stage_number": 4,
       "stage_title": "階段四：暴力成為被接受選項",
       "base_structural_score": 81.1,
@@ -205,45 +205,45 @@
       "year": 2026,
       "description": "當前多極化過渡期、AI技術震盪及地緣陣營重組之全球結構性風險基準評估（v0.3 升級：全量 34 項指標審核、可量化替換、推論評分量表、數據品質與新鮮度監測）",
       "file_path": "scenarios/baseline_2026.json",
-      "global_risk_index": 83.1,
+      "global_risk_index": 83.5,
       "delta_from_baseline": 0.0,
       "delta_str": "+0.0",
       "stage_number": 3,
       "stage_title": "階段三：和平解決機制失效",
-      "base_structural_score": 69.3,
+      "base_structural_score": 69.7,
       "gate_factor": 1.041,
       "peace_capacity": 44.9,
       "probability_bands": {
         "1y": {
           "horizon_years": 1,
-          "central_pct": 9.3,
-          "lower_pct": 6.0,
-          "upper_pct": 13.4,
-          "band_str": "6.0% – 13.4% (中位: 9.3%)",
+          "central_pct": 9.5,
+          "lower_pct": 6.2,
+          "upper_pct": 13.8,
+          "band_str": "6.2% – 13.8% (中位: 9.5%)",
           "disclaimer": "結構風險之情境推演估算，非已驗證統計預測；大國全面戰爭歷史基率極低，結構指數係易燃度而非事件機率（Scenario Estimate, not verified statistical forecast）"
         },
         "5y": {
           "horizon_years": 5,
-          "central_pct": 31.7,
-          "lower_pct": 23.8,
-          "upper_pct": 41.2,
-          "band_str": "23.8% – 41.2% (中位: 31.7%)",
+          "central_pct": 32.3,
+          "lower_pct": 24.2,
+          "upper_pct": 42.0,
+          "band_str": "24.2% – 42.0% (中位: 32.3%)",
           "disclaimer": "結構風險之情境推演估算，非已驗證統計預測；大國全面戰爭歷史基率極低，結構指數係易燃度而非事件機率（Scenario Estimate, not verified statistical forecast）"
         },
         "10y": {
           "horizon_years": 10,
-          "central_pct": 49.8,
-          "lower_pct": 39.9,
-          "upper_pct": 62.3,
-          "band_str": "39.9% – 62.3% (中位: 49.8%)",
+          "central_pct": 50.5,
+          "lower_pct": 40.4,
+          "upper_pct": 63.1,
+          "band_str": "40.4% – 63.1% (中位: 50.5%)",
           "disclaimer": "結構風險之情境推演估算，非已驗證統計預測；大國全面戰爭歷史基率極低，結構指數係易燃度而非事件機率（Scenario Estimate, not verified statistical forecast）"
         }
       },
       "layer_scores": {
         "L1": 63.0,
         "L2": 71.3,
-        "L3": 64.9,
-        "L4": 74.5,
+        "L3": 66.0,
+        "L4": 75.5,
         "L5": 71.9
       }
     },
@@ -255,8 +255,8 @@
       "description": "主要強權達成戰略護欄與新軍控協議，重啟高層外交與兩軍熱線，撤銷懲罰性關稅與限制，建立全球AI安全與關鍵礦產共享對話機制",
       "file_path": "scenarios/detente.json",
       "global_risk_index": 35.6,
-      "delta_from_baseline": -47.5,
-      "delta_str": "-47.5",
+      "delta_from_baseline": -48.0,
+      "delta_str": "-48.0",
       "stage_number": 2,
       "stage_title": "階段二：利益衝突顯性化",
       "base_structural_score": 42.6,
@@ -304,8 +304,8 @@
       "description": "氣候複合災害疊加戰略咽喉（紅海、霍爾木茲、黑海）全面封鎖，主要產油國與糧食大國實施絕對出口禁令，全球陷入生存資源極端短缺與搶奪",
       "file_path": "scenarios/energy_food_crisis.json",
       "global_risk_index": 97.6,
-      "delta_from_baseline": 14.5,
-      "delta_str": "+14.5",
+      "delta_from_baseline": 14.1,
+      "delta_str": "+14.1",
       "stage_number": 4,
       "stage_title": "階段四：暴力成為被接受選項",
       "base_structural_score": 85.2,
@@ -626,6 +626,111 @@
       ],
       "formula": "示意拆分（指標原始平均）：(68.0 海運咽喉風險 ＋ 72.0 關鍵礦物管制 ＋ 76.0 相互依賴武器化) ÷ 3 = 72.0",
       "note": "示意拆分：指標原始平均映射 [l1_maritime_chokepoints, l1_critical_minerals, l4_weaponized_interdependence]，反映關鍵礦物禁運與全球海運供應鏈梗阻。"
+    },
+    {
+      "id": "africa_sudan",
+      "name": "東非與薩赫勒（蘇丹內戰 / 政變帶 / 糧食與氣候危機）",
+      "name_en": "East Africa & Sahel / Sudan Conflict & Food-Climate Crisis",
+      "score": 69.5,
+      "level": "ELEVATED",
+      "level_label": "顯著升級 (Elevated)",
+      "color_class": "elevated",
+      "indicators_used": [
+        "l4_active_war_intensity",
+        "l3_civil_unrest_intensity",
+        "l1_climate_impact",
+        "l1_water_stress"
+      ],
+      "components": [
+        {
+          "id": "l4_active_war_intensity",
+          "name": "活躍戰爭烈度",
+          "value": 82.0
+        },
+        {
+          "id": "l3_civil_unrest_intensity",
+          "name": "大型抗議暴動",
+          "value": 73.0
+        },
+        {
+          "id": "l1_climate_impact",
+          "name": "氣候衝擊",
+          "value": 65.0
+        },
+        {
+          "id": "l1_water_stress",
+          "name": "水資源壓力",
+          "value": 58.0
+        }
+      ],
+      "formula": "示意拆分（指標原始平均）：(82.0 活躍戰爭烈度 ＋ 73.0 大型抗議暴動 ＋ 65.0 氣候衝擊 ＋ 58.0 水資源壓力) ÷ 4 = 69.5",
+      "note": "示意拆分：指標原始平均映射 [l4_active_war_intensity, l3_civil_unrest_intensity, l1_climate_impact, l1_water_stress]，反映活躍內戰衝突、政變動盪、極端乾旱與人道糧食危機之複合共振。"
+    },
+    {
+      "id": "southeast_asia",
+      "name": "東南亞（緬甸內戰 / 湄公河跨界摩擦）",
+      "name_en": "Southeast Asia / Myanmar Conflict & Mekong Flashpoints",
+      "score": 78.3,
+      "level": "HIGH",
+      "level_label": "高度緊張 (High)",
+      "color_class": "warning",
+      "indicators_used": [
+        "l4_active_war_intensity",
+        "l4_territorial_flashpoints",
+        "l3_civil_unrest_intensity"
+      ],
+      "components": [
+        {
+          "id": "l4_active_war_intensity",
+          "name": "活躍戰爭烈度",
+          "value": 82.0
+        },
+        {
+          "id": "l4_territorial_flashpoints",
+          "name": "領土引信點",
+          "value": 80.0
+        },
+        {
+          "id": "l3_civil_unrest_intensity",
+          "name": "大型抗議暴動",
+          "value": 73.0
+        }
+      ],
+      "formula": "示意拆分（指標原始平均）：(82.0 活躍戰爭烈度 ＋ 80.0 領土引信點 ＋ 73.0 大型抗議暴動) ÷ 3 = 78.3",
+      "note": "示意拆分：指標原始平均映射 [l4_active_war_intensity, l4_territorial_flashpoints, l3_civil_unrest_intensity]，反映緬甸全境多方內戰、跨界地緣摩擦與內部社會動盪。"
+    },
+    {
+      "id": "western_europe",
+      "name": "西歐（法意社會動盪 / 生活成本 / 勞工罷工）",
+      "name_en": "Western Europe / Civil Unrest & Cost-of-Living Stagnation",
+      "score": 68.3,
+      "level": "ELEVATED",
+      "level_label": "顯著升級 (Elevated)",
+      "color_class": "elevated",
+      "indicators_used": [
+        "l3_civil_unrest_intensity",
+        "l5_economic_stagnation",
+        "l3_youth_unemployment"
+      ],
+      "components": [
+        {
+          "id": "l3_civil_unrest_intensity",
+          "name": "大型抗議暴動",
+          "value": 73.0
+        },
+        {
+          "id": "l5_economic_stagnation",
+          "name": "長期停滯預期",
+          "value": 64.0
+        },
+        {
+          "id": "l3_youth_unemployment",
+          "name": "青年失業",
+          "value": 68.0
+        }
+      ],
+      "formula": "示意拆分（指標原始平均）：(73.0 大型抗議暴動 ＋ 64.0 長期停滯預期 ＋ 68.0 青年失業) ÷ 3 = 68.3",
+      "note": "示意拆分：指標原始平均映射 [l3_civil_unrest_intensity, l5_economic_stagnation, l3_youth_unemployment]，反映主要經濟體生活成本危機、勞工總罷工、青年就業困境與城市騷亂。"
     }
   ],
   "indicators": [
@@ -1098,6 +1203,32 @@
       "note": "「內卷」與「躺平」並存，青年世代對「按部就班實現階級躍升」信念破滅"
     },
     {
+      "id": "l3_civil_unrest_intensity",
+      "layer": "L3",
+      "layer_name": "工作／生計／AI取代",
+      "name": "全球大型抗議暴動與社會動盪烈度",
+      "name_en": "Civil Unrest, Protests & Riots Intensity",
+      "value": 73.0,
+      "weight": 1.1,
+      "evidence_level": "inference",
+      "source": "ACLED (Armed Conflict Location & Event Data Project)",
+      "source_name": "ACLED (Armed Conflict Location & Event Data Project)",
+      "source_url": "https://acleddata.com",
+      "year": 2024,
+      "raw_value": 38500,
+      "raw_unit": "起 (全球年度抗議與暴動事件總數)",
+      "observation_date": "2023-2024",
+      "publication_date": "2024-03-15",
+      "last_checked": "2026-10-21",
+      "stale_after": "365d",
+      "status": "stale",
+      "normalization_method": "clamp(30.0 + (events - 15000) / 25000 * 35.0 + 10.0, 0, 100) = 30.0 + (23500 / 25000) * 35.0 + 10.0 = 72.9 -> 73.0",
+      "scoring_rubric": "全球抗議平穩且無主要經濟體系統性騷亂(30分); 局部生活成本遊行但局限於和平請願(50分); 全球抗議超3.5萬起且法意等核心國爆發嚴重城市騷亂、焚燒市政建築與全境總罷工(73.0分); 跨國總革命引發政權瓦解與戒嚴(90+分)",
+      "applicability_note": "反映主要經濟體內部社會契約瓦解、生活成本危機引發之民意激化、罷工與城市暴動烈度，為內部危機外溢為外部冒險之壓力源",
+      "uncertainty_note": "各國警力通報口徑與法律定義存在差異，威權國家對街頭群眾聚集存在資訊審查與封鎖",
+      "note": "生活成本危機與制度不滿引發全球抗議浪潮，法國2023騷亂創歷史新高，意大利及西歐各國罷工與街頭抗議持續"
+    },
+    {
       "id": "l4_military_expenditure_growth",
       "layer": "L4",
       "layer_name": "權力／安全困境",
@@ -1252,6 +1383,32 @@
       "applicability_note": "領土引信點摩擦是觸發全面世界大戰最直接的戰術導火線",
       "uncertainty_note": "各方海警及海軍保持一定克制避免開第一槍，但在近距離碰撞中誤判概率極高",
       "note": "烏克蘭縱深打擊、中東多線飛彈互射、台海常態化抵近演訓、南海仁愛礁摩擦"
+    },
+    {
+      "id": "l4_active_war_intensity",
+      "layer": "L4",
+      "layer_name": "權力／安全困境",
+      "name": "全球大型活躍戰爭與武裝衝突烈度",
+      "name_en": "Active War & Armed Conflict Intensity",
+      "value": 82.0,
+      "weight": 1.2,
+      "evidence_level": "verified",
+      "source": "UCDP Conflict Data Program (Uppsala University)",
+      "source_name": "UCDP Conflict Data Program (Uppsala University)",
+      "source_url": "https://ucdp.uu.se",
+      "year": 2024,
+      "raw_value": 159800,
+      "raw_unit": "人 (年度戰鬥與武裝衝突死亡人數) / 11 場 (大型戰爭數)",
+      "observation_date": "2023-2024",
+      "publication_date": "2024-06-18",
+      "last_checked": "2026-10-21",
+      "stale_after": "365d",
+      "status": "stale",
+      "normalization_method": "clamp(30.0 + (deaths - 30000) / (200000 - 30000) * 50.0 + (active_wars - 4) * 2.0, 0, 100) = 30.0 + (129800 / 170000) * 50.0 + 14.0 = 82.2 -> 82.0",
+      "scoring_rubric": "戰鬥死亡<3萬且大型戰爭<4場為和平低谷(30分); 5-10萬為區域中度升級(55-65分); 15萬以上且大型戰爭>=9場(烏克蘭、加沙、蘇丹、緬甸多線齊爆)達到冷戰後第四高危區(82.0分); 全球全面大戰(>50萬/年)為100分",
+      "applicability_note": "直接衡量全球多個核心戰區（烏克蘭、中東加沙黎巴嫩、東非蘇丹、東南亞緬甸）正在進行之動態武裝衝突規模與破壞烈度，為體系衝突總量核心指標",
+      "uncertainty_note": "交戰國死傷通報具備宣傳戰偏誤，UCDP 採保守直接確認口徑，實際傷亡高於統計",
+      "note": "烏克蘭、蘇丹、緬甸、加沙/黎巴嫩多線大型戰爭齊發，活躍國家衝突數與戰鬥死亡創冷戰後高位"
     },
     {
       "id": "l5_relative_decline_anxiety",
@@ -1590,9 +1747,9 @@
   ],
   "data_quality": {
     "as_of_date": "2026-10-21",
-    "total_indicators": 34,
+    "total_indicators": 36,
     "fresh_count": 1,
-    "stale_count": 33,
+    "stale_count": 35,
     "missing_count": 0,
     "completeness_pct": 100.0,
     "items": [
@@ -1867,6 +2024,21 @@
         "normalization_method": "0.5 * 消極離職(62%) + 1.0 * 主動對抗(15%) + 0.4 * 每日重壓(41%) = 31.0 + 15.0 + 16.4 = 62.4 -> 64.0"
       },
       {
+        "id": "l3_civil_unrest_intensity",
+        "name": "全球大型抗議暴動與社會動盪烈度",
+        "layer": "L3",
+        "status": "stale",
+        "evidence_level": "inference",
+        "raw_value": 38500,
+        "raw_unit": "起 (全球年度抗議與暴動事件總數)",
+        "source_name": "ACLED (Armed Conflict Location & Event Data Project)",
+        "source_url": "https://acleddata.com",
+        "publication_date": "2024-03-15",
+        "last_checked": "2026-10-21",
+        "stale_after": "365d",
+        "normalization_method": "clamp(30.0 + (events - 15000) / 25000 * 35.0 + 10.0, 0, 100) = 30.0 + (23500 / 25000) * 35.0 + 10.0 = 72.9 -> 73.0"
+      },
+      {
         "id": "l4_military_expenditure_growth",
         "name": "全球軍費加速擴張與防衛預算GDP佔比",
         "layer": "L4",
@@ -1955,6 +2127,21 @@
         "last_checked": "2026-10-21",
         "stale_after": "90d",
         "normalization_method": "四大戰區烈度加權: 歐洲常規大戰 + 中東飛彈對射 + 台海南海日常灰色地帶摩擦，判定為 80.0 分"
+      },
+      {
+        "id": "l4_active_war_intensity",
+        "name": "全球大型活躍戰爭與武裝衝突烈度",
+        "layer": "L4",
+        "status": "stale",
+        "evidence_level": "verified",
+        "raw_value": 159800,
+        "raw_unit": "人 (年度戰鬥與武裝衝突死亡人數) / 11 場 (大型戰爭數)",
+        "source_name": "UCDP Conflict Data Program (Uppsala University)",
+        "source_url": "https://ucdp.uu.se",
+        "publication_date": "2024-06-18",
+        "last_checked": "2026-10-21",
+        "stale_after": "365d",
+        "normalization_method": "clamp(30.0 + (deaths - 30000) / (200000 - 30000) * 50.0 + (active_wars - 4) * 2.0, 0, 100) = 30.0 + (129800 / 170000) * 50.0 + 14.0 = 82.2 -> 82.0"
       },
       {
         "id": "l5_relative_decline_anxiety",
@@ -2109,13 +2296,13 @@
     ]
   },
   "evidence_distribution": {
-    "verified": 7,
-    "inference": 20,
+    "verified": 8,
+    "inference": 21,
     "illustrative": 7,
-    "total": 34,
-    "verified_pct": 20.6,
-    "inference_pct": 58.8,
-    "illustrative_pct": 20.6
+    "total": 36,
+    "verified_pct": 22.2,
+    "inference_pct": 58.3,
+    "illustrative_pct": 19.4
   },
   "model_params": {
     "c_l1_l2": 0.08,

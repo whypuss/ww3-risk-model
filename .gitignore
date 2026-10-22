@@ -52,4 +52,5 @@ staging/
 # Node & Cloudflare
 node_modules/
 .cloudflare/
+.wrangler/
 
