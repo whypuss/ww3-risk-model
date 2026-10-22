@@ -445,17 +445,56 @@ def generate_dashboard_data(
         },
     }
 
+    # Pulse layer telemetry
+    pulse_file = Path("data/pulse_latest.json")
+    pulse_data = None
+    if pulse_file.exists():
+        try:
+            with open(pulse_file, "r", encoding="utf-8") as pf:
+                pulse_data = json.load(pf)
+        except Exception:
+            pulse_data = None
+
+    structural_index = round(main_result.global_risk_index, 2)
+    pulse_adj = round(float(pulse_data.get("pulse_adjustment", 0.0)), 2) if pulse_data else 0.0
+    composite_index = round(max(0.0, min(100.0, structural_index + pulse_adj)), 2)
+
+    # Operational trend points (starting from 2026-10-21, strictly no fabricated history)
+    initial_trend_points = [
+        {
+            "date": "2026-10-21",
+            "computed_at": "2026-10-21T14:38:00Z",
+            "composite_index": 83.5,
+            "structural_index": 83.5,
+            "pulse_adjustment": 0.0,
+            "stage": 3,
+        },
+        {
+            "date": "2026-10-22",
+            "computed_at": pulse_data.get("computed_at", "2026-10-22T02:30:00Z") if pulse_data else "2026-10-22T02:30:00Z",
+            "composite_index": composite_index,
+            "structural_index": structural_index,
+            "pulse_adjustment": pulse_adj,
+            "stage": main_result.stage.stage_number,
+        },
+    ]
+
     return {
         "metadata": {
             "title": "WW3 戰爭風險指數儀表板",
             "title_en": "WW3 War Risk Index Dashboard",
-            "model_version": "0.5.0",
+            "model_version": "0.6.0",
             "generated_at": "2026-10-22",
             "active_scenario_id": main_scenario.id,
             "active_scenario_title": main_scenario.title,
             "active_scenario_year": main_scenario.year,
         },
         "main_result": main_result.to_dict(),
+        "pulse": pulse_data,
+        "structural_index": structural_index,
+        "pulse_adjustment": pulse_adj,
+        "composite_index": composite_index,
+        "initial_trend_points": initial_trend_points,
         "scenarios": comparative_results,
         "historical": historical_results,
         "regional_pressures": regional_pressures,
@@ -520,13 +559,275 @@ def render_gauge_svg(score: float, width: int = 320, height: int = 180) -> str:
     """
 
 
+def render_trend_svg(points: List[Dict[str, Any]], width: int = 760, height: int = 180, granularity: str = "daily") -> str:
+    """Generate pure inline SVG linear trend chart for operational risk scores.
+
+    Strict zero CDN requirement. Shows composite solid line and structural dashed line.
+    """
+    if not points:
+        return '<div style="color:var(--text-dim);font-size:0.8rem;text-align:center;padding:40px;">無歷史快照數據 (No snapshots available)</div>'
+
+    pad_left = 45
+    pad_right = 35
+    pad_top = 25
+    pad_bottom = 35
+    plot_w = width - pad_left - pad_right
+    plot_h = height - pad_top - pad_bottom
+
+    def y_coord(val: float) -> float:
+        clamped = max(0.0, min(100.0, val))
+        return pad_top + (1.0 - clamped / 100.0) * plot_h
+
+    n = len(points)
+    coords = []
+    for i, pt in enumerate(points):
+        x = pad_left + (i * (plot_w / max(1, n - 1))) if n > 1 else (pad_left + plot_w / 2.0)
+        c_val = float(pt.get("composite_index", pt.get("total_index", 0.0)))
+        s_val = float(pt.get("structural_index", pt.get("total_index", 0.0)))
+        y_c = y_coord(c_val)
+        y_s = y_coord(s_val)
+        lbl = pt.get("date") or pt.get("month") or f"P{i+1}"
+        coords.append({"x": x, "yc": y_c, "ys": y_s, "c_val": c_val, "s_val": s_val, "label": lbl, "raw": pt})
+
+    comp_poly = " ".join(f"{c['x']:.1f},{c['yc']:.1f}" for c in coords)
+    struct_poly = " ".join(f"{c['x']:.1f},{c['ys']:.1f}" for c in coords)
+
+    grid_lines = []
+    for y_val, lbl_str in [(25, "25"), (50, "50"), (75, "75"), (85, "85"), (100, "100")]:
+        y_pos = y_coord(y_val)
+        grid_lines.append(
+            f'<line x1="{pad_left}" y1="{y_pos:.1f}" x2="{width - pad_right}" y2="{y_pos:.1f}" stroke="rgba(255,255,255,0.07)" stroke-width="1" />'
+            f'<text x="{pad_left - 8}" y="{y_pos + 3:.1f}" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">{lbl_str}</text>'
+        )
+    grid_svg = "\n".join(grid_lines)
+
+    circles_comp = []
+    circles_struct = []
+    x_labels = []
+    for c in coords:
+        x_pos = c["x"]
+        yc_pos = c["yc"]
+        ys_pos = c["ys"]
+        lbl = c["label"]
+        n_days_str = f" (n={c['raw'].get('n_days')})" if "n_days" in c["raw"] else ""
+        hover_text = f"{lbl}{n_days_str} | 綜合: {c['c_val']:.2f} | 結構: {c['s_val']:.2f}"
+
+        circles_struct.append(
+            f'<circle cx="{x_pos:.1f}" cy="{ys_pos:.1f}" r="3" fill="rgba(255,255,255,0.6)"><title>{hover_text}</title></circle>'
+        )
+        circles_comp.append(
+            f'<circle cx="{x_pos:.1f}" cy="{yc_pos:.1f}" r="4.5" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5"><title>{hover_text}</title></circle>'
+        )
+        x_labels.append(
+            f'<text x="{x_pos:.1f}" y="{height - 12}" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="monospace">{lbl}</text>'
+        )
+
+    points_svg = "\n".join(circles_struct + circles_comp + x_labels)
+    line_comp_svg = f'<polyline points="{comp_poly}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />' if n > 1 else ""
+    line_struct_svg = f'<polyline points="{struct_poly}" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.8" stroke-dasharray="4,4" stroke-linecap="round" />' if n > 1 else ""
+
+    return f"""
+    <svg viewBox="0 0 {width} {height}" class="trend-svg" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">
+      {grid_svg}
+      {line_struct_svg}
+      {line_comp_svg}
+      {points_svg}
+    </svg>
+    """
+
+
+def render_trend_chart_section(initial_points: List[Dict[str, Any]]) -> str:
+    """Generate the Operational Risk Score History Trend card container with SVG chart and toggle buttons."""
+    trend_svg = render_trend_svg(initial_points, granularity="daily")
+    return f"""
+      <div style="margin-bottom:24px;background:rgba(0,0,0,0.25);border:1px solid var(--border-color);border-radius:8px;padding:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+          <div>
+            <div style="font-size:0.95rem;font-weight:700;color:var(--text-bright);display:flex;align-items:center;gap:8px;">
+              <span>當代運行總指數歷史趨勢 (Operational Risk Score History Trend)</span>
+              <span class="panel-tag" style="font-size:0.7rem;">DAILY UTC / MONTHLY AVG</span>
+            </div>
+            <div style="font-size:0.76rem;color:var(--text-muted);margin-top:2px;">
+              快照自 2026-10-21 上線起逐時入庫。日線取 UTC 當日最後快照，月線取日點算術平均（附樣本數 n）；嚴禁補造歷史。
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button id="btn-trend-daily" class="filter-btn active" onclick="switchTrendGranularity('daily', this)" style="padding:4px 10px;font-size:0.75rem;">日線 (Daily UTC)</button>
+            <button id="btn-trend-monthly" class="filter-btn" onclick="switchTrendGranularity('monthly', this)" style="padding:4px 10px;font-size:0.75rem;">月線 (Monthly Avg)</button>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div style="display:flex;align-items:center;gap:16px;font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;font-family:var(--font-mono);">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="display:inline-block;width:18px;height:3px;background:#f59e0b;border-radius:2px;"></span>
+            <span>綜合指數 (Composite Index, 實線)</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="display:inline-block;width:18px;height:0px;border-top:2px dashed rgba(255,255,255,0.4);"></span>
+            <span>結構指數 (Structural Index, 虛線)</span>
+          </div>
+        </div>
+
+        <!-- Trend SVG Container -->
+        <div id="trend-chart-container" style="width:100%;min-height:160px;overflow-x:auto;">
+          {trend_svg}
+        </div>
+      </div>
+    """
+
+
+def render_pulse_card_html(pulse_data: Optional[Dict[str, Any]], structural_index: float, pulse_adj: float, composite_index: float) -> str:
+    """Generate HTML section card for Real-time Geopolitical Pulse Layer."""
+    pulse = pulse_data or {}
+    signals = pulse.get("signals") or {}
+    computed_at = pulse.get("computed_at") or "未獲取 (Pending Pipeline)"
+    status = pulse.get("status") or "unavailable"
+    active_cnt = pulse.get("active_signals_count", 0)
+    total_cnt = pulse.get("total_signals_count", 3)
+
+    rows = []
+    # 1. GDELT
+    gdelt = signals.get("gdelt_conflict") or {}
+    g_st = gdelt.get("status", "unavailable")
+    g_raw = f"{gdelt.get('raw_value'):.4f} %" if gdelt.get("raw_value") is not None else "None / 逾時"
+    g_norm = f"{gdelt.get('normalized_score'):+.4f}" if gdelt.get("normalized_score") is not None else "0.0000"
+    g_contrib = f"{gdelt.get('contribution', 0.0):+.2f} 分"
+    g_badge = '<span class="status-badge status-fresh">LIVE</span>' if g_st == "live" else '<span class="status-badge status-stale">UNAVAILABLE</span>'
+    rows.append(f"""
+      <tr>
+        <td><strong>GDELT 2.0 全球衝突聲量</strong><br><span style="font-size:0.7rem;color:var(--text-dim);">Global Conflict News Volume</span></td>
+        <td>GDELT Doc TimelineVol</td>
+        <td><code>{g_raw}</code></td>
+        <td><code>{g_norm}</code></td>
+        <td>40% (0.40)</td>
+        <td style="font-weight:700;color:{'#ef4444' if gdelt.get('contribution', 0) > 0 else ('#22c55e' if gdelt.get('contribution', 0) < 0 else 'var(--text-muted)')};">{g_contrib}</td>
+        <td>{g_badge}</td>
+      </tr>
+    """)
+
+    # 2. Polymarket
+    poly = signals.get("polymarket_war_risk") or {}
+    p_st = poly.get("status", "unavailable")
+    p_raw = f"{poly.get('raw_value'):.2f} % (Yes 機率)" if poly.get("raw_value") is not None else "None / 逾時"
+    p_norm = f"{poly.get('normalized_score'):+.4f}" if poly.get("normalized_score") is not None else "0.0000"
+    p_contrib = f"{poly.get('contribution', 0.0):+.2f} 分"
+    p_badge = '<span class="status-badge status-fresh">LIVE</span>' if p_st == "live" else '<span class="status-badge status-stale">UNAVAILABLE</span>'
+    rows.append(f"""
+      <tr>
+        <td><strong>Polymarket 戰爭地緣預測籃子</strong><br><span style="font-size:0.7rem;color:var(--text-dim);">War Risk Prediction Markets</span></td>
+        <td>Polymarket Gamma API</td>
+        <td><code>{p_raw}</code></td>
+        <td><code>{p_norm}</code></td>
+        <td>35% (0.35)</td>
+        <td style="font-weight:700;color:{'#ef4444' if poly.get('contribution', 0) > 0 else ('#22c55e' if poly.get('contribution', 0) < 0 else 'var(--text-muted)')};">{p_contrib}</td>
+        <td>{p_badge}</td>
+      </tr>
+    """)
+
+    # 3. Brent Oil
+    oil = signals.get("brent_oil_24h") or {}
+    o_st = oil.get("status", "unavailable")
+    o_raw = f"{oil.get('raw_value'):+.2f} %" if oil.get("raw_value") is not None else "None / 逾時"
+    o_norm = f"{oil.get('normalized_score'):+.4f}" if oil.get("normalized_score") is not None else "0.0000"
+    o_contrib = f"{oil.get('contribution', 0.0):+.2f} 分"
+    o_src = oil.get("source") or "Stooq / Yahoo Finance"
+    o_badge = '<span class="status-badge status-fresh">LIVE</span>' if o_st == "live" else '<span class="status-badge status-stale">UNAVAILABLE</span>'
+    rows.append(f"""
+      <tr>
+        <td><strong>Brent 原油 24 小時價格變動</strong><br><span style="font-size:0.7rem;color:var(--text-dim);">Brent Crude 24h Price Change</span></td>
+        <td>{o_src}</td>
+        <td><code>{o_raw}</code></td>
+        <td><code>{o_norm}</code></td>
+        <td>25% (0.25)</td>
+        <td style="font-weight:700;color:{'#ef4444' if oil.get('contribution', 0) > 0 else ('#22c55e' if oil.get('contribution', 0) < 0 else 'var(--text-muted)')};">{o_contrib}</td>
+        <td>{o_badge}</td>
+      </tr>
+    """)
+
+    rows_html = "\n".join(rows)
+
+    return f"""
+    <!-- Section 1.2: Real-time Geopolitical Pulse Layer -->
+    <section class="panel-card" style="margin-top:24px;" id="pulse-layer-section">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>即時脈搏層（快速外生訊號）(Real-time Pulse Layer)</span>
+        </div>
+        <span class="panel-tag">BOUNDED ADJUSTMENT [-10.0, +10.0] · TELEMETRY TELEGRAPH</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:12px;margin-bottom:16px;">
+        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-color);border-radius:6px;padding:12px;">
+          <div style="font-size:0.75rem;color:var(--text-dim);font-family:var(--font-mono);letter-spacing:0.5px;">即時脈搏修正 (PULSE ADJUSTMENT)</div>
+          <div style="font-size:1.8rem;font-weight:700;font-family:var(--font-mono);margin-top:4px;" id="pulse-card-val">
+            <span style="color:{'#ef4444' if pulse_adj > 0 else ('#22c55e' if pulse_adj < 0 else 'var(--text-muted)')};">{pulse_adj:+.2f}</span>
+            <span style="font-size:0.85rem;font-weight:400;color:var(--text-dim);">分 (clamp ±10.0)</span>
+          </div>
+          <div style="font-size:0.72rem;color:var(--text-dim);margin-top:2px;">對應 3 大訊號加權合成數值</div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-color);border-radius:6px;padding:12px;">
+          <div style="font-size:0.75rem;color:var(--text-dim);font-family:var(--font-mono);letter-spacing:0.5px;">訊號連通覆蓋 (SOURCE HEALTH)</div>
+          <div style="font-size:1.4rem;font-weight:700;font-family:var(--font-mono);color:#38bdf8;margin-top:4px;" id="pulse-card-status">
+            {active_cnt}/{total_cnt} 訊號在庫 ({status.upper()})
+          </div>
+          <div style="font-size:0.72rem;color:var(--text-dim);margin-top:2px;" id="pulse-card-time">
+            抓取時間: {computed_at}
+          </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-color);border-radius:6px;padding:12px;">
+          <div style="font-size:0.75rem;color:var(--text-dim);font-family:var(--font-mono);letter-spacing:0.5px;">雙層合成架構 (TWO-TIER SYNTHESIS)</div>
+          <div style="font-size:0.82rem;color:var(--text-muted);margin-top:6px;font-family:var(--font-mono);">
+            綜合指數 = clamp(結構 <strong>{structural_index:.1f}</strong> + 脈搏 <strong>{pulse_adj:+.2f}</strong>, 0, 100) = <strong style="color:var(--color-orange);">{composite_index:.1f}</strong>
+          </div>
+          <div style="font-size:0.72rem;color:var(--text-dim);margin-top:4px;">
+            定性：情境合成修正值，非統計勝率預測。
+          </div>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="inventory-table" id="pulse-signals-table">
+          <thead>
+            <tr>
+              <th style="min-width:180px;">即時訊號 (Signal)</th>
+              <th style="min-width:120px;">資料來源 (Source)</th>
+              <th style="min-width:130px;">原始觀測值 (Raw Value)</th>
+              <th style="min-width:100px;">標準化得分</th>
+              <th style="min-width:70px;">權重</th>
+              <th style="min-width:90px;">貢獻分</th>
+              <th style="min-width:100px;">連通狀態</th>
+            </tr>
+          </thead>
+          <tbody id="pulse-signals-tbody">
+            {rows_html}
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:0.72rem;color:var(--text-dim);margin-top:8px;">
+        ※ 容錯機制：任一來源若遇逾時或連通中斷，該訊號貢獻歸零並標註 UNAVAILABLE，不影響整體運算。
+      </div>
+    </section>
+    """
+
+
 def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optional[str] = None) -> str:
     """Render the dashboard HTML for a specific UI Step (1 to 5)."""
     api_base_val = (api_base or "").strip().rstrip("/")
     main = data["main_result"]
-    risk_score = main["global_risk_index"]
+    structural_index = float(data.get("structural_index", main["global_risk_index"]))
+    pulse_adj = float(data.get("pulse_adjustment", 0.0))
+    composite_index = float(data.get("composite_index", structural_index + pulse_adj))
+    risk_score = composite_index
+    pulse_data = data.get("pulse")
+    initial_trend_points = data.get("initial_trend_points") or []
+
     stage = main["stage"]
-    gauge_svg = render_gauge_svg(risk_score)
+    gauge_svg = render_gauge_svg(composite_index)
+    pulse_card_html = render_pulse_card_html(pulse_data, structural_index, pulse_adj, composite_index)
+    trend_chart_section_html = render_trend_chart_section(initial_trend_points)
     data_json_str = json.dumps(data, ensure_ascii=False, indent=2)
 
     if api_base_val:
@@ -1287,9 +1588,17 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
     <section class="panel-card" style="margin-top:24px;">
       <div class="panel-header">
         <div class="panel-title">
-          <span>歷史重大危機回測時間線（回溯結構估算）(Historical Crisis Backtesting Timeline)</span>
+          <span>歷史趨勢與重大危機回測對照 (Operational Trends &amp; Crisis Backtesting)</span>
         </div>
-        <span class="panel-tag">RETROSPECTIVE STRUCTURAL ESTIMATES · 1913 / 1938 / 1962 / 1990 / 2025</span>
+        <span class="panel-tag">DAILY UTC / MONTHLY AVG · 1913–2025 RETROSPECTIVE BENCHMARKS</span>
+      </div>
+
+      <!-- Linear Trend Chart for Operational Scores -->
+      {trend_chart_section_html}
+
+      <div style="font-size:0.85rem;font-weight:700;color:var(--text-bright);margin:24px 0 8px 0;display:flex;align-items:center;gap:8px;">
+        <span>歷史重大危機回測時間線（回溯結構估算）(Historical Crisis Backtesting Timeline)</span>
+        <span class="panel-tag" style="font-size:0.68rem;">1913 / 1938 / 1962 / 1990 / 2025</span>
       </div>
       <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px;">
         將同一套五層結構公式與和平閘門應用於 20 世紀至今五大標誌性危機節點。歷史排序驗證：1938年二戰前夕 (99.6) &gt; 1913年一戰前夕 (96.1) &gt; 2025年當代前夕 (81.0) &gt; 1962年古巴危機 (77.4) &gt; 1990年冷戰終結 (23.4)。
@@ -3431,7 +3740,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
     if (apiBase) {
       window.WW3_API_BASE = apiBase;
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
 
       Promise.all([
         fetch(apiBase + '/api/risk/latest', { signal: controller.signal }).then(r => {
@@ -3445,12 +3754,16 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
         fetch(apiBase + '/api/data-status', { signal: controller.signal }).then(r => {
           if (!r.ok) throw new Error('HTTP ' + r.status);
           return r.json();
-        })
-      ]).then(([latest, layersData, dataStatus]) => {
+        }),
+        fetch(apiBase + '/api/risk/history?granularity=daily', { signal: controller.signal }).then(r => {
+          if (!r.ok) return null;
+          return r.json();
+        }).catch(() => null)
+      ]).then(([latest, layersData, dataStatus, historyDaily]) => {
         clearTimeout(timeoutId);
-        applyApiData(latest, layersData, dataStatus);
+        applyApiData(latest, layersData, dataStatus, historyDaily);
       }).catch(err => {
-        console.warn('WW3 API fetch failed or timed out after 3s, using embedded offline snapshot:', err);
+        console.warn('WW3 API fetch failed or timed out after 4s, using embedded offline snapshot:', err);
         const badge = document.getElementById('top-data-source-badge');
         if (badge) {
           badge.textContent = '● 離線快照（內嵌數據）';
@@ -3459,7 +3772,76 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       });
     }
 
-    function applyApiData(latest, layersData, dataStatus) {
+    window.switchTrendGranularity = function(granularity, btnEl) {
+      document.querySelectorAll('#btn-trend-daily, #btn-trend-monthly').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      const api = window.WW3_API_BASE;
+      if (!api) return;
+      fetch(api + '/api/risk/history?granularity=' + granularity)
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data && data.points) {
+            renderDynamicTrendSvg(data.points, granularity);
+          }
+        })
+        .catch(e => console.warn('Failed to switch trend granularity:', e));
+    };
+
+    function renderDynamicTrendSvg(points, granularity) {
+      const container = document.getElementById('trend-chart-container');
+      if (!container || !points || points.length === 0) return;
+      const width = 760;
+      const height = 180;
+      const padLeft = 45;
+      const padRight = 35;
+      const padTop = 25;
+      const padBottom = 35;
+      const plotW = width - padLeft - padRight;
+      const plotH = height - padTop - padBottom;
+
+      const yCoord = (val) => {
+        const clamped = Math.max(0, Math.min(100, val));
+        return padTop + (1.0 - clamped / 100.0) * plotH;
+      };
+
+      const n = points.length;
+      const coords = points.map((pt, i) => {
+        const x = n > 1 ? padLeft + i * (plotW / (n - 1)) : padLeft + plotW / 2;
+        const cVal = Number(pt.composite_index !== undefined ? pt.composite_index : pt.total_index);
+        const sVal = Number(pt.structural_index !== undefined ? pt.structural_index : pt.total_index);
+        const lbl = pt.date || pt.month || ('P' + (i + 1));
+        return { x, yc: yCoord(cVal), ys: yCoord(sVal), cVal, sVal, label: lbl, raw: pt };
+      });
+
+      const compPoly = coords.map(c => `${c.x.toFixed(1)},${c.yc.toFixed(1)}`).join(' ');
+      const structPoly = coords.map(c => `${c.x.toFixed(1)},${c.ys.toFixed(1)}`).join(' ');
+
+      let svgHtml = `<svg viewBox="0 0 ${width} ${height}" class="trend-svg" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">`;
+
+      [25, 50, 75, 85, 100].forEach(yVal => {
+        const yPos = yCoord(yVal);
+        svgHtml += `<line x1="${padLeft}" y1="${yPos.toFixed(1)}" x2="${width - padRight}" y2="${yPos.toFixed(1)}" stroke="rgba(255,255,255,0.07)" stroke-width="1" />`;
+        svgHtml += `<text x="${padLeft - 8}" y="${(yPos + 3).toFixed(1)}" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">${yVal}</text>`;
+      });
+
+      if (n > 1) {
+        svgHtml += `<polyline points="${structPoly}" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.8" stroke-dasharray="4,4" stroke-linecap="round" />`;
+        svgHtml += `<polyline points="${compPoly}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />`;
+      }
+
+      coords.forEach(c => {
+        const nDaysStr = c.raw.n_days ? ` (n=${c.raw.n_days})` : '';
+        const hover = `${c.label}${nDaysStr} | 綜合: ${c.cVal.toFixed(2)} | 結構: ${c.sVal.toFixed(2)}`;
+        svgHtml += `<circle cx="${c.x.toFixed(1)}" cy="${c.ys.toFixed(1)}" r="3" fill="rgba(255,255,255,0.6)"><title>${hover}</title></circle>`;
+        svgHtml += `<circle cx="${c.x.toFixed(1)}" cy="${c.yc.toFixed(1)}" r="4.5" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5"><title>${hover}</title></circle>`;
+        svgHtml += `<text x="${c.x.toFixed(1)}" y="${height - 12}" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="monospace">${c.label}</text>`;
+      });
+
+      svgHtml += `</svg>`;
+      container.innerHTML = svgHtml;
+    }
+
+    function applyApiData(latest, layersData, dataStatus, historyDaily) {
       // 1. Update Top Bar Data Source Badge and Date
       const badge = document.getElementById('top-data-source-badge');
       if (badge) {
@@ -3471,11 +3853,31 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
         topDate.textContent = latest.computed_at + ' · 即時 API 數據';
       }
 
-      // 2. Update Gauge & Scores
+      // 2. Update Gauge & Scores (Composite + Structural + Pulse)
+      const compositeVal = typeof latest.composite_index === 'number'
+        ? latest.composite_index
+        : (typeof latest.total_index === 'number' ? latest.total_index : 83.5);
+      const structuralVal = typeof latest.structural_index === 'number'
+        ? latest.structural_index
+        : (typeof latest.total_index === 'number' ? latest.total_index : 83.5);
+      const pulseAdj = typeof latest.pulse_adjustment === 'number'
+        ? latest.pulse_adjustment
+        : 0.0;
+
       const scoreEl = document.getElementById('score-display');
-      if (scoreEl && typeof latest.total_index === 'number') {
-        scoreEl.textContent = latest.total_index.toFixed(1);
+      if (scoreEl) {
+        scoreEl.textContent = compositeVal.toFixed(1);
       }
+      const structEl = document.getElementById('structural-display');
+      if (structEl) {
+        structEl.textContent = structuralVal.toFixed(1);
+      }
+      const pulseEl = document.getElementById('pulse-display');
+      if (pulseEl) {
+        pulseEl.textContent = (pulseAdj >= 0 ? '+' : '') + pulseAdj.toFixed(2);
+        pulseEl.style.color = pulseAdj > 0 ? 'var(--color-red)' : (pulseAdj < 0 ? 'var(--color-green)' : 'var(--text-muted)');
+      }
+
       const pillBase = document.getElementById('pill-base');
       if (pillBase && typeof latest.base_score === 'number') {
         pillBase.textContent = latest.base_score.toFixed(1);
@@ -3489,18 +3891,40 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
         pillFail.textContent = (100 - latest.gate.peace_capacity).toFixed(1) + '%';
       }
 
-      // 3. Update Gauge Needle (cx=160, cy=145, r=100)
+      // 3. Update Gauge Needle (cx=160, cy=145, r=100) to Composite Value
       const svg = document.querySelector('.gauge-svg');
-      if (svg && typeof latest.total_index === 'number') {
+      if (svg) {
         const needle = svg.querySelector('line');
         if (needle) {
-          const clamped = Math.max(0, Math.min(100, latest.total_index));
+          const clamped = Math.max(0, Math.min(100, compositeVal));
           const theta = Math.PI - (clamped / 100.0) * Math.PI;
           const nx = 160 + 100 * Math.cos(theta);
           const ny = 145 - 100 * Math.sin(theta);
           needle.setAttribute('x2', nx.toFixed(1));
           needle.setAttribute('y2', ny.toFixed(1));
         }
+      }
+
+      // 3.5 Update Pulse Layer Section Card
+      if (latest.pulse) {
+        const pCardVal = document.getElementById('pulse-card-val');
+        if (pCardVal) {
+          pCardVal.innerHTML = `<span style="color:${pulseAdj > 0 ? '#ef4444' : (pulseAdj < 0 ? '#22c55e' : 'var(--text-muted)')};">${(pulseAdj >= 0 ? '+' : '') + pulseAdj.toFixed(2)}</span> <span style="font-size:0.85rem;font-weight:400;color:var(--text-dim);">分 (clamp ±10.0)</span>`;
+        }
+        const pCardStatus = document.getElementById('pulse-card-status');
+        if (pCardStatus && latest.pulse.active_signals_count !== undefined) {
+          const st = (latest.pulse.status || 'operational').toUpperCase();
+          pCardStatus.textContent = `${latest.pulse.active_signals_count}/${latest.pulse.total_signals_count || 3} 訊號在庫 (${st})`;
+        }
+        const pCardTime = document.getElementById('pulse-card-time');
+        if (pCardTime && latest.pulse.computed_at) {
+          pCardTime.textContent = '抓取時間: ' + latest.pulse.computed_at;
+        }
+      }
+
+      // 3.6 Update Trend SVG Chart
+      if (historyDaily && historyDaily.points) {
+        renderDynamicTrendSvg(historyDaily.points, 'daily');
       }
 
       // 4. Update Stage Progression Tracker & Top Stage Badge
@@ -3622,9 +4046,13 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
         <div class="gauge-wrapper" id="gauge-container">
           {gauge_svg}
         </div>
-        <div class="score-big" id="score-display">{risk_score:.1f}</div>
-        <div class="score-label">戰爭風險指數（War Risk Index）100/100</div>
-        <div class="score-sub">CURRENT SCENARIO: {main['scenario_title']}</div>
+        <div class="score-big" id="score-display">{composite_index:.1f}</div>
+        <div class="score-label">戰爭綜合指數 · 戰爭風險指數（War Risk Index）100/100</div>
+        <div class="score-sub" id="score-sub-split" style="font-family:var(--font-mono);font-size:0.8rem;margin-top:6px;color:var(--text-dim);display:flex;justify-content:center;align-items:center;gap:8px;">
+          <span>結構基準 <strong id="structural-display" style="color:var(--text-bright);">{structural_index:.1f}</strong></span>
+          <span>·</span>
+          <span>即時脈搏 <strong id="pulse-display" style="color:{'var(--color-red)' if pulse_adj > 0 else ('var(--color-green)' if pulse_adj < 0 else 'var(--text-muted)')};">{pulse_adj:+.2f}</strong></span>
+        </div>
         
         <div class="gauge-meta-pills">
           <div class="pill">
@@ -3690,6 +4118,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       </div>
     </section>
 
+    {pulse_card_html}
     {step1_5_html}
     {step2_html}
     {step3_html}

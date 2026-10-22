@@ -313,7 +313,7 @@ def test_dashboard_v03_terminology_and_credibility_separation(tmp_path):
     assert "100.0%" in content  # Completeness pct
 
     # 5. Metadata and JSON audit
-    assert data["metadata"]["model_version"] == "0.5.0"
+    assert data["metadata"]["model_version"] in {"0.5.0", "0.6.0"}
     assert "data_quality" in data
     assert data["data_quality"]["completeness_pct"] == 100.0
     assert "evidence_distribution" in data
@@ -487,6 +487,49 @@ def test_regional_8_cards_id_integrity_and_discipline():
         assert f"= {c['score']:.1f}" in c["formula"]
         # Valid level
         assert c["level"] in {"CRITICAL", "HIGH", "ELEVATED", "MODERATE"}
+
+
+def test_pulse_layer_card_and_trend_svg_rendering(tmp_path):
+    """Verify v0.6.0 pulse layer card, composite/structural split, and SVG linear trend chart."""
+    out_html = tmp_path / "dashboard_v06.html"
+    out_json = tmp_path / "dashboard_v06.json"
+
+    data = build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        output_json_path=out_json,
+        ui_step=5,
+    )
+    content = out_html.read_text(encoding="utf-8")
+
+    # 1. Main gauge composite index & structural/pulse split
+    assert 'id="score-display"' in content
+    assert 'id="structural-display"' in content
+    assert 'id="pulse-display"' in content
+    assert "結構基準" in content
+    assert "即時脈搏" in content
+
+    # 2. Pulse Layer Section & Signals Table
+    assert 'id="pulse-layer-section"' in content
+    assert "即時脈搏層（快速外生訊號）" in content
+    assert 'id="pulse-signals-table"' in content
+    assert "GDELT 2.0 全球衝突聲量" in content
+    assert "Polymarket 戰爭地緣預測籃子" in content
+    assert "Brent 原油 24 小時價格變動" in content
+
+    # 3. Operational Trend Linear Chart
+    assert 'id="trend-chart-container"' in content
+    assert "當代運行總指數歷史趨勢" in content
+    assert 'id="btn-trend-daily"' in content
+    assert 'id="btn-trend-monthly"' in content
+    assert 'class="trend-svg"' in content
+    assert "2026-10-21" in content
+    assert "嚴禁補造歷史" in content
+
+    # 4. Zero external CDN scripts or stylesheets
+    external_links = re.findall(r'(src|href)=["\']https?://[^"\']+["\']', content)
+    assert len(external_links) == 0, f"Found external web dependencies: {external_links}"
+
 
 
 

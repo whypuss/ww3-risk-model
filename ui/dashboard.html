@@ -1781,15 +1781,19 @@
       <text x="285" y="165" fill="#64748b" font-size="11" font-weight="600" text-anchor="middle">100</text>
 
       <!-- Needle pointer -->
-      <line x1="160" y1="145" x2="246.9" y2="95.5" stroke="#f8fafc" stroke-width="3.5" stroke-linecap="round" filter="url(#needleGlow)"/>
+      <line x1="160" y1="145" x2="246.7" y2="95.1" stroke="#f8fafc" stroke-width="3.5" stroke-linecap="round" filter="url(#needleGlow)"/>
       <circle cx="160" cy="145" r="7" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
       <circle cx="160" cy="145" r="3" fill="#ef4444"/>
     </svg>
     
         </div>
-        <div class="score-big" id="score-display">83.5</div>
-        <div class="score-label">戰爭風險指數（War Risk Index）100/100</div>
-        <div class="score-sub">CURRENT SCENARIO: 2026 全球結構風險基準情境</div>
+        <div class="score-big" id="score-display">83.4</div>
+        <div class="score-label">戰爭綜合指數 · 戰爭風險指數（War Risk Index）100/100</div>
+        <div class="score-sub" id="score-sub-split" style="font-family:var(--font-mono);font-size:0.8rem;margin-top:6px;color:var(--text-dim);display:flex;justify-content:center;align-items:center;gap:8px;">
+          <span>結構基準 <strong id="structural-display" style="color:var(--text-bright);">83.5</strong></span>
+          <span>·</span>
+          <span>即時脈搏 <strong id="pulse-display" style="color:var(--color-green);">-0.12</strong></span>
+        </div>
         
         <div class="gauge-meta-pills">
           <div class="pill">
@@ -1899,6 +1903,102 @@
     </section>
 
     
+    <!-- Section 1.2: Real-time Geopolitical Pulse Layer -->
+    <section class="panel-card" style="margin-top:24px;" id="pulse-layer-section">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>即時脈搏層（快速外生訊號）(Real-time Pulse Layer)</span>
+        </div>
+        <span class="panel-tag">BOUNDED ADJUSTMENT [-10.0, +10.0] · TELEMETRY TELEGRAPH</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:12px;margin-bottom:16px;">
+        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-color);border-radius:6px;padding:12px;">
+          <div style="font-size:0.75rem;color:var(--text-dim);font-family:var(--font-mono);letter-spacing:0.5px;">即時脈搏修正 (PULSE ADJUSTMENT)</div>
+          <div style="font-size:1.8rem;font-weight:700;font-family:var(--font-mono);margin-top:4px;" id="pulse-card-val">
+            <span style="color:#22c55e;">-0.12</span>
+            <span style="font-size:0.85rem;font-weight:400;color:var(--text-dim);">分 (clamp ±10.0)</span>
+          </div>
+          <div style="font-size:0.72rem;color:var(--text-dim);margin-top:2px;">對應 3 大訊號加權合成數值</div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-color);border-radius:6px;padding:12px;">
+          <div style="font-size:0.75rem;color:var(--text-dim);font-family:var(--font-mono);letter-spacing:0.5px;">訊號連通覆蓋 (SOURCE HEALTH)</div>
+          <div style="font-size:1.4rem;font-weight:700;font-family:var(--font-mono);color:#38bdf8;margin-top:4px;" id="pulse-card-status">
+            2/3 訊號在庫 (OPERATIONAL)
+          </div>
+          <div style="font-size:0.72rem;color:var(--text-dim);margin-top:2px;" id="pulse-card-time">
+            抓取時間: 2026-10-22T02:39:59Z
+          </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-color);border-radius:6px;padding:12px;">
+          <div style="font-size:0.75rem;color:var(--text-dim);font-family:var(--font-mono);letter-spacing:0.5px;">雙層合成架構 (TWO-TIER SYNTHESIS)</div>
+          <div style="font-size:0.82rem;color:var(--text-muted);margin-top:6px;font-family:var(--font-mono);">
+            綜合指數 = clamp(結構 <strong>83.5</strong> + 脈搏 <strong>-0.12</strong>, 0, 100) = <strong style="color:var(--color-orange);">83.4</strong>
+          </div>
+          <div style="font-size:0.72rem;color:var(--text-dim);margin-top:4px;">
+            定性：情境合成修正值，非統計勝率預測。
+          </div>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="inventory-table" id="pulse-signals-table">
+          <thead>
+            <tr>
+              <th style="min-width:180px;">即時訊號 (Signal)</th>
+              <th style="min-width:120px;">資料來源 (Source)</th>
+              <th style="min-width:130px;">原始觀測值 (Raw Value)</th>
+              <th style="min-width:100px;">標準化得分</th>
+              <th style="min-width:70px;">權重</th>
+              <th style="min-width:90px;">貢獻分</th>
+              <th style="min-width:100px;">連通狀態</th>
+            </tr>
+          </thead>
+          <tbody id="pulse-signals-tbody">
+            
+      <tr>
+        <td><strong>GDELT 2.0 全球衝突聲量</strong><br><span style="font-size:0.7rem;color:var(--text-dim);">Global Conflict News Volume</span></td>
+        <td>GDELT Doc TimelineVol</td>
+        <td><code>None / 逾時</code></td>
+        <td><code>+0.0000</code></td>
+        <td>40% (0.40)</td>
+        <td style="font-weight:700;color:var(--text-muted);">+0.00 分</td>
+        <td><span class="status-badge status-stale">UNAVAILABLE</span></td>
+      </tr>
+    
+
+      <tr>
+        <td><strong>Polymarket 戰爭地緣預測籃子</strong><br><span style="font-size:0.7rem;color:var(--text-dim);">War Risk Prediction Markets</span></td>
+        <td>Polymarket Gamma API</td>
+        <td><code>3.60 % (Yes 機率)</code></td>
+        <td><code>-0.1400</code></td>
+        <td>35% (0.35)</td>
+        <td style="font-weight:700;color:#22c55e;">-0.49 分</td>
+        <td><span class="status-badge status-fresh">LIVE</span></td>
+      </tr>
+    
+
+      <tr>
+        <td><strong>Brent 原油 24 小時價格變動</strong><br><span style="font-size:0.7rem;color:var(--text-dim);">Brent Crude 24h Price Change</span></td>
+        <td>Yahoo Finance (BZ=F)</td>
+        <td><code>+1.46 %</code></td>
+        <td><code>+0.1461</code></td>
+        <td>25% (0.25)</td>
+        <td style="font-weight:700;color:#ef4444;">+0.37 分</td>
+        <td><span class="status-badge status-fresh">LIVE</span></td>
+      </tr>
+    
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:0.72rem;color:var(--text-dim);margin-top:8px;">
+        ※ 容錯機制：任一來源若遇逾時或連通中斷，該訊號貢獻歸零並標註 UNAVAILABLE，不影響整體運算。
+      </div>
+    </section>
+    
+    
     <!-- Section 1.5: War Risk Drivers & Data Quality Overview (UI-Step 2+) -->
     <section class="grid-two-cols" style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:24px;margin-top:24px;">
       <!-- Driver Decomposition Card -->
@@ -1910,7 +2010,7 @@
           <span class="panel-tag">EXACT MATHEMATICAL TRACEABILITY</span>
         </div>
         <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:14px;">
-          指數由 50 升至當前 <strong>83.5</strong> 係由以下核心結構與機制共同決定，每一項均可向上回溯至指標原始數據與計算公式：
+          指數由 50 升至當前 <strong>83.4</strong> 係由以下核心結構與機制共同決定，每一項均可向上回溯至指標原始數據與計算公式：
         </p>
         <div class="driver-steps-grid">
           <div class="driver-step-box">
@@ -1947,10 +2047,10 @@
             <div class="driver-step-head">
               <span class="driver-step-num">04</span>
               <span class="driver-step-name">高位平滑飽和映射 (Soft-Clamp)</span>
-              <span class="driver-step-val" id="driver-clamp-val">84.6 → 83.5</span>
+              <span class="driver-step-val" id="driver-clamp-val">84.6 → 83.4</span>
             </div>
             <div class="driver-step-desc">
-              未夾持得分 84.6 超越 70 閾值，經雙曲正切 Tanh 飽和函數平滑壓縮，防止無界發散，收斂為 83.5（進入 Stage 3 階段三：和平解決機制失效）。
+              未夾持得分 84.6 超越 70 閾值，經雙曲正切 Tanh 飽和函數平滑壓縮，防止無界發散，收斂為 83.4（進入 Stage 3 階段三：和平解決機制失效）。
             </div>
           </div>
         </div>
@@ -2304,7 +2404,7 @@
           <div class="insight-box" style="margin-top:16px;padding:12px;background:rgba(15, 23, 42, 0.6);border-left:3px solid var(--color-orange);border-radius:4px;">
             <div style="font-size:0.8rem;font-weight:700;color:#fed7aa;margin-bottom:4px;">戰略防務分析員洞察：</div>
             <p style="font-size:0.78rem;color:#cbd5e1;line-height:1.45;">
-              當前風險總分高達 <strong>83.5</strong>（進入階段三），核心驅動並非單一傳統軍備競賽，而是<strong>「算力晶圓與技術壟斷 (82.0)」</strong>與<strong>「多點領土引信 (80.0)」</strong>相互鎖死。外交互信緩衝（僅 36.0）與多邊仲裁（28.0）極度孱弱，導致任何邊境摩擦或技術先發管制均極易跨越防火牆直接升級。
+              當前風險總分高達 <strong>83.4</strong>（進入階段三），核心驅動並非單一傳統軍備競賽，而是<strong>「算力晶圓與技術壟斷 (82.0)」</strong>與<strong>「多點領土引信 (80.0)」</strong>相互鎖死。外交互信緩衝（僅 36.0）與多邊仲裁（28.0）極度孱弱，導致任何邊境摩擦或技術先發管制均極易跨越防火牆直接升級。
             </p>
           </div>
         </div>
@@ -2848,7 +2948,7 @@
               SIMULATED RISK PROJECTION
             </div>
             <div class="sim-score-row">
-              <div class="sim-score-big" id="sim-index-display">83.5</div>
+              <div class="sim-score-big" id="sim-index-display">83.4</div>
               <div class="sim-delta-badge" id="sim-delta-display">基準 (±0.0)</div>
             </div>
             <div class="sim-stage-badge" id="sim-stage-display">STAGE 3 · 階段三：和平解決機制失效</div>
@@ -2909,9 +3009,68 @@
     <section class="panel-card" style="margin-top:24px;">
       <div class="panel-header">
         <div class="panel-title">
-          <span>歷史重大危機回測時間線（回溯結構估算）(Historical Crisis Backtesting Timeline)</span>
+          <span>歷史趨勢與重大危機回測對照 (Operational Trends &amp; Crisis Backtesting)</span>
         </div>
-        <span class="panel-tag">RETROSPECTIVE STRUCTURAL ESTIMATES · 1913 / 1938 / 1962 / 1990 / 2025</span>
+        <span class="panel-tag">DAILY UTC / MONTHLY AVG · 1913–2025 RETROSPECTIVE BENCHMARKS</span>
+      </div>
+
+      <!-- Linear Trend Chart for Operational Scores -->
+      
+      <div style="margin-bottom:24px;background:rgba(0,0,0,0.25);border:1px solid var(--border-color);border-radius:8px;padding:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+          <div>
+            <div style="font-size:0.95rem;font-weight:700;color:var(--text-bright);display:flex;align-items:center;gap:8px;">
+              <span>當代運行總指數歷史趨勢 (Operational Risk Score History Trend)</span>
+              <span class="panel-tag" style="font-size:0.7rem;">DAILY UTC / MONTHLY AVG</span>
+            </div>
+            <div style="font-size:0.76rem;color:var(--text-muted);margin-top:2px;">
+              快照自 2026-10-21 上線起逐時入庫。日線取 UTC 當日最後快照，月線取日點算術平均（附樣本數 n）；嚴禁補造歷史。
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button id="btn-trend-daily" class="filter-btn active" onclick="switchTrendGranularity('daily', this)" style="padding:4px 10px;font-size:0.75rem;">日線 (Daily UTC)</button>
+            <button id="btn-trend-monthly" class="filter-btn" onclick="switchTrendGranularity('monthly', this)" style="padding:4px 10px;font-size:0.75rem;">月線 (Monthly Avg)</button>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div style="display:flex;align-items:center;gap:16px;font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;font-family:var(--font-mono);">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="display:inline-block;width:18px;height:3px;background:#f59e0b;border-radius:2px;"></span>
+            <span>綜合指數 (Composite Index, 實線)</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="display:inline-block;width:18px;height:0px;border-top:2px dashed rgba(255,255,255,0.4);"></span>
+            <span>結構指數 (Structural Index, 虛線)</span>
+          </div>
+        </div>
+
+        <!-- Trend SVG Container -->
+        <div id="trend-chart-container" style="width:100%;min-height:160px;overflow-x:auto;">
+          
+    <svg viewBox="0 0 760 180" class="trend-svg" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">
+      <line x1="45" y1="115.0" x2="725" y2="115.0" stroke="rgba(255,255,255,0.07)" stroke-width="1" /><text x="37" y="118.0" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">25</text>
+<line x1="45" y1="85.0" x2="725" y2="85.0" stroke="rgba(255,255,255,0.07)" stroke-width="1" /><text x="37" y="88.0" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">50</text>
+<line x1="45" y1="55.0" x2="725" y2="55.0" stroke="rgba(255,255,255,0.07)" stroke-width="1" /><text x="37" y="58.0" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">75</text>
+<line x1="45" y1="43.0" x2="725" y2="43.0" stroke="rgba(255,255,255,0.07)" stroke-width="1" /><text x="37" y="46.0" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">85</text>
+<line x1="45" y1="25.0" x2="725" y2="25.0" stroke="rgba(255,255,255,0.07)" stroke-width="1" /><text x="37" y="28.0" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">100</text>
+      <polyline points="45.0,44.8 725.0,44.8" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.8" stroke-dasharray="4,4" stroke-linecap="round" />
+      <polyline points="45.0,44.8 725.0,44.9" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="45.0" cy="44.8" r="3" fill="rgba(255,255,255,0.6)"><title>2026-10-21 | 綜合: 83.50 | 結構: 83.50</title></circle>
+<circle cx="725.0" cy="44.8" r="3" fill="rgba(255,255,255,0.6)"><title>2026-10-22 | 綜合: 83.38 | 結構: 83.50</title></circle>
+<circle cx="45.0" cy="44.8" r="4.5" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5"><title>2026-10-21 | 綜合: 83.50 | 結構: 83.50</title></circle>
+<circle cx="725.0" cy="44.9" r="4.5" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5"><title>2026-10-22 | 綜合: 83.38 | 結構: 83.50</title></circle>
+<text x="45.0" y="168" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="monospace">2026-10-21</text>
+<text x="725.0" y="168" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="monospace">2026-10-22</text>
+    </svg>
+    
+        </div>
+      </div>
+    
+
+      <div style="font-size:0.85rem;font-weight:700;color:var(--text-bright);margin:24px 0 8px 0;display:flex;align-items:center;gap:8px;">
+        <span>歷史重大危機回測時間線（回溯結構估算）(Historical Crisis Backtesting Timeline)</span>
+        <span class="panel-tag" style="font-size:0.68rem;">1913 / 1938 / 1962 / 1990 / 2025</span>
       </div>
       <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:12px;">
         將同一套五層結構公式與和平閘門應用於 20 世紀至今五大標誌性危機節點。歷史排序驗證：1938年二戰前夕 (99.6) &gt; 1913年一戰前夕 (96.1) &gt; 2025年當代前夕 (81.0) &gt; 1962年古巴危機 (77.4) &gt; 1990年冷戰終結 (23.4)。
@@ -4752,7 +4911,7 @@
 
   <footer class="dash-footer">
     <div>WW3 Risk Model · 零框架純靜態離線架構 · 嚴格由模型公式計算</div>
-    <div>Model Version: 0.5.0 · File: ui/dashboard.html</div>
+    <div>Model Version: 0.6.0 · File: ui/dashboard.html</div>
   </footer>
 
   <!-- Embedded Model Output (Guarantees 100% offline file:// rendering without CORS errors) -->
@@ -4761,7 +4920,7 @@
   "metadata": {
     "title": "WW3 戰爭風險指數儀表板",
     "title_en": "WW3 War Risk Index Dashboard",
-    "model_version": "0.5.0",
+    "model_version": "0.6.0",
     "generated_at": "2026-10-22",
     "active_scenario_id": "baseline_2026",
     "active_scenario_title": "2026 全球結構風險基準情境",
@@ -4907,6 +5066,121 @@
       "Gated score: 84.54 -> Index: 83.5"
     ]
   },
+  "pulse": {
+    "version": "0.6.0",
+    "computed_at": "2026-10-22T02:39:59Z",
+    "pulse_adjustment": -0.12,
+    "range": [
+      -10.0,
+      10.0
+    ],
+    "status": "operational",
+    "active_signals_count": 2,
+    "total_signals_count": 3,
+    "weights": {
+      "gdelt_conflict": 0.4,
+      "polymarket_war_risk": 0.35,
+      "brent_oil_24h": 0.25
+    },
+    "signals": {
+      "gdelt_conflict": {
+        "signal_id": "gdelt_conflict",
+        "name": "GDELT 全球衝突與動盪新聞聲量強度",
+        "source": "GDELT 2.0 Doc TimelineVol API",
+        "source_url": "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json",
+        "weight": 0.4,
+        "status": "unavailable",
+        "fetched_at": null,
+        "raw_value": null,
+        "raw_unit": "% (全球新聞總量佔比)",
+        "normalized_score": 0.0,
+        "contribution": 0.0,
+        "details": {},
+        "error": "The read operation timed out"
+      },
+      "polymarket_war_risk": {
+        "signal_id": "polymarket_war_risk",
+        "name": "Polymarket 戰爭地緣預測市場綜合機率",
+        "source": "Polymarket Gamma API",
+        "source_url": "https://gamma-api.polymarket.com/markets",
+        "weight": 0.35,
+        "status": "live",
+        "fetched_at": "2026-10-22T02:39:55Z",
+        "raw_value": 3.6,
+        "raw_unit": "% (Yes 隱含機率)",
+        "normalized_score": -0.14,
+        "contribution": -0.49,
+        "details": {
+          "monitored_markets": [
+            {
+              "id": "1124834",
+              "question": "US x Russia military clash by December 31, 2026?",
+              "short": "US-RU Clash",
+              "yes_price": 0.029,
+              "volume": 1087282.9438660003
+            },
+            {
+              "id": "2749367",
+              "question": "Will Russia invade a NATO country by December 31, 2026?",
+              "short": "RU-NATO Invasion",
+              "yes_price": 0.045,
+              "volume": 416600.5720479999
+            },
+            {
+              "id": "2749382",
+              "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
+              "short": "NATO Troops in UA",
+              "yes_price": 0.034,
+              "volume": 159258.671711
+            }
+          ],
+          "baseline_anchor": 0.05,
+          "formula": "clamp((P_yes - 0.05) / 0.10, -1.0, 1.0)"
+        },
+        "error": null
+      },
+      "brent_oil_24h": {
+        "signal_id": "brent_oil_24h",
+        "name": "Brent 原油近月 24 小時價格變動",
+        "source": "Yahoo Finance (BZ=F)",
+        "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
+        "weight": 0.25,
+        "status": "live",
+        "fetched_at": "2026-10-22T02:39:59Z",
+        "raw_value": 1.46,
+        "raw_unit": "% (24h 漲跌幅)",
+        "normalized_score": 0.1461,
+        "contribution": 0.37,
+        "details": {
+          "price_usd": 110.41,
+          "scale_anchor_pct": 10.0,
+          "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
+        },
+        "error": null
+      }
+    }
+  },
+  "structural_index": 83.5,
+  "pulse_adjustment": -0.12,
+  "composite_index": 83.38,
+  "initial_trend_points": [
+    {
+      "date": "2026-10-21",
+      "computed_at": "2026-10-21T14:38:00Z",
+      "composite_index": 83.5,
+      "structural_index": 83.5,
+      "pulse_adjustment": 0.0,
+      "stage": 3
+    },
+    {
+      "date": "2026-10-22",
+      "computed_at": "2026-10-22T02:39:59Z",
+      "composite_index": 83.38,
+      "structural_index": 83.5,
+      "pulse_adjustment": -0.12,
+      "stage": 3
+    }
+  ],
   "scenarios": [
     {
       "id": "ai_displacement_shock",
@@ -7361,7 +7635,7 @@
     if (apiBase) {
       window.WW3_API_BASE = apiBase;
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
 
       Promise.all([
         fetch(apiBase + '/api/risk/latest', { signal: controller.signal }).then(r => {
@@ -7375,12 +7649,16 @@
         fetch(apiBase + '/api/data-status', { signal: controller.signal }).then(r => {
           if (!r.ok) throw new Error('HTTP ' + r.status);
           return r.json();
-        })
-      ]).then(([latest, layersData, dataStatus]) => {
+        }),
+        fetch(apiBase + '/api/risk/history?granularity=daily', { signal: controller.signal }).then(r => {
+          if (!r.ok) return null;
+          return r.json();
+        }).catch(() => null)
+      ]).then(([latest, layersData, dataStatus, historyDaily]) => {
         clearTimeout(timeoutId);
-        applyApiData(latest, layersData, dataStatus);
+        applyApiData(latest, layersData, dataStatus, historyDaily);
       }).catch(err => {
-        console.warn('WW3 API fetch failed or timed out after 3s, using embedded offline snapshot:', err);
+        console.warn('WW3 API fetch failed or timed out after 4s, using embedded offline snapshot:', err);
         const badge = document.getElementById('top-data-source-badge');
         if (badge) {
           badge.textContent = '● 離線快照（內嵌數據）';
@@ -7389,7 +7667,76 @@
       });
     }
 
-    function applyApiData(latest, layersData, dataStatus) {
+    window.switchTrendGranularity = function(granularity, btnEl) {
+      document.querySelectorAll('#btn-trend-daily, #btn-trend-monthly').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      const api = window.WW3_API_BASE;
+      if (!api) return;
+      fetch(api + '/api/risk/history?granularity=' + granularity)
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data && data.points) {
+            renderDynamicTrendSvg(data.points, granularity);
+          }
+        })
+        .catch(e => console.warn('Failed to switch trend granularity:', e));
+    };
+
+    function renderDynamicTrendSvg(points, granularity) {
+      const container = document.getElementById('trend-chart-container');
+      if (!container || !points || points.length === 0) return;
+      const width = 760;
+      const height = 180;
+      const padLeft = 45;
+      const padRight = 35;
+      const padTop = 25;
+      const padBottom = 35;
+      const plotW = width - padLeft - padRight;
+      const plotH = height - padTop - padBottom;
+
+      const yCoord = (val) => {
+        const clamped = Math.max(0, Math.min(100, val));
+        return padTop + (1.0 - clamped / 100.0) * plotH;
+      };
+
+      const n = points.length;
+      const coords = points.map((pt, i) => {
+        const x = n > 1 ? padLeft + i * (plotW / (n - 1)) : padLeft + plotW / 2;
+        const cVal = Number(pt.composite_index !== undefined ? pt.composite_index : pt.total_index);
+        const sVal = Number(pt.structural_index !== undefined ? pt.structural_index : pt.total_index);
+        const lbl = pt.date || pt.month || ('P' + (i + 1));
+        return { x, yc: yCoord(cVal), ys: yCoord(sVal), cVal, sVal, label: lbl, raw: pt };
+      });
+
+      const compPoly = coords.map(c => `${c.x.toFixed(1)},${c.yc.toFixed(1)}`).join(' ');
+      const structPoly = coords.map(c => `${c.x.toFixed(1)},${c.ys.toFixed(1)}`).join(' ');
+
+      let svgHtml = `<svg viewBox="0 0 ${width} ${height}" class="trend-svg" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">`;
+
+      [25, 50, 75, 85, 100].forEach(yVal => {
+        const yPos = yCoord(yVal);
+        svgHtml += `<line x1="${padLeft}" y1="${yPos.toFixed(1)}" x2="${width - padRight}" y2="${yPos.toFixed(1)}" stroke="rgba(255,255,255,0.07)" stroke-width="1" />`;
+        svgHtml += `<text x="${padLeft - 8}" y="${(yPos + 3).toFixed(1)}" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">${yVal}</text>`;
+      });
+
+      if (n > 1) {
+        svgHtml += `<polyline points="${structPoly}" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.8" stroke-dasharray="4,4" stroke-linecap="round" />`;
+        svgHtml += `<polyline points="${compPoly}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />`;
+      }
+
+      coords.forEach(c => {
+        const nDaysStr = c.raw.n_days ? ` (n=${c.raw.n_days})` : '';
+        const hover = `${c.label}${nDaysStr} | 綜合: ${c.cVal.toFixed(2)} | 結構: ${c.sVal.toFixed(2)}`;
+        svgHtml += `<circle cx="${c.x.toFixed(1)}" cy="${c.ys.toFixed(1)}" r="3" fill="rgba(255,255,255,0.6)"><title>${hover}</title></circle>`;
+        svgHtml += `<circle cx="${c.x.toFixed(1)}" cy="${c.yc.toFixed(1)}" r="4.5" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5"><title>${hover}</title></circle>`;
+        svgHtml += `<text x="${c.x.toFixed(1)}" y="${height - 12}" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="monospace">${c.label}</text>`;
+      });
+
+      svgHtml += `</svg>`;
+      container.innerHTML = svgHtml;
+    }
+
+    function applyApiData(latest, layersData, dataStatus, historyDaily) {
       // 1. Update Top Bar Data Source Badge and Date
       const badge = document.getElementById('top-data-source-badge');
       if (badge) {
@@ -7401,11 +7748,31 @@
         topDate.textContent = latest.computed_at + ' · 即時 API 數據';
       }
 
-      // 2. Update Gauge & Scores
+      // 2. Update Gauge & Scores (Composite + Structural + Pulse)
+      const compositeVal = typeof latest.composite_index === 'number'
+        ? latest.composite_index
+        : (typeof latest.total_index === 'number' ? latest.total_index : 83.5);
+      const structuralVal = typeof latest.structural_index === 'number'
+        ? latest.structural_index
+        : (typeof latest.total_index === 'number' ? latest.total_index : 83.5);
+      const pulseAdj = typeof latest.pulse_adjustment === 'number'
+        ? latest.pulse_adjustment
+        : 0.0;
+
       const scoreEl = document.getElementById('score-display');
-      if (scoreEl && typeof latest.total_index === 'number') {
-        scoreEl.textContent = latest.total_index.toFixed(1);
+      if (scoreEl) {
+        scoreEl.textContent = compositeVal.toFixed(1);
       }
+      const structEl = document.getElementById('structural-display');
+      if (structEl) {
+        structEl.textContent = structuralVal.toFixed(1);
+      }
+      const pulseEl = document.getElementById('pulse-display');
+      if (pulseEl) {
+        pulseEl.textContent = (pulseAdj >= 0 ? '+' : '') + pulseAdj.toFixed(2);
+        pulseEl.style.color = pulseAdj > 0 ? 'var(--color-red)' : (pulseAdj < 0 ? 'var(--color-green)' : 'var(--text-muted)');
+      }
+
       const pillBase = document.getElementById('pill-base');
       if (pillBase && typeof latest.base_score === 'number') {
         pillBase.textContent = latest.base_score.toFixed(1);
@@ -7419,18 +7786,40 @@
         pillFail.textContent = (100 - latest.gate.peace_capacity).toFixed(1) + '%';
       }
 
-      // 3. Update Gauge Needle (cx=160, cy=145, r=100)
+      // 3. Update Gauge Needle (cx=160, cy=145, r=100) to Composite Value
       const svg = document.querySelector('.gauge-svg');
-      if (svg && typeof latest.total_index === 'number') {
+      if (svg) {
         const needle = svg.querySelector('line');
         if (needle) {
-          const clamped = Math.max(0, Math.min(100, latest.total_index));
+          const clamped = Math.max(0, Math.min(100, compositeVal));
           const theta = Math.PI - (clamped / 100.0) * Math.PI;
           const nx = 160 + 100 * Math.cos(theta);
           const ny = 145 - 100 * Math.sin(theta);
           needle.setAttribute('x2', nx.toFixed(1));
           needle.setAttribute('y2', ny.toFixed(1));
         }
+      }
+
+      // 3.5 Update Pulse Layer Section Card
+      if (latest.pulse) {
+        const pCardVal = document.getElementById('pulse-card-val');
+        if (pCardVal) {
+          pCardVal.innerHTML = `<span style="color:${pulseAdj > 0 ? '#ef4444' : (pulseAdj < 0 ? '#22c55e' : 'var(--text-muted)')};">${(pulseAdj >= 0 ? '+' : '') + pulseAdj.toFixed(2)}</span> <span style="font-size:0.85rem;font-weight:400;color:var(--text-dim);">分 (clamp ±10.0)</span>`;
+        }
+        const pCardStatus = document.getElementById('pulse-card-status');
+        if (pCardStatus && latest.pulse.active_signals_count !== undefined) {
+          const st = (latest.pulse.status || 'operational').toUpperCase();
+          pCardStatus.textContent = `${latest.pulse.active_signals_count}/${latest.pulse.total_signals_count || 3} 訊號在庫 (${st})`;
+        }
+        const pCardTime = document.getElementById('pulse-card-time');
+        if (pCardTime && latest.pulse.computed_at) {
+          pCardTime.textContent = '抓取時間: ' + latest.pulse.computed_at;
+        }
+      }
+
+      // 3.6 Update Trend SVG Chart
+      if (historyDaily && historyDaily.points) {
+        renderDynamicTrendSvg(historyDaily.points, 'daily');
       }
 
       // 4. Update Stage Progression Tracker & Top Stage Badge
