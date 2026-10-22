@@ -138,7 +138,7 @@ def test_simulator_formula_consistency():
 
     l1 = (52.0 * 1.0 + 58.0 * 1.0 + energy_val * 1.2 + minerals_val * 1.3 + 65.0 * 1.0 + 68.0 * 1.2) / 6.7
     l2 = 71.32352941176471
-    l3 = (56.0 * 1.0 + unemp_val * 1.2 + 65.0 * 1.1 + 75.0 * 1.0 + ai_val * 1.5 + 64.0 * 1.0 + 73.0 * 1.1) / 7.9
+    l3 = (56.0 * 1.0 + unemp_val * 1.2 + 65.0 * 1.1 + 75.0 * 1.0 + ai_val * 1.5 + 64.0 * 1.0 + 71.5 * 1.1) / 7.9
     l4 = (72.0 * 1.2 + 75.0 * 1.2 + bloc_val * 1.3 + 76.0 * 1.2 + 66.0 * 1.4 + 80.0 * 1.4 + 82.0 * 1.2) / 8.9
     l5 = (76.0 * 1.3 + 70.0 * 1.1 + 64.0 * 1.0 + fear_val * 1.4 + 72.0 * 1.2 + 68.0 * 1.0) / 7.0
 
@@ -374,9 +374,9 @@ def test_regional_pressures_raw_average_and_formula_regression():
         middle_east: 66.5 (ELEVATED)
         south_central_asia: 63.0 (ELEVATED)
         global_chokepoints: 72.0 (HIGH)
-        africa_sudan: 69.5 (ELEVATED)
-        southeast_asia: 78.3 (HIGH)
-        western_europe: 68.3 (ELEVATED)
+        africa_sudan: 69.1 (ELEVATED)
+        southeast_asia: 77.8 (HIGH)
+        western_europe: 67.8 (ELEVATED)
     """
     scenario_path = Path("scenarios/baseline_2026.json")
     scenario = load_scenario_from_file(scenario_path)
@@ -405,9 +405,9 @@ def test_regional_pressures_raw_average_and_formula_regression():
         "middle_east": (66.5, "ELEVATED"),
         "south_central_asia": (63.0, "ELEVATED"),
         "global_chokepoints": (72.0, "HIGH"),
-        "africa_sudan": (69.5, "ELEVATED"),
-        "southeast_asia": (78.3, "HIGH"),
-        "western_europe": (68.3, "ELEVATED"),
+        "africa_sudan": (69.1, "ELEVATED"),
+        "southeast_asia": (77.8, "HIGH"),
+        "western_europe": (67.8, "ELEVATED"),
     }
 
     card_dict = {c["id"]: c for c in cards}

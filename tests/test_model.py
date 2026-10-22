@@ -556,11 +556,11 @@ def test_new_v05_indicators_quality_and_fields(baseline_scenario: ScenarioData):
     unrest_ind = l3_inds["l3_civil_unrest_intensity"]
     assert unrest_ind.evidence_level == "inference"
     assert "ACLED" in unrest_ind.source_name
-    assert unrest_ind.raw_value == 38500
+    assert unrest_ind.raw_value == 143000
     assert "clamp" in unrest_ind.normalization_method
     assert unrest_ind.scoring_rubric
     assert unrest_ind.source_url.startswith("https://")
-    assert unrest_ind.value == 73.0
+    assert unrest_ind.value == 71.5
 
     # Ensure full fields are non-empty for both
     for ind in (war_ind, unrest_ind):

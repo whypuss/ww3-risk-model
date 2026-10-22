@@ -113,7 +113,7 @@ def test_snapshot_sql_insert_and_roundtrip():
     assert row[3] == 3
     layers_back = json.loads(row[4])
     assert round(layers_back["L4"], 1) == 75.5
-    assert round(layers_back["L3"], 1) == 66.0
+    assert round(layers_back["L3"], 1) == 65.8
 
     # Query observations count and staleness
     cursor.execute("SELECT COUNT(*), SUM(is_stale) FROM indicator_observations WHERE snapshot_id = ?", (row[0],))

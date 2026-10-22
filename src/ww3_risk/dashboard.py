@@ -3279,7 +3279,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       // 2. Compute dynamic layer scores
       const l1 = (52.0 * 1.0 + 58.0 * 1.0 + energyVal * 1.2 + mineralsVal * 1.3 + 65.0 * 1.0 + 68.0 * 1.2) / 6.7;
       const l2 = 71.3235;
-      const l3 = (56.0 * 1.0 + unempVal * 1.2 + 65.0 * 1.1 + 75.0 * 1.0 + aiVal * 1.5 + 64.0 * 1.0 + 73.0 * 1.1) / 7.9;
+      const l3 = (56.0 * 1.0 + unempVal * 1.2 + 65.0 * 1.1 + 75.0 * 1.0 + aiVal * 1.5 + 64.0 * 1.0 + 71.5 * 1.1) / 7.9;
       const l4 = (72.0 * 1.2 + 75.0 * 1.2 + blocVal * 1.3 + 76.0 * 1.2 + 66.0 * 1.4 + 80.0 * 1.4 + 82.0 * 1.2) / 8.9;
       const l5 = (76.0 * 1.3 + 70.0 * 1.1 + 64.0 * 1.0 + fearVal * 1.4 + 72.0 * 1.2 + 68.0 * 1.0) / 7.0;
 
