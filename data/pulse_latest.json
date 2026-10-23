@@ -1,13 +1,13 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-10-23T03:26:27Z",
-  "pulse_adjustment": -0.36,
+  "computed_at": "2026-10-23T04:26:25Z",
+  "pulse_adjustment": -3.9,
   "range": [
     -10.0,
     10.0
   ],
   "status": "operational",
-  "active_signals_count": 2,
+  "active_signals_count": 3,
   "total_signals_count": 3,
   "weights": {
     "gdelt_conflict": 0.4,
@@ -21,14 +21,19 @@
       "source": "GDELT 2.0 Doc TimelineVol API",
       "source_url": "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json",
       "weight": 0.4,
-      "status": "unavailable",
-      "fetched_at": null,
-      "raw_value": null,
+      "status": "live",
+      "fetched_at": "2026-10-23T04:26:24Z",
+      "raw_value": 13.8674,
       "raw_unit": "% (全球新聞總量佔比)",
-      "normalized_score": 0.0,
-      "contribution": 0.0,
-      "details": {},
-      "error": "HTTP Error 429: Too Many Requests"
+      "normalized_score": -0.879,
+      "contribution": -3.52,
+      "details": {
+        "latest_date": "20261023T000000Z",
+        "history_points": 69,
+        "baseline_30d": 15.4056,
+        "formula": "clamp((raw - 15.41) / 1.75, -1.0, 1.0)"
+      },
+      "error": null
     },
     "polymarket_war_risk": {
       "signal_id": "polymarket_war_risk",
@@ -37,10 +42,10 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-10-23T03:26:26Z",
-      "raw_value": 3.67,
+      "fetched_at": "2026-10-23T04:26:24Z",
+      "raw_value": 3.65,
       "raw_unit": "% (Yes 隱含機率)",
-      "normalized_score": -0.1333,
+      "normalized_score": -0.135,
       "contribution": -0.47,
       "details": {
         "monitored_markets": [
@@ -48,15 +53,15 @@
             "id": "1124834",
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
-            "yes_price": 0.0295,
-            "volume": 1087342.9098800002
+            "yes_price": 0.029,
+            "volume": 1087355.2125440002
           },
           {
             "id": "2749367",
             "question": "Will Russia invade a NATO country by December 31, 2026?",
             "short": "RU-NATO Invasion",
             "yes_price": 0.045,
-            "volume": 416610.98871499987
+            "volume": 416610.9887149999
           },
           {
             "id": "2749382",
@@ -78,13 +83,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-10-23T03:26:27Z",
-      "raw_value": 0.42,
+      "fetched_at": "2026-10-23T04:26:25Z",
+      "raw_value": 0.37,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": 0.0424,
-      "contribution": 0.11,
+      "normalized_score": 0.0371,
+      "contribution": 0.09,
       "details": {
-        "price_usd": 113.65,
+        "price_usd": 113.59,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
