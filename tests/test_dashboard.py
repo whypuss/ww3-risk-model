@@ -783,12 +783,15 @@ def test_protests_snapshot_aggregate_statistics():
 def test_generate_dashboard_data_initial_trend_points_matches_worker_api():
     """Verify initial_trend_points matches Worker API daily trend definition:
     - Group by UTC date, take last snapshot per day
-    - 10-21 → composite 83.07 (last snapshot 13:44:41Z, pulse 0.0)
-    - 10-22 → composite 87.0 (last snapshot 23:26:36Z, pulse +3.5)
-    - 10-23 → composite 87.1 (last snapshot 08:26:31Z, pulse +3.6)
+    - 10-21 → composite 83.07 (last snapshot 13:44:41Z, pulse 0.0) — HISTORICAL, FIXED
+    - 10-22 → composite 87.0 (last snapshot 23:26:36Z, pulse +3.5) — HISTORICAL, FIXED
+    - 10-23 → rule-based from current pulse_latest.json (last snapshot of today)
     - Each point's date equals its computed_at UTC date
     - No duplicate dates
     """
+    import json
+    from pathlib import Path
+
     model = WW3RiskModel()
     data = generate_dashboard_data(scenario_path="scenarios/baseline_2026.json", model=model)
 
@@ -805,7 +808,17 @@ def test_generate_dashboard_data_initial_trend_points_matches_worker_api():
     dates = [pt["date"] for pt in points]
     assert len(dates) == len(set(dates)), "Duplicate dates in initial_trend_points"
 
-    # Verify authoritative values
+    # Load current pulse data to compute expected values for today (2026-10-23)
+    pulse_file = Path("data/pulse_latest.json")
+    with open(pulse_file, "r", encoding="utf-8") as f:
+        pulse_data = json.load(f)
+    current_pulse_adj = round(float(pulse_data.get("pulse_adjustment", 0.0)), 2)
+    current_structural = round(data["main_result"]["global_risk_index"], 2)
+    current_composite = round(max(0.0, min(100.0, current_structural + current_pulse_adj)), 2)
+    current_computed_at = pulse_data.get("computed_at", "2026-10-23T00:00:00Z")
+    current_stage = data["main_result"]["stage"]["number"]
+
+    # Verify historical fixed points (10-21, 10-22) — these days are complete, values won't change
     pt_21 = next(p for p in points if p["date"] == "2026-10-21")
     pt_22 = next(p for p in points if p["date"] == "2026-10-22")
     pt_23 = next(p for p in points if p["date"] == "2026-10-23")
@@ -820,10 +833,13 @@ def test_generate_dashboard_data_initial_trend_points_matches_worker_api():
     assert pt_22["pulse_adjustment"] == 3.5
     assert pt_22["computed_at"] == "2026-10-22T23:26:36Z"
 
-    assert pt_23["composite_index"] == 87.1
-    assert pt_23["structural_index"] == 83.5
-    assert pt_23["pulse_adjustment"] == 3.6
-    assert pt_23["computed_at"] == "2026-10-23T08:26:31Z"
+    # Verify today's point (10-23) using rule-based expectations from current pulse data
+    assert pt_23["date"] == "2026-10-23"
+    assert pt_23["computed_at"] == current_computed_at
+    assert pt_23["structural_index"] == current_structural
+    assert pt_23["pulse_adjustment"] == current_pulse_adj
+    assert pt_23["composite_index"] == current_composite
+    assert pt_23["stage"] == current_stage
 
 
 def test_render_trend_svg_dynamic_y_axis_and_value_labels():
