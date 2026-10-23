@@ -860,7 +860,7 @@ def render_pulse_card_html(pulse_data: Optional[Dict[str, Any]], structural_inde
         <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-color);border-radius:6px;padding:12px;">
           <div style="font-size:0.75rem;color:var(--text-dim);font-family:var(--font-mono);letter-spacing:0.5px;">雙層合成架構 (TWO-TIER SYNTHESIS)</div>
           <div style="font-size:0.82rem;color:var(--text-muted);margin-top:6px;font-family:var(--font-mono);">
-            綜合指數 = clamp(結構 <strong>{structural_index:.1f}</strong> + 脈搏 <strong>{pulse_adj:+.2f}</strong>, 0, 100) = <strong style="color:var(--color-orange);">{composite_index:.1f}</strong>
+            綜合指數 = clamp(結構 <strong id="synth-structural">{structural_index:.1f}</strong> + 脈搏 <strong id="synth-pulse">{pulse_adj:+.2f}</strong>, 0, 100) = <strong id="synth-composite" style="color:var(--color-orange);">{composite_index:.1f}</strong>
           </div>
           <div style="font-size:0.72rem;color:var(--text-dim);margin-top:4px;">
             定性：情境合成修正值，非統計勝率預測。
@@ -4329,6 +4329,20 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       if (pulseEl) {
         pulseEl.textContent = (pulseAdj >= 0 ? '+' : '') + pulseAdj.toFixed(2);
         pulseEl.style.color = pulseAdj > 0 ? 'var(--color-red)' : (pulseAdj < 0 ? 'var(--color-green)' : 'var(--text-muted)');
+      }
+
+      // 3.5 Update Two-Tier Synthesis caption
+      const synthStructural = document.getElementById('synth-structural');
+      if (synthStructural && typeof structuralVal === 'number' && isFinite(structuralVal)) {
+        synthStructural.textContent = structuralVal.toFixed(1);
+      }
+      const synthPulse = document.getElementById('synth-pulse');
+      if (synthPulse && typeof pulseAdj === 'number' && isFinite(pulseAdj)) {
+        synthPulse.textContent = (pulseAdj >= 0 ? '+' : '') + pulseAdj.toFixed(2);
+      }
+      const synthComposite = document.getElementById('synth-composite');
+      if (synthComposite && typeof compositeVal === 'number' && isFinite(compositeVal)) {
+        synthComposite.textContent = compositeVal.toFixed(1);
       }
 
       const pillBase = document.getElementById('pill-base');
