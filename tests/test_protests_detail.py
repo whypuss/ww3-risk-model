@@ -4,6 +4,10 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
 from ww3_risk.dashboard import build_dashboard
@@ -49,45 +53,130 @@ def test_protests_snapshot_has_summary_and_sources():
             assert len(sources) >= 2, f"{name}: verified country must have >= 2 sources, got {len(sources)}"
 
 
-def test_dashboard_html_contains_protests_detail(tmp_path):
-    """Verify generated dashboard HTML contains protest inspector detail:
-    - Contains '來源' text
-    - At least one target="_blank" source link
-    - Contains France summary text (e.g., '憤怒日')
-    """
+def extract_script_blocks(html: str) -> list[str]:
+    """Extract all <script>...</script> block contents from HTML that are JavaScript (not JSON)."""
+    # Match <script> blocks but exclude type="application/json"
+    pattern = r'<script(?![^>]*type="application/json")[^>]*>(.*?)</script>'
+    matches = re.findall(pattern, html, re.DOTALL | re.IGNORECASE)
+    return [m.strip() for m in matches]
+
+
+def test_dashboard_js_syntax_valid(tmp_path):
+    """Validate all <script> blocks in generated dashboard with node --check."""
     out_html = tmp_path / "dashboard.html"
-    out_json = tmp_path / "dashboard_data.json"
 
     build_dashboard(
         scenario_path="scenarios/baseline_2026.json",
         output_html_path=out_html,
-        output_json_path=out_json,
+        output_json_path=tmp_path / "dashboard_data.json",
+        ui_step=5,
+    )
+
+    content = out_html.read_text(encoding="utf-8")
+    script_blocks = extract_script_blocks(content)
+
+    # node must be available
+    node_path = shutil.which("node")
+    if not node_path:
+        import pytest
+        pytest.skip("node not available in PATH, skipping JS syntax check")
+
+    for i, script in enumerate(script_blocks):
+        if not script.strip():
+            continue
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".js", delete=False) as f:
+            f.write(script)
+            temp_js = f.name
+        try:
+            result = subprocess.run(
+                [node_path, "--check", temp_js],
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+            assert result.returncode == 0, f"Script block {i} failed node --check:\n{result.stderr}\nScript:\n{script[:500]}..."
+        finally:
+            Path(temp_js).unlink(missing_ok=True)
+
+
+def test_dashboard_pre_rendered_france_sources(tmp_path):
+    """Verify pre-rendered inspector contains France summary and first source link with correct href, target, and text."""
+    out_html = tmp_path / "dashboard.html"
+
+    build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
         ui_step=5,
     )
 
     content = out_html.read_text(encoding="utf-8")
 
-    # 1. Contains '來源' label (in JS or HTML)
-    assert "來源：" in content, "HTML missing '來源：' label"
+    # Load protests data to get expected France source
+    protests = json.loads(Path("data/protests_snapshot.json").read_text(encoding="utf-8"))
+    france = next(c for c in protests["countries"] if c["name_zh"] == "法國")
+    first_source = france["sources"][0]
+    expected_name = first_source["name"]
+    expected_url = first_source["url"]
 
-    # 2. At least one target="_blank" source link (in JS constant or HTML)
-    target_blank_links = re.findall(r'target="_blank"', content)
-    assert len(target_blank_links) >= 1, f"Expected at least one target='_blank' link, found {len(target_blank_links)}"
-
-    # 3. Contains France summary text (e.g., '憤怒日') in pre-rendered HTML
-    assert "憤怒日" in content, "HTML missing France summary text '憤怒日'"
-
-    # 4. protest-inspector-detail container exists
+    # Check protest-inspector-detail container exists
     assert 'id="protest-inspector-detail"' in content, "Missing protest-inspector-detail container"
 
-    # 5. protest-inspector-summary class exists (in pre-rendered HTML)
-    assert 'class="protest-inspector-summary"' in content, "Missing protest-inspector-summary class"
+    # Extract the pre-rendered content inside protest-inspector-detail
+    detail_match = re.search(
+        r'id="protest-inspector-detail">(.*?)</div>\s*</div>\s*</div>',
+        content,
+        re.DOTALL,
+    )
+    assert detail_match, "Could not find protest-inspector-detail content"
+    detail_html = detail_match.group(1)
 
-    # 6. protest-source-list class exists (in JS code as string)
-    assert "protest-source-list" in content, "Missing protest-source-list class reference"
+    # Check France summary is present
+    assert "憤怒日" in detail_html, "France summary missing '憤怒日' in pre-rendered detail"
 
-    # 7. Default text mentions new functionality
-    assert "事件簡述與來源連結" in content, "Default inspector text missing new functionality description"
+    # Check protest-inspector-summary class exists
+    assert 'class="protest-inspector-summary"' in detail_html, "Missing protest-inspector-summary class"
+
+    # Check protest-source-list class exists
+    assert 'class="protest-source-list"' in detail_html, "Missing protest-source-list class"
+
+    # Check "來源：" label
+    assert "來源：" in detail_html, "Missing '來源：' label in pre-rendered sources"
+
+    # Check first source link: href, target="_blank", rel="noopener noreferrer", and link text
+    source_link_pattern = (
+        r'<a href="' + re.escape(expected_url) + r'" target="_blank" rel="noopener noreferrer">' + re.escape(expected_name) + r"</a>"
+    )
+    assert re.search(source_link_pattern, detail_html), (
+        f"First source link not found or incorrect in pre-rendered detail. "
+        f"Expected: <a href=\"{expected_url}\" target=\"_blank\" rel=\"noopener noreferrer\">{expected_name}</a>"
+    )
+
+
+def test_dashboard_js_click_path_and_no_dead_code(tmp_path):
+    """Verify JS click path exists and dead code (TARGET_BLANK_ATTR, (void)) is removed."""
+    out_html = tmp_path / "dashboard.html"
+
+    build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        ui_step=5,
+    )
+
+    content = out_html.read_text(encoding="utf-8")
+    script_blocks = extract_script_blocks(content)
+
+    # Combine all script blocks for searching
+    all_js = "\n".join(script_blocks)
+
+    # 1. selectProtestCountry function must exist
+    assert "selectProtestCountry" in all_js, "JS missing selectProtestCountry function"
+
+    # 2. createElement must be used (for dynamic source link creation in JS path)
+    assert "createElement" in all_js, "JS missing createElement usage (dynamic source rendering)"
+
+    # 3. Dead code must NOT exist
+    assert "TARGET_BLANK_ATTR" not in all_js, "Dead code TARGET_BLANK_ATTR still present in JS"
+    assert "(void)" not in all_js, "Dead code (void) still present in JS"
 
 
 def test_protests_detail_default_france_rendered(tmp_path):

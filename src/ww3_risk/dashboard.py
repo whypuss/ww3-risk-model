@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import glob
+import html
 import json
 import math
 import shutil
@@ -993,7 +994,7 @@ def render_protests_card_html(protests_data: Optional[Dict[str, Any]]) -> str:
             </div>
           </div>""")
 
-    # Build pre-rendered France detail for default state (summary only; sources rendered by JS)
+    # Build pre-rendered France detail for default state (summary + sources)
     france_country = None
     for c in countries:
         if c.get("name_zh") == "法國":
@@ -1004,7 +1005,21 @@ def render_protests_card_html(protests_data: Optional[Dict[str, Any]]) -> str:
     if france_country:
         france_summary = france_country.get("summary", "")
         if france_summary:
-            france_detail_html += f'<div class="protest-inspector-summary">{france_summary}</div>'
+            france_detail_html += f'<div class="protest-inspector-summary">{html.escape(france_summary)}</div>'
+        # Pre-render sources list (same structure as JS render)
+        sources = france_country.get("sources")
+        if isinstance(sources, list) and len(sources) > 0:
+            sources_html = ['<div class="protest-source-list">',
+                           f'<span class="protest-source-label">來源：</span>']
+            for src in sources:
+                src_name = html.escape(str(src.get("name", "")))
+                src_url = html.escape(str(src.get("url", "")))
+                if src_name and src_url:
+                    sources_html.append(
+                        f'<a href="{src_url}" target="_blank" rel="noopener noreferrer">{src_name}</a>'
+                    )
+            sources_html.append('</div>')
+            france_detail_html += "".join(sources_html)
 
     # Build Right Column: Hotspots 5 Countries
     default_flags = {
@@ -4515,9 +4530,6 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
         if (franceChip) {
           window.selectProtestCountry(franceChip);
         }
-        // Ensure target="_blank" string exists in JS for test detection
-        const TARGET_BLANK_ATTR = 'target="_blank" rel="noopener noreferrer"';
-        (void)TARGET_BLANK_ATTR;
       }
     })();
     """
