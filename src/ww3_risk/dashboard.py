@@ -1305,7 +1305,6 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
     step1_5_html = ""
     step2_html = ""
     step3_html = ""
-    step4_html = ""
     step5_html = ""
 
     # Step 1.5: War Risk Drivers Decomposition & Data Quality Overview (UI-Step >= 2)
@@ -1649,121 +1648,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
     </section>
         """
 
-    # Step 4: Interactive Conflict Risk Simulator
-    if ui_step >= 4:
-        # Predefined key simulator sliders
-        sliders_def = [
-            {"id": "sim_l3_ai", "ind_id": "l3_ai_displacement_rate", "layer": "L3", "name": "AI 認知自動化取代率", "name_en": "AI Cognitive Displacement Rate", "default": 62.0, "desc": "白領分析、編程與常規行政自動化衝擊程度"},
-            {"id": "sim_l3_unemp", "ind_id": "l3_youth_unemployment", "layer": "L3", "name": "青年失業與社會挫折感", "name_en": "Youth Unemployment & Frustration", "default": 68.0, "desc": "青年群體經濟參與受限及極端化動員潛力"},
-            {"id": "sim_l1_energy", "ind_id": "l1_energy_vulnerability", "layer": "L1", "name": "化石能源與電網供應鏈脆弱性", "name_en": "Energy Supply Vulnerability & Grid Stress", "default": 60.0, "desc": "電網負荷、油氣禁運及AI算力能源消耗爭奪"},
-            {"id": "sim_l1_minerals", "ind_id": "l1_critical_minerals", "layer": "L1", "name": "關鍵礦物與稀土出口管制集中度", "name_en": "Critical Minerals Export Restrictions", "default": 72.0, "desc": "鎵鍺銻鋰關鍵原料禁運對國防工業之制約"},
-            {"id": "sim_l4_bloc", "ind_id": "l4_bloc_polarization", "layer": "L4", "name": "全球陣營極化與同盟剛性", "name_en": "Geopolitical Bloc Polarization", "default": 78.0, "desc": "兩大陣營軍事同盟自動捲入條款與脫鉤剛性"},
-            {"id": "sim_l5_fear", "ind_id": "l5_tech_supremacy_fear", "layer": "L5", "name": "技術霸權焦慮與先發打擊邏輯", "name_en": "Fear of Tech Loss & Preventive Logic", "default": 78.0, "desc": "憂慮對手獲得超強智能或技術突破之冒險動機"},
-            {"id": "sim_gate_peace", "ind_id": "peace_capacity", "layer": "GATE", "name": "和平機制與外交互信容量 (Peace Capacity)", "name_en": "Peace Buffers & Diplomatic Trust Capacity", "default": 44.9, "desc": "元首熱線、經貿互賴、國際多邊法規與核威懾穩定度（越高越和平）"},
-        ]
-
-        slider_rows = []
-        for sl in sliders_def:
-            slider_rows.append(f"""
-            <div class="sim-slider-group">
-              <div class="sim-slider-header">
-                <div>
-                  <span class="sim-layer-tag">{sl['layer']}</span>
-                  <span class="sim-label">{sl['name']}</span>
-                </div>
-                <span class="sim-val" id="val-{sl['id']}">{sl['default']:.1f}</span>
-              </div>
-              <input type="range" class="sim-range" id="{sl['id']}" min="0" max="100" step="1" value="{sl['default']}" oninput="runSimulation()">
-              <div class="sim-slider-desc">{sl['desc']}</div>
-            </div>
-            """)
-        sliders_html = "\n".join(slider_rows)
-
-        step4_html = f"""
-    <!-- Section 4: Interactive Conflict Risk Simulator (UI-Step 4) -->
-    <section class="panel-card" style="margin-top:24px;" id="simulator-section">
-      <div class="panel-header">
-        <div class="panel-title">
-          <span>實時交互衝突模擬器 (Interactive Crisis Escalation Simulator)</span>
-        </div>
-        <div class="sim-header-actions" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-          <button class="btn-tactical" onclick="resetSimulation()">重設為基準情境 (Reset)</button>
-          <span class="panel-tag">PURE CLIENT-SIDE JS ENGINE · EXACT MODEL REPLICATION</span>
-        </div>
-      </div>
-      <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:18px;">
-        拖動下方滑桿即時調節關鍵驅動因子（AI 取代率、能源壓力、陣營極化、和平機制容量等）。純靜態 JavaScript 運算引擎內建同 Python 核心模型 100% 嚴格一致之加權公式、閘門乘數插值、三維超線性互動與 Soft-Clamp 飽和映射。
-      </p>
-
-      <div class="simulator-layout">
-        <!-- Controls Column -->
-        <div class="sim-controls-col">
-          {sliders_html}
-        </div>
-
-        <!-- Simulation Live Result Column -->
-        <div class="sim-result-col">
-          <div class="sim-result-card">
-            <div style="font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--text-dim);text-transform:uppercase;font-family:var(--font-mono);">
-              SIMULATED RISK PROJECTION
-            </div>
-            <div class="sim-score-row">
-              <div class="sim-score-big" id="sim-index-display">{risk_score:.1f}</div>
-              <div class="sim-delta-badge" id="sim-delta-display">基準 (±0.0)</div>
-            </div>
-            <div class="sim-stage-badge" id="sim-stage-display">STAGE {stage['number']} · {stage['title']}</div>
-            
-            <div class="sim-metrics-grid">
-              <div class="sim-metric-cell">
-                <span class="sim-m-label">基礎結構分</span>
-                <span class="sim-m-val" id="sim-base-display">{main['base_structural_score']:.1f}</span>
-              </div>
-              <div class="sim-metric-cell">
-                <span class="sim-m-label">和平閘門乘數</span>
-                <span class="sim-m-val" id="sim-gate-display">x{main['gate_factor']:.3f}</span>
-              </div>
-              <div class="sim-metric-cell">
-                <span class="sim-m-label">互動共振加成</span>
-                <span class="sim-m-val" id="sim-inter-display">+{main['interactions']['total']:.2f}</span>
-              </div>
-              <div class="sim-metric-cell">
-                <span class="sim-m-label">未夾持總分</span>
-                <span class="sim-m-val" id="sim-raw-display">{main['raw_interacted_score']:.1f}</span>
-              </div>
-            </div>
-
-            <!-- Simulated Probability Bands -->
-            <div style="margin-top:16px;">
-              <div style="font-size:0.75rem;font-weight:700;color:var(--text-dim);margin-bottom:8px;font-family:var(--font-mono);">
-                結構風險情境帶（非經驗證概率）(SIMULATED STRUCTURAL RISK BANDS)
-              </div>
-              <div class="sim-prob-rows">
-                <div class="sim-p-row">
-                  <span class="sim-p-h">1 年期 (1-Year)</span>
-                  <span class="sim-p-v" id="sim-prob-1y">{main['probability_bands']['1y']['central_pct']:.1f}% ({main['probability_bands']['1y']['lower_pct']:.1f}%–{main['probability_bands']['1y']['upper_pct']:.1f}%)</span>
-                </div>
-                <div class="sim-p-row">
-                  <span class="sim-p-h">5 年期 (5-Year)</span>
-                  <span class="sim-p-v" id="sim-prob-5y">{main['probability_bands']['5y']['central_pct']:.1f}% ({main['probability_bands']['5y']['lower_pct']:.1f}%–{main['probability_bands']['5y']['upper_pct']:.1f}%)</span>
-                </div>
-                <div class="sim-p-row">
-                  <span class="sim-p-h">10 年期 (10-Year)</span>
-                  <span class="sim-p-v" id="sim-prob-10y">{main['probability_bands']['10y']['central_pct']:.1f}% ({main['probability_bands']['10y']['lower_pct']:.1f}%–{main['probability_bands']['10y']['upper_pct']:.1f}%)</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Interactive Formula Breakdown -->
-            <div class="sim-formula-note">
-              <strong>實時公式追蹤 (Formula Tracking)：</strong><br>
-              <code>Gated = (Base + Bonus) × GateFactor</code><br>
-              <code>Index = SoftClamp(Gated, 70, 100)</code>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-        """
+    
     if ui_step >= 3:
         # Generate Scenario Cards
         sc_cards = []
@@ -2247,9 +2132,6 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
     .panel-card,
     .hero-grid,
     .grid-two-cols,
-    .simulator-layout,
-    .sim-controls-col,
-    .sim-result-col,
     .scenarios-grid,
     .regions-grid,
     .history-grid,
@@ -2981,204 +2863,6 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       margin-top: 4px;
     }
 
-    /* Step 4: Simulator Styles */
-    .simulator-layout {
-      display: grid;
-      grid-template-columns: 1.25fr 0.75fr;
-      gap: 24px;
-    }
-    .btn-tactical {
-      background: rgba(6, 182, 212, 0.15);
-      border: 1px solid var(--accent-cyan);
-      color: #67e8f9;
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-tactical:hover {
-      background: rgba(6, 182, 212, 0.3);
-      box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
-    }
-    .sim-controls-col {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .sim-slider-group {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .sim-slider-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .sim-layer-tag {
-      font-size: 0.7rem;
-      font-weight: 800;
-      font-family: var(--font-mono);
-      color: var(--accent-cyan);
-      background: rgba(6, 182, 212, 0.1);
-      padding: 2px 5px;
-      border-radius: 3px;
-      margin-right: 6px;
-    }
-    .sim-label {
-      font-size: 0.84rem;
-      font-weight: 700;
-      color: #f1f5f9;
-    }
-    .sim-val {
-      font-size: 1.05rem;
-      font-weight: 800;
-      font-family: var(--font-mono);
-      color: var(--accent-cyan);
-    }
-    .sim-range {
-      width: 100%;
-      height: 6px;
-      background: #1e293b;
-      border-radius: 3px;
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-      cursor: pointer;
-    }
-    .sim-range::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--accent-cyan);
-      box-shadow: 0 0 8px rgba(6, 182, 212, 0.8);
-      cursor: pointer;
-    }
-    .sim-range::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--accent-cyan);
-      box-shadow: 0 0 8px rgba(6, 182, 212, 0.8);
-      cursor: pointer;
-    }
-    .sim-slider-desc {
-      font-size: 0.72rem;
-      color: var(--text-dim);
-    }
-    .sim-result-card {
-      background: linear-gradient(180deg, #131d36 0%, #0d1424 100%);
-      border: 1px solid var(--accent-cyan);
-      border-radius: 8px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
-      position: sticky;
-      top: 80px;
-    }
-    .sim-score-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-    }
-    .sim-score-big {
-      font-size: 3rem;
-      font-weight: 800;
-      font-family: var(--font-mono);
-      color: #fff;
-      line-height: 1;
-    }
-    .sim-delta-badge {
-      font-size: 0.85rem;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      padding: 4px 8px;
-      border-radius: 4px;
-      background: rgba(148, 163, 184, 0.15);
-      color: #cbd5e1;
-    }
-    .sim-stage-badge {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--color-orange);
-      padding: 4px 10px;
-      background: rgba(249, 115, 22, 0.12);
-      border: 1px solid rgba(249, 115, 22, 0.3);
-      border-radius: 4px;
-      text-align: center;
-    }
-    .sim-metrics-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 4px;
-    }
-    .sim-metric-cell {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 8px 10px;
-      display: flex;
-      flex-direction: column;
-    }
-    .sim-m-label {
-      font-size: 0.68rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-    }
-    .sim-m-val {
-      font-size: 1rem;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      color: #e2e8f0;
-      margin-top: 2px;
-    }
-    .sim-prob-rows {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .sim-p-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.76rem;
-      background: var(--bg-surface);
-      padding: 6px 10px;
-      border-radius: 4px;
-      border: 1px solid var(--border-color);
-    }
-    .sim-p-h {
-      color: var(--text-dim);
-      font-family: var(--font-mono);
-    }
-    .sim-p-v {
-      font-family: var(--font-mono);
-      font-weight: 700;
-      color: var(--accent-cyan);
-    }
-    .sim-formula-note {
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      background: rgba(0, 0, 0, 0.25);
-      border-radius: 4px;
-      padding: 8px;
-      line-height: 1.4;
-    }
-    .sim-formula-note code {
-      color: var(--accent-cyan);
-    }
-
     /* Step 5: Historical Timeline */
     .history-grid {
       display: grid;
@@ -3636,13 +3320,11 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       .hero-grid { grid-template-columns: 1fr; }
       .grid-two-cols { grid-template-columns: 1fr !important; }
       .scenarios-grid { grid-template-columns: repeat(2, 1fr); }
-      .simulator-layout { grid-template-columns: 1fr; }
-      .sim-result-card { position: static; }
     }
 
     @media (max-width: 768px) {
       /* Typography & Base */
-      body, p, .panel-card p, .sim-slider-desc, .sc-desc, .reg-note, .hist-desc, .unc-desc, .stage-card-desc, .insight-box p {
+      body, p, .panel-card p, .sc-desc, .reg-note, .hist-desc, .unc-desc, .stage-card-desc, .insight-box p {
         font-size: 14px;
         line-height: 1.5;
       }
@@ -3745,24 +3427,6 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       .scenario-card {
         min-height: 44px;
         padding: 14px;
-      }
-
-      /* Slider touch target & thumb enlargement */
-      .sim-range {
-        height: 10px;
-        margin: 10px 0;
-      }
-      .sim-range::-webkit-slider-thumb {
-        width: 28px;
-        height: 28px;
-      }
-      .sim-range::-moz-range-thumb {
-        width: 28px;
-        height: 28px;
-      }
-      .sim-slider-group {
-        min-height: 44px;
-        padding: 14px 12px;
       }
 
       /* Table responsive & scroll hint */
@@ -3911,20 +3575,6 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       }
       .score-big {
         font-size: 2.7rem;
-      }
-      .sim-score-big {
-        font-size: 2.4rem;
-      }
-      .sim-metrics-grid {
-        grid-template-columns: 1fr;
-      }
-      .sim-header-actions {
-        flex-direction: column;
-        align-items: stretch;
-        width: 100%;
-      }
-      .sim-header-actions .btn-tactical {
-        width: 100%;
       }
     }
 
@@ -4444,146 +4094,6 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       }
     }
 
-    // Step 4: Interactive Simulation Recalculator Engine
-    function runSimulation() {
-      // 1. Read slider inputs
-      const aiVal = parseFloat(document.getElementById('sim_l3_ai')?.value || 62);
-      const unempVal = parseFloat(document.getElementById('sim_l3_unemp')?.value || 68);
-      const energyVal = parseFloat(document.getElementById('sim_l1_energy')?.value || 60);
-      const mineralsVal = parseFloat(document.getElementById('sim_l1_minerals')?.value || 72);
-      const blocVal = parseFloat(document.getElementById('sim_l4_bloc')?.value || 78);
-      const fearVal = parseFloat(document.getElementById('sim_l5_fear')?.value || 78);
-      const peaceCap = parseFloat(document.getElementById('sim_gate_peace')?.value || 44.9);
-
-      // Update slider badge displays
-      if (document.getElementById('val-sim_l3_ai')) document.getElementById('val-sim_l3_ai').textContent = aiVal.toFixed(1);
-      if (document.getElementById('val-sim_l3_unemp')) document.getElementById('val-sim_l3_unemp').textContent = unempVal.toFixed(1);
-      if (document.getElementById('val-sim_l1_energy')) document.getElementById('val-sim_l1_energy').textContent = energyVal.toFixed(1);
-      if (document.getElementById('val-sim_l1_minerals')) document.getElementById('val-sim_l1_minerals').textContent = mineralsVal.toFixed(1);
-      if (document.getElementById('val-sim_l4_bloc')) document.getElementById('val-sim_l4_bloc').textContent = blocVal.toFixed(1);
-      if (document.getElementById('val-sim_l5_fear')) document.getElementById('val-sim_l5_fear').textContent = fearVal.toFixed(1);
-      if (document.getElementById('val-sim_gate_peace')) document.getElementById('val-sim_gate_peace').textContent = peaceCap.toFixed(1);
-
-      // 2. Compute dynamic layer scores
-      const l1 = (52.0 * 1.0 + 58.0 * 1.0 + energyVal * 1.2 + mineralsVal * 1.3 + 65.0 * 1.0 + 68.0 * 1.2) / 6.7;
-      const l2 = 71.3235;
-      const l3 = (56.0 * 1.0 + unempVal * 1.2 + 65.0 * 1.1 + 75.0 * 1.0 + aiVal * 1.5 + 64.0 * 1.0 + 71.5 * 1.1) / 7.9;
-      const l4 = (72.0 * 1.2 + 75.0 * 1.2 + blocVal * 1.3 + 76.0 * 1.2 + 66.0 * 1.4 + 80.0 * 1.4 + 82.0 * 1.2) / 8.9;
-      const l5 = (76.0 * 1.3 + 70.0 * 1.1 + 64.0 * 1.0 + fearVal * 1.4 + 72.0 * 1.2 + 68.0 * 1.0) / 7.0;
-
-      // 3. Base Structural Score (Weights: L1:1.0, L2:1.0, L3:1.1, L4:1.2, L5:1.1 = 5.4)
-      const baseStructural = (l1 * 1.0 + l2 * 1.0 + l3 * 1.1 + l4 * 1.2 + l5 * 1.1) / 5.4;
-
-      // 4. Peace Mechanism Gate Factor
-      const gateFailure = Math.max(0, 100.0 - peaceCap);
-      const gateFactor = 1.4 - (Math.max(0, Math.min(100, peaceCap)) / 100.0) * 0.8;
-
-      // 5. Interaction Effects
-      const iL1L2 = 0.08 * (l1 * l2 / 100.0);
-      const iL3L5 = 0.08 * (l3 * l5 / 100.0);
-      const iL4Gate = 0.10 * (l4 * gateFailure / 100.0);
-      const rawInteraction = iL1L2 + iL3L5 + iL4Gate;
-      const totalInteraction = Math.min(25.0, rawInteraction);
-
-      // 6. Gated Score
-      const rawInteracted = baseStructural + totalInteraction;
-      const gated = rawInteracted * gateFactor;
-
-      // 7. Soft Clamp (threshold=70.0, ceiling=100.0)
-      let simIndex = 0.0;
-      if (gated <= 0.0) {
-        simIndex = 0.0;
-      } else if (gated <= 70.0) {
-        simIndex = gated;
-      } else {
-        simIndex = 70.0 + 30.0 * Math.tanh((gated - 70.0) / 30.0);
-      }
-      simIndex = Math.min(100.0, Math.max(0.0, simIndex));
-
-      // 8. Stage Mapping
-      let stageNum = 1;
-      let stageTitle = "階段一：結構壓力形成";
-      if (simIndex < 25.0) {
-        stageNum = 1; stageTitle = "階段一：結構壓力形成";
-      } else if (simIndex < 50.0) {
-        stageNum = 2; stageTitle = "階段二：利益衝突顯性化";
-      } else if (simIndex < 85.0) {
-        stageNum = 3; stageTitle = "階段三：和平解決機制失效";
-      } else {
-        stageNum = 4; stageTitle = "階段四：暴力成為被接受選項";
-      }
-
-      // 9. Probability Bands (v0.2 Calibrated Anchors)
-      const p1y = 80.0 / (1.0 + Math.exp(-0.055 * (simIndex - 120.0)));
-      const p5y = 95.0 / (1.0 + Math.exp(-0.058 * (simIndex - 95.0)));
-      const p10y = 98.0 / (1.0 + Math.exp(-0.059 * (simIndex - 82.5)));
-
-      // 10. Update DOM elements
-      const indexDisplay = document.getElementById('sim-index-display');
-      if (indexDisplay) indexDisplay.textContent = simIndex.toFixed(1);
-
-      const delta = simIndex - 83.1;
-      const deltaDisplay = document.getElementById('sim-delta-display');
-      if (deltaDisplay) {
-        const sign = delta >= 0 ? '+' : '';
-        deltaDisplay.textContent = Math.abs(delta) < 0.05 ? '基準 (±0.0)' : `${sign}${delta.toFixed(1)} vs 基準`;
-        deltaDisplay.style.background = delta > 0.05 ? 'rgba(239, 68, 68, 0.2)' : (delta < -0.05 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(148, 163, 184, 0.15)');
-        deltaDisplay.style.color = delta > 0.05 ? '#fca5a5' : (delta < -0.05 ? '#6ee7b7' : '#cbd5e1');
-      }
-
-      const stageDisplay = document.getElementById('sim-stage-display');
-      if (stageDisplay) {
-        stageDisplay.textContent = `STAGE ${stageNum} · ${stageTitle}`;
-        stageDisplay.style.color = stageNum >= 4 ? 'var(--color-red)' : (stageNum === 3 ? 'var(--color-orange)' : (stageNum === 2 ? 'var(--color-yellow)' : 'var(--color-green)'));
-      }
-
-      if (document.getElementById('sim-base-display')) document.getElementById('sim-base-display').textContent = baseStructural.toFixed(1);
-      if (document.getElementById('sim-gate-display')) document.getElementById('sim-gate-display').textContent = 'x' + gateFactor.toFixed(3);
-      if (document.getElementById('sim-inter-display')) document.getElementById('sim-inter-display').textContent = '+' + totalInteraction.toFixed(2);
-      if (document.getElementById('sim-raw-display')) document.getElementById('sim-raw-display').textContent = rawInteracted.toFixed(1);
-
-      if (document.getElementById('sim-prob-1y')) document.getElementById('sim-prob-1y').textContent = `${p1y.toFixed(1)}% (${(p1y*0.65).toFixed(1)}%–${Math.min(100, p1y*1.45).toFixed(1)}%)`;
-      if (document.getElementById('sim-prob-5y')) document.getElementById('sim-prob-5y').textContent = `${p5y.toFixed(1)}% (${(p5y*0.75).toFixed(1)}%–${Math.min(100, p5y*1.30).toFixed(1)}%)`;
-      if (document.getElementById('sim-prob-10y')) document.getElementById('sim-prob-10y').textContent = `${p10y.toFixed(1)}% (${(p10y*0.80).toFixed(1)}%–${Math.min(100, p10y*1.25).toFixed(1)}%)`;
-
-      // Sync to Main Gauge
-      const mainScore = document.getElementById('score-display');
-      if (mainScore) mainScore.textContent = simIndex.toFixed(1);
-
-      const svg = document.querySelector('.gauge-svg');
-      if (svg) {
-        const needle = svg.querySelector('line');
-        if (needle) {
-          const theta = Math.PI - (simIndex / 100.0) * Math.PI;
-          const nx = 160 + 100 * Math.cos(theta);
-          const ny = 145 - 100 * Math.sin(theta);
-          needle.setAttribute('x2', nx.toFixed(1));
-          needle.setAttribute('y2', ny.toFixed(1));
-        }
-      }
-
-      document.querySelectorAll('.stage-card').forEach(el => el.classList.remove('active'));
-      const activeStageCard = document.getElementById('stage-card-' + stageNum);
-      if (activeStageCard) activeStageCard.classList.add('active');
-    }
-
-    function resetSimulation() {
-      const defaults = {
-        'sim_l3_ai': 62.0,
-        'sim_l3_unemp': 68.0,
-        'sim_l1_energy': 60.0,
-        'sim_l1_minerals': 72.0,
-        'sim_l4_bloc': 78.0,
-        'sim_l5_fear': 78.0,
-        'sim_gate_peace': 44.9
-      };
-      for (const [id, val] of Object.entries(defaults)) {
-        const el = document.getElementById(id);
-        if (el) el.value = val;
-      }
-      runSimulation();
-    }
-
     // Step 5: Filter Table by Layer
     function filterTable(layerCode, btn) {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -5032,7 +4542,6 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
     {step3_html}
     {protests_card_html}
     {step1_5_html}
-    {step4_html}
     {step5_html}
   </main>
 

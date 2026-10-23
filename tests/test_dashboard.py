@@ -121,52 +121,63 @@ def test_build_dashboard_offline_zero_cdn(tmp_path):
     assert f"{data['main_result']['global_risk_index']:.1f}" in content
 
 
-def test_simulator_formula_consistency():
-    """Verify that the simulator JS recalculation engine formula matches Python WW3RiskModel exactly."""
-    import math
-    model = WW3RiskModel()
-    scenario_path = Path("scenarios/baseline_2026.json")
-    scenario = load_scenario_from_file(scenario_path)
-    py_result = model.evaluate(scenario)
+def test_dashboard_no_simulator_section(tmp_path):
+    """Verify that the Interactive Crisis Escalation Simulator section has been removed from the dashboard."""
+    out_html = tmp_path / "dashboard.html"
+    build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        ui_step=5,
+    )
+    content = out_html.read_text(encoding="utf-8")
 
-    # Replicate the exact JS simulator recalculation in Python
-    ai_val = 62.0
-    unemp_val = 68.0
-    energy_val = 60.0
-    minerals_val = 72.0
-    bloc_val = 78.0
-    fear_val = 78.0
-    peace_cap = 44.916666666666664
+    # 1. Simulator section title must NOT be present
+    assert "實時交互衝突模擬器" not in content
+    assert "Interactive Crisis Escalation Simulator" not in content
 
-    l1 = (52.0 * 1.0 + 58.0 * 1.0 + energy_val * 1.2 + minerals_val * 1.3 + 65.0 * 1.0 + 68.0 * 1.2) / 6.7
-    l2 = 71.32352941176471
-    l3 = (56.0 * 1.0 + unemp_val * 1.2 + 65.0 * 1.1 + 75.0 * 1.0 + ai_val * 1.5 + 64.0 * 1.0 + 71.5 * 1.1) / 7.9
-    l4 = (72.0 * 1.2 + 75.0 * 1.2 + bloc_val * 1.3 + 76.0 * 1.2 + 66.0 * 1.4 + 80.0 * 1.4 + 82.0 * 1.2) / 8.9
-    l5 = (76.0 * 1.3 + 70.0 * 1.1 + 64.0 * 1.0 + fear_val * 1.4 + 72.0 * 1.2 + 68.0 * 1.0) / 7.0
+    # 2. Simulator DOM elements (id="sim-") must NOT be present
+    assert 'id="simulator-section"' not in content
+    assert 'id="sim_l3_ai"' not in content
+    assert 'id="sim_l3_unemp"' not in content
+    assert 'id="sim_l1_energy"' not in content
+    assert 'id="sim_l1_minerals"' not in content
+    assert 'id="sim_l4_bloc"' not in content
+    assert 'id="sim_l5_fear"' not in content
+    assert 'id="sim_gate_peace"' not in content
+    assert 'id="sim-index-display"' not in content
+    assert 'id="sim-delta-display"' not in content
+    assert 'id="sim-stage-display"' not in content
+    assert 'id="sim-base-display"' not in content
+    assert 'id="sim-gate-display"' not in content
+    assert 'id="sim-inter-display"' not in content
+    assert 'id="sim-raw-display"' not in content
+    assert 'id="sim-prob-1y"' not in content
+    assert 'id="sim-prob-5y"' not in content
+    assert 'id="sim-prob-10y"' not in content
 
-    base_structural = (l1 * 1.0 + l2 * 1.0 + l3 * 1.1 + l4 * 1.2 + l5 * 1.1) / 5.4
+    # 3. Simulator CSS classes must NOT be present
+    assert "simulator-layout" not in content
+    assert "sim-controls-col" not in content
+    assert "sim-result-col" not in content
+    assert "sim-slider-group" not in content
+    assert "sim-range" not in content
+    assert "sim-result-card" not in content
+    assert "sim-score-row" not in content
+    assert "sim-metrics-grid" not in content
+    assert "sim-prob-rows" not in content
+    assert "sim-formula-note" not in content
 
-    gate_failure = 100.0 - peace_cap
-    gate_factor = 1.4 - (peace_cap / 100.0) * 0.8
+    # 4. Simulator JS functions must NOT be present
+    assert "function runSimulation()" not in content
+    assert "function resetSimulation()" not in content
 
-    i_l1_l2 = 0.08 * (l1 * l2 / 100.0)
-    i_l3_l5 = 0.08 * (l3 * l5 / 100.0)
-    i_l4_gate = 0.10 * (l4 * gate_failure / 100.0)
-    total_interaction = min(25.0, i_l1_l2 + i_l3_l5 + i_l4_gate)
-
-    raw_interacted = base_structural + total_interaction
-    gated = raw_interacted * gate_factor
-
-    if gated <= 70.0:
-        sim_index = gated
-    else:
-        sim_index = 70.0 + 30.0 * math.tanh((gated - 70.0) / 30.0)
-
-    # Check exact match with baseline 83.1
-    assert round(sim_index, 1) == round(py_result.global_risk_index, 1)
-    assert round(base_structural, 1) == round(py_result.base_structural_score, 1)
-    assert round(gate_factor, 3) == round(py_result.gate_factor, 3)
-    assert round(total_interaction, 2) == round(py_result.interactions["total"], 2)
+    # 5. Other dashboard sections must still be present
+    assert "全球抗議活動監測" in content
+    assert "歷史趨勢與重大危機回測對照" in content
+    assert "情境卡矩陣與動態比對" in content
+    assert "全球關鍵地緣戰區壓力卡列" in content
+    assert "數據品質與審計新鮮度" in content
+    assert "即時脈搏層" in content
 
 
 def test_dashboard_html_style_tags_balanced_and_enclosing_root_css(tmp_path):
@@ -269,9 +280,8 @@ def test_dashboard_mobile_responsive_structure(tmp_path):
         ".table-scroll must directly wrap <table class=\"styled-table\">"
     )
 
-    # 3. Touch targets and slider ergonomics in CSS
+    # 3. Touch targets in CSS
     assert "min-height: 44px" in content, "Missing >= 44px touch target rules"
-    assert "width: 28px" in content, "Missing enlarged slider thumb rule"
     assert "overflow-x: hidden" in content, "Missing overflow safety on html/body"
 
     # 4. Top bar mobile wrap & badge styling
