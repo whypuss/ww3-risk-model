@@ -150,8 +150,8 @@
   },
   "pulse": {
     "version": "0.6.0",
-    "computed_at": "2026-10-23T12:26:25Z",
-    "pulse_adjustment": -0.01,
+    "computed_at": "2026-10-23T14:27:24Z",
+    "pulse_adjustment": 0.21,
     "range": [
       -10.0,
       10.0
@@ -187,7 +187,7 @@
         "source_url": "https://gamma-api.polymarket.com/markets",
         "weight": 0.35,
         "status": "live",
-        "fetched_at": "2026-10-23T12:26:24Z",
+        "fetched_at": "2026-10-23T14:27:23Z",
         "raw_value": 3.78,
         "raw_unit": "% (Yes 隱含機率)",
         "normalized_score": -0.1217,
@@ -228,13 +228,13 @@
         "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
         "weight": 0.25,
         "status": "live",
-        "fetched_at": "2026-10-23T12:26:25Z",
-        "raw_value": 1.67,
+        "fetched_at": "2026-10-23T14:27:24Z",
+        "raw_value": 2.55,
         "raw_unit": "% (24h 漲跌幅)",
-        "normalized_score": 0.1666,
-        "contribution": 0.42,
+        "normalized_score": 0.2549,
+        "contribution": 0.64,
         "details": {
-          "price_usd": 110.47,
+          "price_usd": 111.43,
           "scale_anchor_pct": 10.0,
           "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
         },
@@ -338,203 +338,526 @@
         "name_zh": "法國",
         "region": "歐洲",
         "level": "severe",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "10/17 全國「憤怒日」：工會與學生抗議生活成本高企與學校資源不足，官方估計約 55 萬人上街（CGT 稱 80 萬）；巴黎、馬賽、里昂等地出現縱火與衝突，約 2,400 人被捕，多地實施局部宵禁。",
+        "sources": [
+          {
+            "name": "AITimeline",
+            "url": "https://aitimeline.in/france-protests-timeline-social-unrest-16880/"
+          },
+          {
+            "name": "The Boston Report",
+            "url": "https://thebostonreport.com/geopolitics/france-protest-tracker/"
+          }
+        ]
       },
       {
         "name_zh": "意大利",
         "region": "歐洲",
         "level": "severe",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "10/17 十三個城市遊行抗議工資停滯、物價與教育問題，米蘭、都靈、博洛尼亞等地與警方衝突；羅馬 CGIL 集會約十萬人，工會領袖 Landini 宣佈 11/20 舉行全國總罷工。",
+        "sources": [
+          {
+            "name": "EuropeSays",
+            "url": "https://www.europesays.com/italy/57610/"
+          },
+          {
+            "name": "NewsTarget",
+            "url": "https://www.newstarget.com/2026-10-22-riots-europe-inflation-stagnant-wages-crumbling-services.html"
+          }
+        ]
       },
       {
         "name_zh": "阿爾巴尼亞",
         "region": "歐洲",
         "level": "severe",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "地拉那反政府示威連續八日：學生要求降低學費、增加教育投資，並要求總理 Rama 下台；警方以催淚彈與水炮驅散，有警局被縱火，約 295 人受傷。運動源於學費争议與「Flamingo」海岸發展項目糾紛。",
+        "sources": [
+          {
+            "name": "New Indian Express (AP)",
+            "url": "https://www.newindianexpress.com/amp/story/world/2026/Oct/21/albanian-police-clash-with-anti-government-protesters-for-the-eighth-day"
+          },
+          {
+            "name": "Balkan Insight",
+            "url": "https://balkaninsight.com/2026/10/19/albanias-capital-rocked-by-chaotic-weekend-of-street-unrest/bi/"
+          }
+        ]
       },
       {
         "name_zh": "比利時",
         "region": "歐洲",
         "level": "large",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "10/9 工會發動全國罷工反對預算緊縮，布魯塞爾約 3 萬人遊行；10/17 學生抗議教育成本時與警方衝突，布魯塞爾與列日共 195 人被捕，警方出動水炮與催淚彈。",
+        "sources": [
+          {
+            "name": "The Straits Times",
+            "url": "https://www.straitstimes.com/world/europe/protesters-clash-with-police-in-brussels-as-unions-and-students-march"
+          },
+          {
+            "name": "TRT World",
+            "url": "https://www.trtworld.com/article/513dc14ee5bb/amp"
+          }
+        ]
       },
       {
         "name_zh": "葡萄牙",
         "region": "歐洲",
         "level": "large",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "里斯本與波爾圖示威者紮營抗議住屋危機、驅逐與租金上限法案；警方 10/20 清拆營地並拘捕 55 人，示威者同日重返營地繼續抗爭。",
+        "sources": [
+          {
+            "name": "Al Jazeera",
+            "url": "https://www.aljazeera.com/news/2026/10/21/portugal-cost-of-living-protesters-pour-back-into-camps-cleared-by-police"
+          },
+          {
+            "name": "Reuters",
+            "url": "https://www.reuters.com/world/portuguese-police-clear-housing-protest-camps-arresting-55-2026-10-20/"
+          }
+        ]
       },
       {
         "name_zh": "西班牙",
         "region": "歐洲",
         "level": "large",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "一名 87 歲長者被驅逐事件觸發馬德里太陽門廣場紮營抗議（持續逾三週）要求正視租金危機；教師自 10/14 起無限期罷工，UGT／CCOO 工會號召 11/11 總罷工，首相 Sánchez 宣佈 11/29 提前大選。",
+        "sources": [
+          {
+            "name": "Le Monde",
+            "url": "https://www.lemonde.fr/en/international/article/2026/10/20/italy-spain-belgium-portugal-social-unrest-spreads-across-europe-amid-soaring-energy-prices-and-a-housing-crisis_6759435_4.html"
+          },
+          {
+            "name": "The Economic Times",
+            "url": "https://economictimes.indiatimes.com/news/international/world-news/from-france-to-italy-belgium-and-spain-housing-crisis-rising-costs-education-fuel-wave-of-protests-across-europe/articleshow/135087850.cms"
+          }
+        ]
       },
       {
         "name_zh": "希臘",
         "region": "歐洲",
         "level": "large",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "10/21 雅典約一萬名學生與教師遊行（ERT 估計），塞薩洛尼基、帕特雷等地亦有集會；訴求包括教育經費、教師空缺與學生租金，憲法廣場設有營地，教師發動罷工。",
+        "sources": [
+          {
+            "name": "The Hindu",
+            "url": "https://www.thehindu.com/news/international/thousands-of-students-teachers-march-through-greek-capital-to-protest-high-cost-of-living/article71608731.ece"
+          },
+          {
+            "name": "TRT World",
+            "url": "https://www.trtworld.com/article/f00b6e482fc3/amp"
+          }
+        ]
       },
       {
         "name_zh": "塞爾維亞",
         "region": "歐洲",
         "level": "large",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "10/22 貝爾格萊德約 15 萬人集會，支持學生主導的「學生名單」迎戰執政 SNS；運動源於 2024 年諾維薩德車站簷篷倒塌（16 人死亡）引發的近兩年反貪抗議，10/25 舉行提前國會選舉。",
+        "sources": [
+          {
+            "name": "Gulf News (AFP)",
+            "url": "https://gulfnews.com/world/europe/150000-rally-in-belgrade-as-serbia-heads-to-pivotal-poll-1.500720321"
+          },
+          {
+            "name": "The Straits Times",
+            "url": "https://www.straitstimes.com/world/europe/around-150000-rally-in-belgrade-as-serbia-heads-to-pivotal-poll"
+          }
+        ]
       },
       {
         "name_zh": "德國",
         "region": "歐洲",
         "level": "large",
         "evidence": "verified",
-        "note": "柏林學校封鎖及聲援法國集會；全國學校罷工浪潮（9/25 約 4.5 萬人）；已號召 10/31 二十一城示威（DW／Anadolu）"
+        "note": "柏林學校封鎖及聲援法國集會；全國學校罷工浪潮（9/25 約 4.5 萬人）；已號召 10/31 二十一城示威（DW／Anadolu）",
+        "summary": "9/25 第四次全國學校罷工約 4.5 萬人參與；10/12–16 柏林學生封鎖學校，抗議教育削減與恢復徵兵制；「Gen Z regelt」已號召 10/31 於 21 個城市示威。",
+        "sources": [
+          {
+            "name": "Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/2025%E2%80%932026_German_student_strikes"
+          },
+          {
+            "name": "EuropeSays",
+            "url": "https://www.europesays.com/europe/164125/"
+          }
+        ]
       },
       {
         "name_zh": "奧地利",
         "region": "歐洲",
         "level": "large",
         "evidence": "verified",
-        "note": "10/22 維也納 ÖH 遊行，主辦估計 2–3 萬人，反對大學預算削減（ORF 等）"
+        "note": "10/22 維也納 ÖH 遊行，主辦估計 2–3 萬人，反對大學預算削減（ORF 等）",
+        "summary": "10/22 維也納學生組織 ÖH 發動遊行，反對將 2028–30 年大學預算凍結於 160 億歐元（大學方面稱實際需要 180 億）；參與人數估計不一，主辦方稱約 2–3 萬人。",
+        "sources": [
+          {
+            "name": "DPA (via ekkow)",
+            "url": "https://app.ekkow.com/1486051625999155259"
+          },
+          {
+            "name": "Armenpress",
+            "url": "https://armenpress.am/en/article/1263579"
+          }
+        ]
       },
       {
         "name_zh": "瑞士",
         "region": "歐洲",
         "level": "active",
         "evidence": "verified",
-        "note": "僅動員籌備：洛桑學生大會約百人、已號召 11/20 青年罷工；瑞士媒體明言大規模抗議浪潮未出現（NZZ／20min／Le Temps）"
+        "note": "僅動員籌備：洛桑學生大會約百人、已號召 11/20 青年罷工；瑞士媒體明言大規模抗議浪潮未出現（NZZ／20min／Le Temps）",
+        "summary": "目前僅屬動員籌備階段：左翼青年組織 Juso 與盟友正籌備 11/20「反緊縮與反軍事化青年罷工」，洛桑學生大會約百人出席；瑞士媒體明言當地尚未出現大規模抗議浪潮。",
+        "sources": [
+          {
+            "name": "Le Temps",
+            "url": "https://www.letemps.ch/en/switzerland/in-switzerland-the-left-and-student-groups-call-for-a-national-strike"
+          },
+          {
+            "name": "SWI swissinfo",
+            "url": "https://www.swissinfo.ch/eng/swiss-abroad-community/switzerland-today/92245239"
+          }
+        ]
       },
       {
         "name_zh": "愛爾蘭",
         "region": "歐洲",
         "level": "large",
         "evidence": "verified",
-        "note": "都柏林數千大學生遊行，要求降學費、增高教經費及可負擔住屋（RTE）"
+        "note": "都柏林數千大學生遊行，要求降學費、增高教經費及可負擔住屋（RTE）",
+        "summary": "都柏林學生遊行要求取消每年 2,500 歐元的學生供款費、補足高等教育經費缺口並投資學生住屋；工會亦就租金與工資問題發動遊行。",
+        "sources": [
+          {
+            "name": "The University Times",
+            "url": "https://universitytimes.ie/2026/10/1000-students-march-in-fuck-the-fees-protest-ahead-of-budget-2027/"
+          },
+          {
+            "name": "CENO",
+            "url": "https://ceno.org.uk/student-protests-europes-young-generation-losing-confidence-in-the-future/"
+          }
+        ]
       },
       {
         "name_zh": "美國",
         "region": "美洲",
         "level": "large",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "10/17「No Kings：提早投票」行動於全美 50 州舉行逾 2,500 場活動，反對特朗普政府權力集中，並將抗議能量轉化為 11/3 中期選舉的提早投票動員。",
+        "sources": [
+          {
+            "name": "Seoul Economic Daily",
+            "url": "https://en.sedaily.com/international/2026/10/18/us-protesters-chant-no-kings-urge-voters-to-rebuke-trump"
+          },
+          {
+            "name": "Fast Company",
+            "url": "https://www.fastcompany.com/91618419/no-kings-october-17-protests-rally-march-early-voting-midterm-election-events-cities-locations-polling-stations"
+          }
+        ]
       },
       {
         "name_zh": "阿根廷",
         "region": "美洲",
         "level": "large",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "10/15 布宜諾斯艾利斯數千名學生、教師與大學職員上街，反對米萊政府緊縮政策，要求落實國會已通過的大學經費法；國會附近爆發衝突（水炮、橡膠子彈），翌日布宜諾斯艾利斯大學被學生佔領。",
+        "sources": [
+          {
+            "name": "Outlook India (AP)",
+            "url": "https://www.outlookindia.com/international/argentina-anti-government-protest-thousands-rally-against-milei-over-university-funding-cuts"
+          },
+          {
+            "name": "Times Now World",
+            "url": "https://www.timesnowworld.com/us-news/argentina-protests-buenos-aires-university-funding-milei-article-156348172"
+          }
+        ]
       },
       {
         "name_zh": "墨西哥",
         "region": "美洲",
         "level": "active",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "瓜達拉哈拉（哈利斯科州）居民抗議自來水受污染，10/18–19 衝擊州政府與國會大樓，要求潔淨食水並調查警方執法；另有約 8,000 人於 10/2 在墨西哥城遊行紀念 1968 年特拉特洛爾科屠殺。",
+        "sources": [
+          {
+            "name": "Al Jazeera",
+            "url": "https://www.aljazeera.com/video/newsfeed/2026/10/19/mexican-protesters-demanding-clean-water-storm-state-congress"
+          },
+          {
+            "name": "Global South World",
+            "url": "https://www.globalsouthworld.com/article/thousands-march-in-mexico-city-to-mark-1968-student-massacre"
+          }
+        ]
       },
       {
         "name_zh": "秘魯",
         "region": "美洲",
         "level": "active",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "反罪案與反貪抗議席捲全國：總統 Boluarte 於 10/10 被國會罷免；10/15 利馬 Gen Z 示威與警方衝突，1 名示威者中槍身亡、約百人受傷；新任總統 Jerí 宣佈首都 30 日緊急狀態。",
+        "sources": [
+          {
+            "name": "Caliber.az",
+            "url": "https://caliber.az/en/post/state-of-emergency-looms-as-peru-faces-deadly-protests-over-crime-corruption"
+          },
+          {
+            "name": "MyRepublica",
+            "url": "https://myrepublica.nagariknetwork.com/news/perus-president-declares-state-of-emergency-in-capital-as-it-tries-to-stem--54-52.html"
+          }
+        ]
       },
       {
         "name_zh": "巴西",
         "region": "美洲",
         "level": "active",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "首輪投票盧拉落後於 Flávio Bolsonaro 後，左翼陣營展開全國催票動員：里約學生「Never Again Bolsonaro」遊行、聖保羅等地集會；10/20 有示威者到 Meta 聖保羅辦公室抗議其選舉內容處理；10/25 舉行次輪投票。",
+        "sources": [
+          {
+            "name": "Gulf News",
+            "url": "https://gulfnews.com/world/americas/never-again-bolsonaro-thousands-march-ahead-of-brazil-election-runoff-1.500702397"
+          },
+          {
+            "name": "teleSUR",
+            "url": "https://www.telesurenglish.net/brazil-protest-meta-electioninterference/"
+          }
+        ]
       },
       {
         "name_zh": "古巴",
         "region": "美洲",
         "level": "active",
-        "evidence": "single"
+        "evidence": "single",
+        "summary": "停電危機引發多地街頭抗議：10 月中民眾在 Granma 省 Santa Rita、Artemisa 省 Cabañas 等地上街高呼「我們要電力」；人權組織 Cubalex 統計 2026 年上半年全國錄得 766 宗抗議。",
+        "sources": [
+          {
+            "name": "CubaHeadlines",
+            "url": "https://www.cubaheadlines.com/articles/343131"
+          }
+        ]
       },
       {
         "name_zh": "智利",
         "region": "美洲",
         "level": "active",
-        "evidence": "single"
+        "evidence": "single",
+        "summary": "聖地牙哥抗議 Kast 政府削減開支：10/1 學生聯會 CONFECH以「教育一披索都不能少」遊行並與警方衝突；10/18 民眾於意大利廣場紀念 2019 年起義七週年亦爆發衝突，全國約 110 人被拘。",
+        "sources": [
+          {
+            "name": "Nutshell Today",
+            "url": "https://www.nutshelltoday.com/article/chile-protests-santiago-spending-cuts"
+          }
+        ]
       },
       {
         "name_zh": "哥倫比亞",
         "region": "美洲",
         "level": "active",
-        "evidence": "single"
+        "evidence": "single",
+        "summary": "10/14 全國罷工與遊行，反對 de la Espriella 政府的削減開支與新警務法令（第 1525 號法令）；政府稱高峰期約 6.2 萬人參與，整體大致和平。",
+        "sources": [
+          {
+            "name": "NewsNation Online",
+            "url": "https://newsnationonline.com/news/colombia-opposition-protests-october-2026/"
+          }
+        ]
       },
       {
         "name_zh": "玻利維亞",
         "region": "美洲",
         "level": "active",
-        "evidence": "single"
+        "evidence": "single",
+        "summary": "教師抗議教育政策與經濟壓力：燃料補貼削減後物價上漲、通脹加劇生活成本；拉巴斯示威遭警方以催淚彈與胡椒噴霧驅散。",
+        "sources": [
+          {
+            "name": "ABP News",
+            "url": "https://news.abplive.com/videos/news/world-global-unrest-bolivia-teachers-clash-with-authorities-as-tear-gas-and-pepper-spray-fill-streets-1872479/amp"
+          }
+        ]
       },
       {
         "name_zh": "肯亞",
         "region": "非洲",
         "level": "large",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "內羅畢 Gen Z 與人權團體抗議燃油加價推高生活成本；10/20 英雄日示威期間一名記者被捕，大學講師罷工亦令學生走上街頭；主辦方已通知 10/26 再遊行前往總統府。",
+        "sources": [
+          {
+            "name": "Citizen Digital",
+            "url": "https://citizen.digital/article/nairobi-protest-planned-for-monday-over-high-fuel-prices-and-soaring-cost-of-living-n392581"
+          },
+          {
+            "name": "Ghafla",
+            "url": "https://www.ghafla.co.ke/activists-stage-mashujaa-day-protests-in-nairobi-cbd-over-soaring-fuel-prices/"
+          }
+        ]
       },
       {
         "name_zh": "突尼斯",
         "region": "非洲",
         "level": "large",
-        "evidence": "single"
+        "evidence": "single",
+        "summary": "加貝斯居民抗議國營磷酸鹽廠污染（近期氣體洩漏導致多人送院）；總工會 UGTT 號召 10/21 全市總罷工，數萬人遊行要求關閉污染設施；另有一宗相關案件中 10 名環保人士被判入獄。",
+        "sources": [
+          {
+            "name": "US World Today",
+            "url": "https://www.usworldtoday.com/news/tunisias-gabes-city-on-general-strike-over-factory-pollution202510231030300019/"
+          }
+        ]
       },
       {
         "name_zh": "摩洛哥",
         "region": "非洲",
         "level": "active",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "GenZ 212 青年運動持續，訴求涵蓋就業、醫療、教育與問責；10/21–22 在職學生於拉巴特國會外抗議大學收費。",
+        "sources": [
+          {
+            "name": "Walaw",
+            "url": "https://en.walaw.press/articles/morocco_s_working_students_protest_university_fees_outside_parliament_in_rabat/GPWPWSLLMSSF"
+          },
+          {
+            "name": "Caliber.az",
+            "url": "https://caliber.az/en/post/gen-z-led-protests-shake-morocco-madagascar-amid-growing-economic-frustrations"
+          }
+        ]
       },
       {
         "name_zh": "馬達加斯加",
         "region": "非洲",
         "level": "active",
-        "evidence": "single"
+        "evidence": "single",
+        "summary": "源於水電短缺的 Gen Z 抗議浪潮去年迫使總統 Rajoelina 下台、軍方過渡政權上台；一年後當初承諾的改革大多未落實，青年不滿持續。",
+        "sources": [
+          {
+            "name": "Breaking Africa News (RFI)",
+            "url": "https://breakingafricanews.com/madagascar-a-year-after-madagascars-gen-z-protests-and-rajoelinas-ouster-little-promised-change/"
+          }
+        ]
       },
       {
         "name_zh": "坦桑尼亞",
         "region": "非洲",
         "level": "active",
-        "evidence": "single"
+        "evidence": "single",
+        "summary": "10/29 選舉週年抗議計劃引發緊張：律師公會主席 Mwabukusi 因涉嫌資助示威被警方問話（否認指控，後獲保釋）；背景為 2025 年選後曾爆發致命騷亂。",
+        "sources": [
+          {
+            "name": "The Citizen",
+            "url": "https://www.thecitizen.co.tz/tanzania/news/national/tls-president-mwabukusi-questioned-over-alleged-funding-of-planned-protests-5634224"
+          }
+        ]
       },
       {
         "name_zh": "多哥",
         "region": "非洲",
         "level": "active",
-        "evidence": "single"
+        "evidence": "single",
+        "summary": "青年抗議運動在街頭遭鎮壓後轉向線上動員，訴求包括燃油價格與生活成本，並反對 Gnassingbé 推動修憲取消總統任期限制。",
+        "sources": [
+          {
+            "name": "GenZNewz",
+            "url": "https://genznewz.com/togo-youth-protests-move-online-as-fuel-prices-spike"
+          }
+        ]
       },
       {
         "name_zh": "尼日利亞",
         "region": "非洲",
         "level": "active",
-        "evidence": "single"
+        "evidence": "single",
+        "summary": "勞工大會 NLC 反對汽油價格暴漲與生活困苦：10/9 發出兩週最後通牒，要求調低油價並重啟最低工資談判（現行 ₦70,000 工資已被高油價侵蝕）；10/22 與政府談判破裂，NLC 設下 10/27 新限期。",
+        "sources": [
+          {
+            "name": "Vanguard",
+            "url": "https://www.vanguardngr.com/2026/10/nlc-falana-activists-rally-nigerians-against-petrol-price-hike-hardship/"
+          }
+        ]
       },
       {
         "name_zh": "印度",
         "region": "亞洲/中東",
         "level": "large",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "反對派與「Cockroach Janta Party」青年運動抗議選民名冊修訂（SIR)，指約 1.3 億名字被刪除，要求首席選舉專員 Gyanesh Kumar 辭職；新德里警方大規模拘留與驅散，聯合國專家 10/21 呼籲當局停止過度武力並展開獨立調查。",
+        "sources": [
+          {
+            "name": "Free Malaysia Today",
+            "url": "https://www.freemalaysiatoday.com/category/world/2026/10/21/un-experts-urge-india-to-end-excessive-force-against-protesters"
+          },
+          {
+            "name": "Khaleej Times (Reuters)",
+            "url": "https://www.khaleejtimes.com/world/asia/un-india-protests-cease-use-of-excessive-force-crackdown?amp=1"
+          }
+        ]
       },
       {
         "name_zh": "菲律賓",
         "region": "亞洲/中東",
         "level": "large",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "「幽靈防洪工程」貪腐醜聞（涉款逾 90 億美元、項目疑虛報或從未建成）引發連月抗議：9/21 馬尼拉數萬人遊行，前眾議長 Romualdez 因掠奪罪被捕；近日週日集會要求「立即把他們關起來」，10/17 學生罷課抗議調查緩慢。",
+        "sources": [
+          {
+            "name": "Citizen Digital (AFP)",
+            "url": "http://citizen.digital/article/thousands-protest-in-philippines-against-flood-control-fraud-n373792"
+          },
+          {
+            "name": "Responsible Statecraft",
+            "url": "https://responsiblestatecraft.org/philippines-protests/"
+          }
+        ]
       },
       {
         "name_zh": "印尼",
         "region": "亞洲/中東",
         "level": "active",
-        "evidence": "single"
+        "evidence": "single",
+        "summary": "10/20 學生抗議生活成本飆升與林火霧霾危機：首九個月逾 190 萬公頃林地焚毀、約 4,000 萬人受影響；雅加達、萬隆、日惹等地集會要求宣佈全國災難、追究涉事企業並正視貪腐，當局在首都部署 9,500 名保安人員，萬隆有警車被焚。",
+        "sources": [
+          {
+            "name": "OpIndia",
+            "url": "https://www.opindia.com/news-updates/student-protests-erupt-in-indonesia-over-rising-living-costs-and-forest-fires-9500-security-personnel-deployed/"
+          }
+        ]
       },
       {
         "name_zh": "以色列",
         "region": "亞洲/中東",
         "level": "active",
-        "evidence": "single"
+        "evidence": "single",
+        "summary": "10/7 襲擊遇難者與人質家屬持續抗議，要求成立國家調查委員會追究襲擊前後的失誤：10/24 於特拉維夫舉行選前大型集會，並號召 10/27 選舉日在全國票站外站立示威，口號「在票箱記住他們」。",
+        "sources": [
+          {
+            "name": "Haaretz",
+            "url": "https://www.haaretz.com/israel-news/elections/2026-10-22/ty-article/.premium/october-7-victims-families-to-hold-election-day-protests-across-israel/000001a1-6504-d46d-a1fd-e50599640000"
+          },
+          {
+            "name": "The Times of Israel",
+            "url": "https://www.timesofisrael.com/liveblog_entry/october-7-survivors-bereaved-families-plan-mass-anti-government-rally-3-days-before-election/"
+          }
+        ]
       },
       {
         "name_zh": "格魯吉亞",
         "region": "亞洲/中東",
         "level": "active",
-        "evidence": "verified"
+        "evidence": "verified",
+        "summary": "親歐抗議運動已持續近兩年（逾 680 日）：每週六於第比利斯遊行反對執政黨「格魯吉亞夢想」的親俄轉向，要求重新選舉、廢除反民主法例並釋放政治犯；執政黨正尋求憲法法院禁用主要反對黨，反對派 10/25 啟動新一輪抗議行動，預告 11/28 大型示威。",
+        "sources": [
+          {
+            "name": "Civil.ge",
+            "url": "https://civil.ge/archives/754781"
+          },
+          {
+            "name": "JAMnews",
+            "url": "https://jam-news.net/no-to-torture-saturday-march-against-oligarch-ivanishvili-in-tbilisi-video-podcast/"
+          }
+        ]
       }
     ],
     "key_observations": [
@@ -544,8 +867,8 @@
     ]
   },
   "structural_index": 83.5,
-  "pulse_adjustment": -0.01,
-  "composite_index": 83.49,
+  "pulse_adjustment": 0.21,
+  "composite_index": 83.71,
   "initial_trend_points": [
     {
       "date": "2026-10-21",
@@ -565,10 +888,10 @@
     },
     {
       "date": "2026-10-23",
-      "computed_at": "2026-10-23T12:26:25Z",
-      "composite_index": 83.49,
+      "computed_at": "2026-10-23T14:27:24Z",
+      "composite_index": 83.71,
       "structural_index": 83.5,
-      "pulse_adjustment": -0.01,
+      "pulse_adjustment": 0.21,
       "stage": 3
     }
   ],
