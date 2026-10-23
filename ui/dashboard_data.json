@@ -2,8 +2,8 @@
   "metadata": {
     "title": "WW3 戰爭風險指數儀表板",
     "title_en": "WW3 War Risk Index Dashboard",
-    "model_version": "0.6.0",
-    "generated_at": "2026-10-22",
+    "model_version": "0.7.0",
+    "generated_at": "2026-10-23",
     "active_scenario_id": "baseline_2026",
     "active_scenario_title": "2026 全球結構風險基準情境",
     "active_scenario_year": 2026
@@ -150,14 +150,14 @@
   },
   "pulse": {
     "version": "0.6.0",
-    "computed_at": "2026-10-22T03:05:04Z",
-    "pulse_adjustment": -0.12,
+    "computed_at": "2026-10-23T08:26:31Z",
+    "pulse_adjustment": 3.6,
     "range": [
       -10.0,
       10.0
     ],
     "status": "operational",
-    "active_signals_count": 2,
+    "active_signals_count": 3,
     "total_signals_count": 3,
     "weights": {
       "gdelt_conflict": 0.4,
@@ -171,14 +171,19 @@
         "source": "GDELT 2.0 Doc TimelineVol API",
         "source_url": "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json",
         "weight": 0.4,
-        "status": "unavailable",
-        "fetched_at": null,
-        "raw_value": null,
+        "status": "live",
+        "fetched_at": "2026-10-23T08:26:24Z",
+        "raw_value": 17.1127,
         "raw_unit": "% (全球新聞總量佔比)",
-        "normalized_score": 0.0,
-        "contribution": 0.0,
-        "details": {},
-        "error": "HTTP Error 429: Too Many Requests"
+        "normalized_score": 0.9755,
+        "contribution": 3.9,
+        "details": {
+          "latest_date": "20261023T000000Z",
+          "history_points": 69,
+          "baseline_30d": 15.4056,
+          "formula": "clamp((raw - 15.41) / 1.75, -1.0, 1.0)"
+        },
+        "error": null
       },
       "polymarket_war_risk": {
         "signal_id": "polymarket_war_risk",
@@ -187,33 +192,33 @@
         "source_url": "https://gamma-api.polymarket.com/markets",
         "weight": 0.35,
         "status": "live",
-        "fetched_at": "2026-10-22T03:05:03Z",
-        "raw_value": 3.6,
+        "fetched_at": "2026-10-23T08:26:24Z",
+        "raw_value": 3.67,
         "raw_unit": "% (Yes 隱含機率)",
-        "normalized_score": -0.14,
-        "contribution": -0.49,
+        "normalized_score": -0.1333,
+        "contribution": -0.47,
         "details": {
           "monitored_markets": [
             {
               "id": "1124834",
               "question": "US x Russia military clash by December 31, 2026?",
               "short": "US-RU Clash",
-              "yes_price": 0.029,
-              "volume": 1087282.943866
+              "yes_price": 0.0295,
+              "volume": 1087378.7955770001
             },
             {
               "id": "2749367",
               "question": "Will Russia invade a NATO country by December 31, 2026?",
               "short": "RU-NATO Invasion",
               "yes_price": 0.045,
-              "volume": 416600.5720479999
+              "volume": 416610.98871499987
             },
             {
               "id": "2749382",
               "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
               "short": "NATO Troops in UA",
-              "yes_price": 0.034,
-              "volume": 159258.671711
+              "yes_price": 0.0355,
+              "volume": 159263.981711
             }
           ],
           "baseline_anchor": 0.05,
@@ -228,13 +233,13 @@
         "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
         "weight": 0.25,
         "status": "live",
-        "fetched_at": "2026-10-22T03:05:04Z",
-        "raw_value": 1.49,
+        "fetched_at": "2026-10-23T08:26:31Z",
+        "raw_value": 0.66,
         "raw_unit": "% (24h 漲跌幅)",
-        "normalized_score": 0.1489,
-        "contribution": 0.37,
+        "normalized_score": 0.0663,
+        "contribution": 0.17,
         "details": {
-          "price_usd": 110.44,
+          "price_usd": 109.38,
           "scale_anchor_pct": 10.0,
           "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
         },
@@ -242,9 +247,306 @@
       }
     }
   },
+  "protests": {
+    "as_of": "2026-10-23",
+    "note": "人工整理快照（非即時數據）",
+    "weekly_events": {
+      "value": 1072,
+      "source": "Delta Watchfloor 監測（經 Global South World 報道引述）",
+      "caveat": "含各種規模集會，非全屬大型抗議運動"
+    },
+    "hotspots": [
+      {
+        "country": "法國",
+        "name_zh": "法國",
+        "flag": "🇫🇷",
+        "summary": "110 場遊行・多地暴力衝突・Limoges 市政廳被焚",
+        "next": "11月5日 工會新一輪行動（已公佈）"
+      },
+      {
+        "country": "意大利",
+        "name_zh": "意大利",
+        "flag": "🇮🇹",
+        "summary": "米蘭等地衝突・羅馬 CGIL 稱 10 萬人遊行",
+        "next": "11月20日 CGIL 總罷工（已公佈）"
+      },
+      {
+        "country": "比利時",
+        "name_zh": "比利時",
+        "flag": "🇧🇪",
+        "summary": "布魯塞爾示威・水炮催淚氣驅散",
+        "next": null
+      },
+      {
+        "country": "葡萄牙",
+        "name_zh": "葡萄牙",
+        "flag": "🇵🇹",
+        "summary": "里斯本、波爾圖房屋抗議・紮營清場拘捕",
+        "next": null
+      },
+      {
+        "country": "西班牙",
+        "name_zh": "西班牙",
+        "flag": "🇪🇸",
+        "summary": "馬德里教師無限期罷工・租客迫遷抗議",
+        "next": null
+      }
+    ],
+    "scale_bars": [
+      {
+        "country": "法國",
+        "name_zh": "法國",
+        "min": 55,
+        "max": 80,
+        "label": "55–80 萬（官方 55／主辦方 80）"
+      },
+      {
+        "country": "塞爾維亞",
+        "name_zh": "塞爾維亞",
+        "value": 15,
+        "label": "約 15 萬（貝爾格萊德 10/22 集會）"
+      },
+      {
+        "country": "意大利",
+        "name_zh": "意大利",
+        "value": 10,
+        "label": "約 10 萬（羅馬，CGIL 口徑）"
+      }
+    ],
+    "themes": [
+      "生活成本",
+      "房屋問題",
+      "教育經費",
+      "青年就業",
+      "貪腐問責"
+    ],
+    "timeline": [
+      {
+        "date": "10月17日",
+        "label": "歐洲抗議潮全面爆發"
+      },
+      {
+        "date": "10月25日",
+        "label": "塞爾維亞國會選舉・巴西總統決選"
+      },
+      {
+        "date": "11月5日",
+        "label": "法國新一輪行動（已公佈）"
+      },
+      {
+        "date": "11月20日",
+        "label": "意大利總罷工（已公佈）"
+      }
+    ],
+    "countries": [
+      {
+        "name_zh": "法國",
+        "region": "歐洲",
+        "level": "severe",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "意大利",
+        "region": "歐洲",
+        "level": "severe",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "阿爾巴尼亞",
+        "region": "歐洲",
+        "level": "severe",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "比利時",
+        "region": "歐洲",
+        "level": "large",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "葡萄牙",
+        "region": "歐洲",
+        "level": "large",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "西班牙",
+        "region": "歐洲",
+        "level": "large",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "希臘",
+        "region": "歐洲",
+        "level": "large",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "塞爾維亞",
+        "region": "歐洲",
+        "level": "large",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "德國",
+        "region": "歐洲",
+        "level": "active",
+        "evidence": "unverified"
+      },
+      {
+        "name_zh": "奧地利",
+        "region": "歐洲",
+        "level": "active",
+        "evidence": "unverified"
+      },
+      {
+        "name_zh": "瑞士",
+        "region": "歐洲",
+        "level": "active",
+        "evidence": "unverified"
+      },
+      {
+        "name_zh": "愛爾蘭",
+        "region": "歐洲",
+        "level": "active",
+        "evidence": "unverified"
+      },
+      {
+        "name_zh": "美國",
+        "region": "美洲",
+        "level": "large",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "阿根廷",
+        "region": "美洲",
+        "level": "large",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "墨西哥",
+        "region": "美洲",
+        "level": "active",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "秘魯",
+        "region": "美洲",
+        "level": "active",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "巴西",
+        "region": "美洲",
+        "level": "active",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "古巴",
+        "region": "美洲",
+        "level": "active",
+        "evidence": "single"
+      },
+      {
+        "name_zh": "智利",
+        "region": "美洲",
+        "level": "active",
+        "evidence": "single"
+      },
+      {
+        "name_zh": "哥倫比亞",
+        "region": "美洲",
+        "level": "active",
+        "evidence": "single"
+      },
+      {
+        "name_zh": "玻利維亞",
+        "region": "美洲",
+        "level": "active",
+        "evidence": "single"
+      },
+      {
+        "name_zh": "肯亞",
+        "region": "非洲",
+        "level": "large",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "突尼斯",
+        "region": "非洲",
+        "level": "large",
+        "evidence": "single"
+      },
+      {
+        "name_zh": "摩洛哥",
+        "region": "非洲",
+        "level": "active",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "馬達加斯加",
+        "region": "非洲",
+        "level": "active",
+        "evidence": "single"
+      },
+      {
+        "name_zh": "坦桑尼亞",
+        "region": "非洲",
+        "level": "active",
+        "evidence": "single"
+      },
+      {
+        "name_zh": "多哥",
+        "region": "非洲",
+        "level": "active",
+        "evidence": "single"
+      },
+      {
+        "name_zh": "尼日利亞",
+        "region": "非洲",
+        "level": "active",
+        "evidence": "single"
+      },
+      {
+        "name_zh": "印度",
+        "region": "亞洲/中東",
+        "level": "large",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "菲律賓",
+        "region": "亞洲/中東",
+        "level": "large",
+        "evidence": "verified"
+      },
+      {
+        "name_zh": "印尼",
+        "region": "亞洲/中東",
+        "level": "active",
+        "evidence": "single"
+      },
+      {
+        "name_zh": "以色列",
+        "region": "亞洲/中東",
+        "level": "active",
+        "evidence": "single"
+      },
+      {
+        "name_zh": "格魯吉亞",
+        "region": "亞洲/中東",
+        "level": "active",
+        "evidence": "verified"
+      }
+    ],
+    "key_observations": [
+      "歐元區通脹升至 3.8%，加劇社會不滿",
+      "全球青年 NEET 率 23.2%（ILO，1950 年以來最高）",
+      "多國已公佈 11 月跟進行動"
+    ]
+  },
   "structural_index": 83.5,
-  "pulse_adjustment": -0.12,
-  "composite_index": 83.38,
+  "pulse_adjustment": 3.6,
+  "composite_index": 87.1,
   "initial_trend_points": [
     {
       "date": "2026-10-21",
@@ -256,10 +558,10 @@
     },
     {
       "date": "2026-10-22",
-      "computed_at": "2026-10-22T03:05:04Z",
-      "composite_index": 83.38,
+      "computed_at": "2026-10-23T08:26:31Z",
+      "composite_index": 87.1,
       "structural_index": 83.5,
-      "pulse_adjustment": -0.12,
+      "pulse_adjustment": 3.6,
       "stage": 3
     }
   ],

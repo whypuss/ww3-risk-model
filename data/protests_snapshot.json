@@ -1,0 +1,297 @@
+{
+  "as_of": "2026-10-23",
+  "note": "人工整理快照（非即時數據）",
+  "weekly_events": {
+    "value": 1072,
+    "source": "Delta Watchfloor 監測（經 Global South World 報道引述）",
+    "caveat": "含各種規模集會，非全屬大型抗議運動"
+  },
+  "hotspots": [
+    {
+      "country": "法國",
+      "name_zh": "法國",
+      "flag": "🇫🇷",
+      "summary": "110 場遊行・多地暴力衝突・Limoges 市政廳被焚",
+      "next": "11月5日 工會新一輪行動（已公佈）"
+    },
+    {
+      "country": "意大利",
+      "name_zh": "意大利",
+      "flag": "🇮🇹",
+      "summary": "米蘭等地衝突・羅馬 CGIL 稱 10 萬人遊行",
+      "next": "11月20日 CGIL 總罷工（已公佈）"
+    },
+    {
+      "country": "比利時",
+      "name_zh": "比利時",
+      "flag": "🇧🇪",
+      "summary": "布魯塞爾示威・水炮催淚氣驅散",
+      "next": null
+    },
+    {
+      "country": "葡萄牙",
+      "name_zh": "葡萄牙",
+      "flag": "🇵🇹",
+      "summary": "里斯本、波爾圖房屋抗議・紮營清場拘捕",
+      "next": null
+    },
+    {
+      "country": "西班牙",
+      "name_zh": "西班牙",
+      "flag": "🇪🇸",
+      "summary": "馬德里教師無限期罷工・租客迫遷抗議",
+      "next": null
+    }
+  ],
+  "scale_bars": [
+    {
+      "country": "法國",
+      "name_zh": "法國",
+      "min": 55,
+      "max": 80,
+      "label": "55–80 萬（官方 55／主辦方 80）"
+    },
+    {
+      "country": "塞爾維亞",
+      "name_zh": "塞爾維亞",
+      "value": 15,
+      "label": "約 15 萬（貝爾格萊德 10/22 集會）"
+    },
+    {
+      "country": "意大利",
+      "name_zh": "意大利",
+      "value": 10,
+      "label": "約 10 萬（羅馬，CGIL 口徑）"
+    }
+  ],
+  "themes": [
+    "生活成本",
+    "房屋問題",
+    "教育經費",
+    "青年就業",
+    "貪腐問責"
+  ],
+  "timeline": [
+    {
+      "date": "10月17日",
+      "label": "歐洲抗議潮全面爆發"
+    },
+    {
+      "date": "10月25日",
+      "label": "塞爾維亞國會選舉・巴西總統決選"
+    },
+    {
+      "date": "11月5日",
+      "label": "法國新一輪行動（已公佈）"
+    },
+    {
+      "date": "11月20日",
+      "label": "意大利總罷工（已公佈）"
+    }
+  ],
+  "countries": [
+    {
+      "name_zh": "法國",
+      "region": "歐洲",
+      "level": "severe",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "意大利",
+      "region": "歐洲",
+      "level": "severe",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "阿爾巴尼亞",
+      "region": "歐洲",
+      "level": "severe",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "比利時",
+      "region": "歐洲",
+      "level": "large",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "葡萄牙",
+      "region": "歐洲",
+      "level": "large",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "西班牙",
+      "region": "歐洲",
+      "level": "large",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "希臘",
+      "region": "歐洲",
+      "level": "large",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "塞爾維亞",
+      "region": "歐洲",
+      "level": "large",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "德國",
+      "region": "歐洲",
+      "level": "active",
+      "evidence": "unverified"
+    },
+    {
+      "name_zh": "奧地利",
+      "region": "歐洲",
+      "level": "active",
+      "evidence": "unverified"
+    },
+    {
+      "name_zh": "瑞士",
+      "region": "歐洲",
+      "level": "active",
+      "evidence": "unverified"
+    },
+    {
+      "name_zh": "愛爾蘭",
+      "region": "歐洲",
+      "level": "active",
+      "evidence": "unverified"
+    },
+    {
+      "name_zh": "美國",
+      "region": "美洲",
+      "level": "large",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "阿根廷",
+      "region": "美洲",
+      "level": "large",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "墨西哥",
+      "region": "美洲",
+      "level": "active",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "秘魯",
+      "region": "美洲",
+      "level": "active",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "巴西",
+      "region": "美洲",
+      "level": "active",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "古巴",
+      "region": "美洲",
+      "level": "active",
+      "evidence": "single"
+    },
+    {
+      "name_zh": "智利",
+      "region": "美洲",
+      "level": "active",
+      "evidence": "single"
+    },
+    {
+      "name_zh": "哥倫比亞",
+      "region": "美洲",
+      "level": "active",
+      "evidence": "single"
+    },
+    {
+      "name_zh": "玻利維亞",
+      "region": "美洲",
+      "level": "active",
+      "evidence": "single"
+    },
+    {
+      "name_zh": "肯亞",
+      "region": "非洲",
+      "level": "large",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "突尼斯",
+      "region": "非洲",
+      "level": "large",
+      "evidence": "single"
+    },
+    {
+      "name_zh": "摩洛哥",
+      "region": "非洲",
+      "level": "active",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "馬達加斯加",
+      "region": "非洲",
+      "level": "active",
+      "evidence": "single"
+    },
+    {
+      "name_zh": "坦桑尼亞",
+      "region": "非洲",
+      "level": "active",
+      "evidence": "single"
+    },
+    {
+      "name_zh": "多哥",
+      "region": "非洲",
+      "level": "active",
+      "evidence": "single"
+    },
+    {
+      "name_zh": "尼日利亞",
+      "region": "非洲",
+      "level": "active",
+      "evidence": "single"
+    },
+    {
+      "name_zh": "印度",
+      "region": "亞洲/中東",
+      "level": "large",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "菲律賓",
+      "region": "亞洲/中東",
+      "level": "large",
+      "evidence": "verified"
+    },
+    {
+      "name_zh": "印尼",
+      "region": "亞洲/中東",
+      "level": "active",
+      "evidence": "single"
+    },
+    {
+      "name_zh": "以色列",
+      "region": "亞洲/中東",
+      "level": "active",
+      "evidence": "single"
+    },
+    {
+      "name_zh": "格魯吉亞",
+      "region": "亞洲/中東",
+      "level": "active",
+      "evidence": "verified"
+    }
+  ],
+  "key_observations": [
+    "歐元區通脹升至 3.8%，加劇社會不滿",
+    "全球青年 NEET 率 23.2%（ILO，1950 年以來最高）",
+    "多國已公佈 11 月跟進行動"
+  ]
+}

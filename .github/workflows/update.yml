@@ -90,6 +90,9 @@ jobs:
           if [ -f "ui/dashboard_data.json" ]; then
             cp ui/dashboard_data.json staging/dashboard_data.json
           fi
+          if [ -f "data/protests_snapshot.json" ]; then
+            cp data/protests_snapshot.json staging/protests_snapshot.json
+          fi
 
       - name: Deploy dynamic dashboard to Cloudflare Pages
         run: |

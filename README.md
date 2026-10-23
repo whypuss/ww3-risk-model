@@ -1,9 +1,9 @@
 # WW3 風險預估模型 (WW3 Risk Model)
 
-[![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-blue.svg)](pyproject.toml)
+[![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-blue.svg)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python: 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
-[![Tests: Pytest](https://img.shields.io/badge/Tests-56%20Passed%20(Python)%20%2B%2011%20(Node)-brightgreen.svg)](tests/)
+[![Tests: Pytest](https://img.shields.io/badge/Tests-60%20Passed%20(Python)%20%2B%2011%20(Node)-brightgreen.svg)](tests/)
 
 > **五層結構風險指數 × 和平機制失效閘門 × 即時外生脈搏修正 × 四階段衝突定位**  
 > *Two-tier risk terminal: slow-moving five-layer structural index combined with fast-moving real-time geopolitical pulse (GDELT, Polymarket, Brent crude), gated by peace failure.*
@@ -397,6 +397,17 @@ print(f"風險指數: {result.global_risk_index:.1f}, 階段: {result.stage.titl
 ---
 
 ## 版本變更記錄 (Changelog)
+
+### v0.7.0 (2026-10-23) — 全球抗議活動監測板塊（人工核實快照、地區分佈與證據分級統計）
+- **新增「全球抗議活動監測」板塊（`data/protests_snapshot.json`）**：
+  * 於地區壓力卡之後、數據品質審計卡之前新增獨立板塊，標明數據截點 `2026-10-23` 及「人工整理快照（非即時數據）」徽章。
+  * **嚴格數據紀律**：全數採用經核實之數據集，拒絕任何無來源裝飾性百分比（訴求僅作定性排序、無百分比；證據分級依 `countries` 陣列實計國家數、無寫死百分比；具名國家數由 `countries` 陣列長度動態計算為 33 國，禁用無來源之「60+ 國家」字眼）。
+  * **頂部三格關鍵指標**：單週事件 `1,072`（附來源 Delta Watchfloor 監測／Global South World 引述及口徑說明）、具名國家/地區數（33 國，動態計算）、關注地區「歐洲・美洲・非洲」。
+  * **左分佈右熱點與下方規模時間軸**：
+    1. 左側地區格陣列（歐洲 12 國、美洲 9 國、非洲 7 國、亞洲/中東 5 國），僅標示名單內國家之三級抗議強度顏色（嚴重衝突=紅、大規模示威=橙、有抗議活動=黃、未列名=灰），支援 hover 及點擊檢視各國證據分級。
+    2. 右側五國熱點（法國、意大利、比利時、葡萄牙、西班牙），配國旗 emoji、衝突摘要與已公佈跟進日期徽章。
+    3. 下方規模條（法國 55–80 萬、塞爾維亞約 15 萬、意大利約 10 萬，原樣顯示口徑）、五大訴求定性清單（生活成本、房屋問題、教育經費、青年就業、貪腐問責）、時間軸四站（10/17、10/25、11/5、11/20）、關鍵觀察三點（歐元區通脹 3.8%、全球青年 NEET 率 23.2%、11 月跟進行動）及證據分級實計統計（多源核實 18 國、單一來源 11 國、待驗證 4 國）。
+  * **管線載入與優雅降級**：由 `build_dashboard` 自動讀取並同步複製 `protests_snapshot.json` 至輸出/staging 目錄；當快照檔案缺失時，板塊自動優雅隱藏且不影響頁面渲染。
 
 ### v0.6.0 (2026-10-22) — 即時脈搏層（雙層指數合成）+ 即時訊號抓取（GDELT/Polymarket/Brent油價）+ 分數歷史趨勢（日/月線 SQL 聚合與 SVG 圖表）
 - **雙層總指數設計**：

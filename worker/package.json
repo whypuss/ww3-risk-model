@@ -1,6 +1,6 @@
 {
   "name": "ww3-risk-api",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "type": "module",
   "description": "WW3 Risk Model Cloudflare Worker API",
   "main": "src/index.js",

@@ -556,6 +556,162 @@ def test_dashboard_header_version_matches_package_version(tmp_path):
     assert f"Model Version: {__version__}" in content
 
 
+def test_protests_snapshot_json_schema_and_data_discipline():
+    """Verify v0.7.0 data/protests_snapshot.json is valid JSON, contains all required fields,
+    and strictly adheres to data discipline (no percentage fields in themes, no 60+ decorative numbers).
+    """
+    protests_file = Path("data/protests_snapshot.json")
+    assert protests_file.exists(), "data/protests_snapshot.json must exist"
+
+    raw_text = protests_file.read_text(encoding="utf-8")
+    protests = json.loads(raw_text)
+
+    # Required top-level fields
+    required_keys = {
+        "as_of",
+        "note",
+        "weekly_events",
+        "hotspots",
+        "scale_bars",
+        "themes",
+        "timeline",
+        "countries",
+        "key_observations",
+    }
+    assert required_keys.issubset(protests.keys())
+    assert protests["as_of"] == "2026-10-23"
+    assert protests["note"] == "人工整理快照（非即時數據）"
+
+    # Weekly events
+    assert protests["weekly_events"]["value"] == 1072
+    assert "Delta Watchfloor" in protests["weekly_events"]["source"]
+    assert "含各種規模集會" in protests["weekly_events"]["caveat"]
+
+    # Hotspots (5 countries)
+    assert len(protests["hotspots"]) == 5
+    hotspot_names = [h.get("name_zh") or h.get("country") for h in protests["hotspots"]]
+    assert hotspot_names == ["法國", "意大利", "比利時", "葡萄牙", "西班牙"]
+
+    # Scale bars (3 items: France, Serbia, Italy)
+    assert len(protests["scale_bars"]) == 3
+    fr_bar = protests["scale_bars"][0]
+    assert fr_bar["min"] == 55 and fr_bar["max"] == 80
+    assert fr_bar["label"] == "55–80 萬（官方 55／主辦方 80）"
+
+    # Themes: strictly qualitative strings, no percentage fields or '%' symbols
+    themes = protests["themes"]
+    assert themes == ["生活成本", "房屋問題", "教育經費", "青年就業", "貪腐問責"]
+    for item in themes:
+        assert isinstance(item, str), "Each theme must be a plain qualitative string without percentage fields"
+        assert "%" not in item and "％" not in item
+
+    # Timeline (4 stations)
+    assert len(protests["timeline"]) == 4
+
+    # Countries array integrity
+    countries = protests["countries"]
+    assert isinstance(countries, list)
+    assert len(countries) == 33
+    valid_levels = {"severe", "large", "active"}
+    valid_evidence = {"verified", "single", "unverified"}
+    for c in countries:
+        assert {"name_zh", "region", "level", "evidence"}.issubset(c.keys())
+        assert c["level"] in valid_levels
+        assert c["evidence"] in valid_evidence
+
+    # Strictly no "60+" decorative claim anywhere in protests_snapshot.json
+    assert "60+" not in raw_text
+
+
+def test_dashboard_protests_panel_rendering_and_counts_match(tmp_path):
+    """Verify v0.7.0 protest panel rendering in dashboard.html:
+    - Positioned after Regional Crisis Pressures card and before Data Quality card
+    - Top country count dynamically matches len(countries)
+    - Evidence breakdown counts dynamically match countries array without hardcoded percentages
+    - Themes rendered qualitatively without percentages
+    - protests_snapshot.json copied to output directory
+    """
+    out_html = tmp_path / "dashboard.html"
+    out_json = tmp_path / "dashboard_data.json"
+
+    data = build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        output_json_path=out_json,
+        ui_step=5,
+    )
+    content = out_html.read_text(encoding="utf-8")
+
+    # 1. Copied protests_snapshot.json to staging/output dir
+    copied_protests = tmp_path / "protests_snapshot.json"
+    assert copied_protests.exists()
+    protests = json.loads(copied_protests.read_text(encoding="utf-8"))
+    expected_country_cnt = len(protests["countries"])
+
+    # 2. Section title, subtitle, cutoff badge, and top 3 metrics
+    assert "全球抗議活動監測" in content
+    assert "生活成本・青年就業・房屋・教育・問責" in content
+    assert "數據截點：2026-10-23 · 人工整理快照（非即時數據）" in content
+    assert "1,072" in content
+    assert "歐洲・美洲・非洲" in content
+
+    # 3. Countries count in top KPI matches len(countries) dynamically
+    m_cnt = re.search(
+        r'id="protests-country-count"\s+data-count="(\d+)"[^>]*>(\d+)<',
+        content,
+    )
+    assert m_cnt is not None, "protests-country-count element not found"
+    assert int(m_cnt.group(1)) == expected_country_cnt
+    assert int(m_cnt.group(2)) == expected_country_cnt
+
+    # 4. Evidence counts match countries array dynamically
+    expected_ver = sum(1 for c in protests["countries"] if c["evidence"] == "verified")
+    expected_sin = sum(1 for c in protests["countries"] if c["evidence"] == "single")
+    expected_unv = sum(1 for c in protests["countries"] if c["evidence"] == "unverified")
+    assert f'<strong id="protests-ev-verified-cnt">{expected_ver}</strong>' in content
+    assert f'<strong id="protests-ev-single-cnt">{expected_sin}</strong>' in content
+    assert f'<strong id="protests-ev-unverified-cnt">{expected_unv}</strong>' in content
+
+    # 5. Themes section has no percentages
+    themes_block_match = re.search(
+        r'id="protests-themes-list">(.*?)</div>\s*<div',
+        content,
+        re.DOTALL,
+    )
+    assert themes_block_match is not None
+    assert "%" not in themes_block_match.group(1)
+
+    # 6. Section position: after Regional Pressure Cards and before Data Quality Card
+    idx_regional = content.index("全球關鍵地緣戰區壓力卡列")
+    idx_protests = content.index("全球抗議活動監測")
+    idx_quality = content.index("數據品質與審計新鮮度")
+    assert idx_regional < idx_protests < idx_quality
+
+
+def test_dashboard_protests_panel_graceful_hide_when_snapshot_missing(tmp_path):
+    """Verify that when protests_snapshot.json is missing, build_dashboard succeeds and hides the panel gracefully."""
+    out_html = tmp_path / "dashboard_no_protests.html"
+    out_json = tmp_path / "dashboard_no_protests.json"
+    missing_path = tmp_path / "does_not_exist_protests.json"
+
+    data = build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        output_json_path=out_json,
+        protests_path=missing_path,
+        ui_step=5,
+    )
+    assert out_html.exists()
+    assert data["protests"] is None
+
+    content = out_html.read_text(encoding="utf-8")
+    assert 'id="protests-monitor-section"' in content
+    assert 'data-protests-status="missing"' in content
+    assert 'style="display:none;margin-top:24px;"' in content
+    assert "全球抗議活動監測" not in content
+
+
+
 
 
 

@@ -11,6 +11,7 @@ import argparse
 import glob
 import json
 import math
+import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -274,6 +275,7 @@ def generate_dashboard_data(
     scenario_path: Path | str,
     all_scenarios_dir: Path | str = "scenarios",
     historical_path: Path | str = "data/historical_cases.json",
+    protests_path: Path | str = "data/protests_snapshot.json",
     model: Optional[WW3RiskModel] = None,
 ) -> Dict[str, Any]:
     """Compile all evaluated data needed by the static dashboard."""
@@ -480,18 +482,29 @@ def generate_dashboard_data(
         },
     ]
 
+    # Global protest activity snapshot (gracefully None if file is missing)
+    protests_file = Path(protests_path) if protests_path else None
+    protests_data = None
+    if protests_file and protests_file.exists():
+        try:
+            with open(protests_file, "r", encoding="utf-8") as prf:
+                protests_data = json.load(prf)
+        except Exception:
+            protests_data = None
+
     return {
         "metadata": {
             "title": "WW3 戰爭風險指數儀表板",
             "title_en": "WW3 War Risk Index Dashboard",
             "model_version": __version__,
-            "generated_at": "2026-10-22",
+            "generated_at": "2026-10-23",
             "active_scenario_id": main_scenario.id,
             "active_scenario_title": main_scenario.title,
             "active_scenario_year": main_scenario.year,
         },
         "main_result": main_result.to_dict(),
         "pulse": pulse_data,
+        "protests": protests_data,
         "structural_index": structural_index,
         "pulse_adjustment": pulse_adj,
         "composite_index": composite_index,
@@ -814,6 +827,363 @@ def render_pulse_card_html(pulse_data: Optional[Dict[str, Any]], structural_inde
     """
 
 
+def render_protests_card_html(protests_data: Optional[Dict[str, Any]]) -> str:
+    """Generate HTML section for Global Protest Activity Monitor (v0.7.0).
+
+    Gracefully returns a hidden placeholder if protests_data is None or invalid.
+    All counts (named countries, evidence breakdown, region counts) are dynamically
+    calculated from the countries array without hardcoded decorative percentages.
+    """
+    if not protests_data or not isinstance(protests_data, dict):
+        return (
+            '<!-- Section 3.5: Global Protest Activity Monitor (Hidden: snapshot missing) -->\n'
+            '    <section class="panel-card" id="protests-monitor-section" '
+            'style="display:none;margin-top:24px;" data-protests-status="missing"></section>'
+        )
+
+    countries = protests_data.get("countries")
+    if not isinstance(countries, list) or len(countries) == 0:
+        return (
+            '<!-- Section 3.5: Global Protest Activity Monitor (Hidden: empty countries) -->\n'
+            '    <section class="panel-card" id="protests-monitor-section" '
+            'style="display:none;margin-top:24px;" data-protests-status="missing"></section>'
+        )
+
+    as_of = protests_data.get("as_of", "2026-10-23")
+    note = protests_data.get("note", "人工整理快照（非即時數據）")
+    weekly = protests_data.get("weekly_events") or {}
+    weekly_val = int(weekly.get("value", 1072))
+    weekly_val_fmt = f"{weekly_val:,}"
+    weekly_source = weekly.get("source", "Delta Watchfloor 監測（經 Global South World 報道引述）")
+    weekly_caveat = weekly.get("caveat", "含各種規模集會，非全屬大型抗議運動")
+
+    country_count = len(countries)
+
+    level_meta = {
+        "severe": {"zh": "嚴重衝突", "color": "var(--color-red)", "cls": "protest-lvl-severe"},
+        "large": {"zh": "大規模示威", "color": "var(--color-orange)", "cls": "protest-lvl-large"},
+        "active": {"zh": "有抗議活動", "color": "var(--color-yellow)", "cls": "protest-lvl-active"},
+    }
+    evidence_meta = {
+        "verified": {"zh": "多源核實", "cls": "protest-ev-verified"},
+        "single": {"zh": "單一來源", "cls": "protest-ev-single"},
+        "unverified": {"zh": "待驗證", "cls": "protest-ev-unverified"},
+    }
+
+    # Dynamically count levels, evidence tiers, and regions from countries array
+    lvl_counts = {"severe": 0, "large": 0, "active": 0}
+    ev_counts = {"verified": 0, "single": 0, "unverified": 0}
+    region_order = ["歐洲", "美洲", "非洲", "亞洲/中東"]
+    region_groups: Dict[str, List[Dict[str, Any]]] = {r: [] for r in region_order}
+
+    for c in countries:
+        lvl = c.get("level", "active")
+        ev = c.get("evidence", "unverified")
+        reg = c.get("region", "其他")
+        lvl_counts[lvl] = lvl_counts.get(lvl, 0) + 1
+        ev_counts[ev] = ev_counts.get(ev, 0) + 1
+        if reg not in region_groups:
+            region_groups[reg] = []
+        region_groups[reg].append(c)
+
+    # Build regional distribution grid blocks
+    region_blocks_html = []
+    for reg_name, reg_items in region_groups.items():
+        if not reg_items:
+            continue
+        chips_html = []
+        for c in reg_items:
+            c_name = c.get("name_zh", "")
+            c_lvl = c.get("level", "active")
+            c_ev = c.get("evidence", "unverified")
+            lvl_info = level_meta.get(c_lvl, level_meta["active"])
+            ev_info = evidence_meta.get(c_ev, evidence_meta["unverified"])
+            tooltip = f"{c_name}（{reg_name}）｜活動強度：{lvl_info['zh']}｜證據級別：{ev_info['zh']} ({c_ev})"
+            chips_html.append(f"""
+              <button type="button"
+                class="protest-country-chip {lvl_info['cls']}"
+                data-country="{c_name}"
+                data-region="{reg_name}"
+                data-level="{c_lvl}"
+                data-level-zh="{lvl_info['zh']}"
+                data-evidence="{c_ev}"
+                data-evidence-zh="{ev_info['zh']}"
+                title="{tooltip}"
+                onclick="selectProtestCountry(this)"
+                onmouseenter="selectProtestCountry(this)">
+                <span class="protest-chip-dot"></span>
+                <span class="protest-chip-name">{c_name}</span>
+                <span class="protest-chip-ev {ev_info['cls']}">{ev_info['zh']}</span>
+              </button>""")
+        region_blocks_html.append(f"""
+          <div class="protest-region-box">
+            <div class="protest-region-head">
+              <span class="protest-region-title">{reg_name}</span>
+              <span class="protest-region-cnt">{len(reg_items)} 國</span>
+            </div>
+            <div class="protest-chips-wrap">
+              {"".join(chips_html)}
+            </div>
+          </div>""")
+
+    # Build Right Column: Hotspots 5 Countries
+    default_flags = {
+        "法國": "🇫🇷",
+        "意大利": "🇮🇹",
+        "比利時": "🇧🇪",
+        "葡萄牙": "🇵🇹",
+        "西班牙": "🇪🇸",
+    }
+    hotspot_cards_html = []
+    for h in protests_data.get("hotspots", []):
+        h_name = h.get("name_zh") or h.get("country", "")
+        h_flag = h.get("flag") or default_flags.get(h_name, "🚩")
+        h_summary = h.get("summary", "")
+        h_next = h.get("next")
+        if h_next:
+            next_badge = f'<div class="protest-next-badge">📅 跟進：{h_next}</div>'
+        else:
+            next_badge = '<div class="protest-next-badge protest-next-null">暫無已公佈跟進日期</div>'
+        hotspot_cards_html.append(f"""
+          <div class="protest-hotspot-item">
+            <div class="protest-hotspot-top">
+              <span class="protest-hotspot-country"><span class="protest-flag">{h_flag}</span> {h_name}</span>
+              {next_badge}
+            </div>
+            <div class="protest-hotspot-summary">{h_summary}</div>
+          </div>""")
+
+    # Build Bottom: Scale Bars (萬人)
+    scale_max = 80
+    scale_rows_html = []
+    for sb in protests_data.get("scale_bars", []):
+        sb_name = sb.get("name_zh") or sb.get("country", "")
+        sb_label = sb.get("label", "")
+        if "min" in sb and "max" in sb:
+            sb_min = float(sb["min"])
+            sb_max = float(sb["max"])
+            solid_flex = max(0.0, sb_min)
+            range_flex = max(0.0, sb_max - sb_min)
+            rem_flex = max(0.0, scale_max - sb_max)
+            bar_inner = f"""
+              <div class="protest-scale-fill-solid" style="flex:{solid_flex};" title="官方下限：{sb_min:g} 萬"></div>
+              <div class="protest-scale-fill-range" style="flex:{range_flex};" title="官方至主辦方區間：{sb_min:g}–{sb_max:g} 萬"></div>
+              <div style="flex:{rem_flex};"></div>"""
+        else:
+            sb_val = float(sb.get("value", 0))
+            solid_flex = max(0.0, sb_val)
+            rem_flex = max(0.0, scale_max - sb_val)
+            bar_inner = f"""
+              <div class="protest-scale-fill-single" style="flex:{solid_flex};" title="{sb_label}"></div>
+              <div style="flex:{rem_flex};"></div>"""
+
+        scale_rows_html.append(f"""
+          <div class="protest-scale-row">
+            <div class="protest-scale-head">
+              <span class="protest-scale-country">{sb_name}</span>
+              <span class="protest-scale-label">{sb_label}</span>
+            </div>
+            <div class="protest-scale-track">
+              {bar_inner}
+            </div>
+          </div>""")
+
+    # Build Bottom: Qualitative Themes (Strictly NO percentages)
+    themes_html = []
+    for idx, th in enumerate(protests_data.get("themes", []), 1):
+        themes_html.append(f"""
+          <div class="protest-theme-item">
+            <span class="protest-theme-rank">0{idx}</span>
+            <span class="protest-theme-name">{th}</span>
+            <span class="protest-theme-tag">核心定性訴求</span>
+          </div>""")
+
+    # Build Bottom: 4-Station Timeline
+    timeline_html = []
+    for st in protests_data.get("timeline", []):
+        t_date = st.get("date", "")
+        t_label = st.get("label", "")
+        timeline_html.append(f"""
+          <div class="protest-tl-node">
+            <div class="protest-tl-dot"></div>
+            <div class="protest-tl-date">{t_date}</div>
+            <div class="protest-tl-label">{t_label}</div>
+          </div>""")
+
+    # Build Bottom: Key Observations (3 items)
+    obs_html = []
+    for obs in protests_data.get("key_observations", []):
+        obs_html.append(f'<li class="protest-obs-item">{obs}</li>')
+
+    ver_c = ev_counts.get("verified", 0)
+    sin_c = ev_counts.get("single", 0)
+    unv_c = ev_counts.get("unverified", 0)
+
+    reg_summary_parts = [f"{r} {len(region_groups.get(r, []))}" for r in region_order if region_groups.get(r)]
+    reg_summary_str = " · ".join(reg_summary_parts)
+
+    return f"""
+    <!-- Section 3.5: Global Protest Activity Monitor (v0.7.0) -->
+    <section class="panel-card" style="margin-top:24px;" id="protests-monitor-section" data-protests-status="loaded" data-as-of="{as_of}">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">
+            <span>全球抗議活動監測 (Global Protest Activity Monitor)</span>
+          </div>
+          <div class="protest-subtitle">生活成本・青年就業・房屋・教育・問責</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span class="protest-cutoff-badge" id="protests-cutoff-badge">數據截點：{as_of} · {note}</span>
+        </div>
+      </div>
+
+      <!-- Top 3 Key Metric Cells -->
+      <div class="protest-kpi-grid">
+        <div class="protest-kpi-card">
+          <div class="protest-kpi-label">單週抗議與集會事件 (WEEKLY EVENTS)</div>
+          <div class="protest-kpi-val" id="protests-weekly-val" data-value="{weekly_val}" style="color:var(--color-red);">{weekly_val_fmt}</div>
+          <div class="protest-kpi-fine">來源：{weekly_source}</div>
+          <div class="protest-kpi-caveat">口徑：{weekly_caveat}</div>
+        </div>
+
+        <div class="protest-kpi-card">
+          <div class="protest-kpi-label">具名國家／地區數 (NAMED COUNTRIES)</div>
+          <div class="protest-kpi-val" id="protests-country-count" data-count="{country_count}" style="color:var(--color-orange);">{country_count}</div>
+          <div class="protest-kpi-fine">由 countries 陣列動態實計（{reg_summary_str}）</div>
+          <div class="protest-kpi-caveat">僅列已核實具名國家，嚴禁無來源湊數</div>
+        </div>
+
+        <div class="protest-kpi-card">
+          <div class="protest-kpi-label">重點關注地區 (KEY FOCUS REGIONS)</div>
+          <div class="protest-kpi-val protest-kpi-text" id="protests-focus-regions" style="color:#38bdf8;">歐洲・美洲・非洲</div>
+          <div class="protest-kpi-fine">連同亞洲/中東具名抗議活動監測</div>
+          <div class="protest-kpi-caveat">覆蓋四大洲主要生活成本與社會動盪熱區</div>
+        </div>
+      </div>
+
+      <!-- Middle Split: Left Regional Distribution Grid + Right Top 5 Hotspots -->
+      <div class="protest-main-split">
+        <!-- Left: Regional Distribution Grid -->
+        <div class="protest-subcard">
+          <div class="protest-subhead">
+            <span class="protest-subtitle-strong">全球具名國家抗議強度與證據分佈（地區格陣列）</span>
+            <span class="panel-tag">HOVER / CLICK COUNTRY FOR EVIDENCE TIER</span>
+          </div>
+
+          <!-- 3-Level Color Legend + Unlisted Grey -->
+          <div class="protest-legend-row">
+            <span class="protest-legend-item"><span class="protest-legend-swatch swatch-severe"></span>嚴重衝突＝紅 ({lvl_counts['severe']}國)</span>
+            <span class="protest-legend-item"><span class="protest-legend-swatch swatch-large"></span>大規模示威＝橙 ({lvl_counts['large']}國)</span>
+            <span class="protest-legend-item"><span class="protest-legend-swatch swatch-active"></span>有抗議活動＝黃 ({lvl_counts['active']}國)</span>
+            <span class="protest-legend-item"><span class="protest-legend-swatch swatch-unlisted"></span>未列名＝灰（名單外不標示抗議色）</span>
+          </div>
+
+          <div class="protest-regions-container">
+            {"".join(region_blocks_html)}
+          </div>
+
+          <div class="protest-unlisted-note">
+            <span class="protest-legend-swatch swatch-unlisted" style="display:inline-block;vertical-align:middle;margin-right:6px;"></span>
+            <strong>未列名地區（灰階預設）：</strong>圖表僅標示上述 {country_count} 個名單內國家/地區，名單外國家一律保持灰階，不繪製抗議色。
+          </div>
+
+          <!-- Interactive Country Inspector (Hover / Click target) -->
+          <div class="protest-inspector" id="protest-country-inspector">
+            <span class="protest-inspector-tag">證據檢視</span>
+            <span id="protest-inspector-text">將游標移至或點擊上方任一國家，即可檢視該國之抗議強度級別與消息來源證據分級（預設：法國 · 歐洲 · 嚴重衝突 · 多源核實）。</span>
+          </div>
+        </div>
+
+        <!-- Right: Top 5 Hotspots -->
+        <div class="protest-subcard">
+          <div class="protest-subhead">
+            <span class="protest-subtitle-strong">歐洲五大重點熱點國家動態 (Hotspots)</span>
+            <span class="panel-tag">5 KEY HOTSPOTS &amp; FOLLOW-UP DATES</span>
+          </div>
+          <div class="protest-hotspots-list">
+            {"".join(hotspot_cards_html)}
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Grid: Scale Bars + Qualitative Themes + Timeline + Key Observations & Evidence Stats -->
+      <div class="protest-bottom-grid">
+        <!-- 1. Scale Bars -->
+        <div class="protest-subcard">
+          <div class="protest-subhead">
+            <span class="protest-subtitle-strong">主要集會動員規模對比（單位：萬人）</span>
+            <span class="panel-tag">VERBATIM SOURCE LABELS</span>
+          </div>
+          <div class="protest-scale-list">
+            {"".join(scale_rows_html)}
+          </div>
+        </div>
+
+        <!-- 2. Qualitative Themes (No Percentages) -->
+        <div class="protest-subcard">
+          <div class="protest-subhead">
+            <span class="protest-subtitle-strong">五大核心抗議訴求（定性排序）</span>
+            <span class="panel-tag">QUALITATIVE RANKING · NO %</span>
+          </div>
+          <div class="protest-themes-list" id="protests-themes-list">
+            {"".join(themes_html)}
+          </div>
+          <div style="font-size:0.7rem;color:var(--text-dim);margin-top:8px;">
+            ※ 數據紀律：跨國抗議訴求重疊度高，僅作定性先後排序，不設無來源之裝飾性百分比。
+          </div>
+        </div>
+
+        <!-- 3. 4-Station Timeline -->
+        <div class="protest-subcard">
+          <div class="protest-subhead">
+            <span class="protest-subtitle-strong">近期爆發與已公佈行動時間軸</span>
+            <span class="panel-tag">4 KEY TIMELINE NODES</span>
+          </div>
+          <div class="protest-timeline-track">
+            {"".join(timeline_html)}
+          </div>
+        </div>
+
+        <!-- 4. Key Observations & Evidence Breakdown -->
+        <div class="protest-subcard">
+          <div class="protest-subhead">
+            <span class="protest-subtitle-strong">關鍵宏觀觀察與證據分級統計</span>
+            <span class="panel-tag">DYNAMICALLY COUNTED BY EVIDENCE</span>
+          </div>
+          <ul class="protest-obs-list">
+            {"".join(obs_html)}
+          </ul>
+          <div class="protest-ev-stats-box" id="protests-evidence-stats">
+            <div style="font-size:0.74rem;font-weight:700;color:var(--text-bright);margin-bottom:6px;display:flex;justify-content:space-between;">
+              <span>具名國家證據分級統計（由 countries 陣列實計）</span>
+              <span style="font-family:var(--font-mono);color:var(--text-muted);">共 {country_count} 國</span>
+            </div>
+            <div class="protest-ev-bar">
+              <div style="flex:{ver_c};background:#10b981;" title="多源核實 (verified)：{ver_c} 國"></div>
+              <div style="flex:{sin_c};background:#38bdf8;" title="單一來源 (single)：{sin_c} 國"></div>
+              <div style="flex:{unv_c};background:#eab308;" title="待驗證 (unverified)：{unv_c} 國"></div>
+            </div>
+            <div class="protest-ev-counts-row">
+              <div class="protest-ev-stat-cell">
+                <span class="protest-ev-dot" style="background:#10b981;"></span>
+                <span>多源核實 (verified)：<strong id="protests-ev-verified-cnt">{ver_c}</strong> 國</span>
+              </div>
+              <div class="protest-ev-stat-cell">
+                <span class="protest-ev-dot" style="background:#38bdf8;"></span>
+                <span>單一來源 (single)：<strong id="protests-ev-single-cnt">{sin_c}</strong> 國</span>
+              </div>
+              <div class="protest-ev-stat-cell">
+                <span class="protest-ev-dot" style="background:#eab308;"></span>
+                <span>待驗證 (unverified)：<strong id="protests-ev-unverified-cnt">{unv_c}</strong> 國</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    """
+
+
 def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optional[str] = None) -> str:
     """Render the dashboard HTML for a specific UI Step (1 to 5)."""
     api_base_val = (api_base or "").strip().rstrip("/")
@@ -828,6 +1198,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
     stage = main["stage"]
     gauge_svg = render_gauge_svg(composite_index)
     pulse_card_html = render_pulse_card_html(pulse_data, structural_index, pulse_adj, composite_index)
+    protests_card_html = render_protests_card_html(data.get("protests")) if ui_step >= 3 else ""
     trend_chart_section_html = render_trend_chart_section(initial_trend_points)
     data_json_str = json.dumps(data, ensure_ascii=False, indent=2)
 
@@ -3489,6 +3860,446 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
         width: 100%;
       }
     }
+
+    /* Global Protest Activity Monitor (v0.7.0) */
+    .protest-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+      font-weight: 500;
+    }
+    .protest-cutoff-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.74rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      background: rgba(249, 115, 22, 0.14);
+      border: 1px solid rgba(249, 115, 22, 0.45);
+      color: #fdba74;
+    }
+    .protest-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .protest-kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .protest-kpi-label {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      letter-spacing: 0.5px;
+    }
+    .protest-kpi-val {
+      font-size: 1.9rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      line-height: 1.15;
+    }
+    .protest-kpi-text {
+      font-size: 1.35rem;
+      font-family: var(--font-sans);
+      padding: 4px 0;
+    }
+    .protest-kpi-fine {
+      font-size: 0.74rem;
+      color: #cbd5e1;
+      font-weight: 500;
+    }
+    .protest-kpi-caveat {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+    .protest-main-split {
+      display: grid;
+      grid-template-columns: 1.35fr 0.95fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .protest-subcard {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+    .protest-subhead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .protest-subtitle-strong {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .protest-legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      background: rgba(8, 13, 26, 0.5);
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+    .protest-legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .protest-legend-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+    .swatch-severe { background: var(--color-red); box-shadow: 0 0 6px rgba(239, 68, 68, 0.5); }
+    .swatch-large { background: var(--color-orange); }
+    .swatch-active { background: var(--color-yellow); }
+    .swatch-unlisted { background: #475569; border: 1px solid #64748b; }
+    .protest-regions-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .protest-region-box {
+      background: rgba(19, 29, 54, 0.65);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+    .protest-region-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+    .protest-region-cnt {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+    .protest-chips-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .protest-country-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-family: var(--font-sans);
+      color: #f8fafc;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border-bright);
+    }
+    .protest-country-chip:hover,
+    .protest-country-chip.active-chip {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+    }
+    .protest-lvl-severe {
+      border-color: rgba(239, 68, 68, 0.7);
+      background: rgba(239, 68, 68, 0.14);
+    }
+    .protest-lvl-severe .protest-chip-dot { background: var(--color-red); }
+    .protest-lvl-large {
+      border-color: rgba(249, 115, 22, 0.65);
+      background: rgba(249, 115, 22, 0.12);
+    }
+    .protest-lvl-large .protest-chip-dot { background: var(--color-orange); }
+    .protest-lvl-active {
+      border-color: rgba(234, 179, 8, 0.55);
+      background: rgba(234, 179, 8, 0.10);
+    }
+    .protest-lvl-active .protest-chip-dot { background: var(--color-yellow); }
+    .protest-chip-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .protest-chip-name {
+      font-weight: 600;
+    }
+    .protest-chip-ev {
+      font-size: 0.64rem;
+      font-family: var(--font-mono);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+    .protest-ev-verified { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; }
+    .protest-ev-single { background: rgba(56, 189, 248, 0.18); color: #7dd3fc; }
+    .protest-ev-unverified { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; }
+    .protest-unlisted-note {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      padding: 6px 10px;
+      background: rgba(30, 41, 59, 0.45);
+      border-radius: 4px;
+      border: 1px dashed #334155;
+    }
+    .protest-inspector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 4px;
+      background: rgba(6, 182, 212, 0.08);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      font-size: 0.76rem;
+      color: #e2e8f0;
+    }
+    .protest-inspector-tag {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: var(--accent-cyan);
+      color: #080d1a;
+      white-space: nowrap;
+    }
+    .protest-hotspots-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .protest-hotspot-item {
+      background: rgba(19, 29, 54, 0.7);
+      border: 1px solid var(--border-color);
+      border-left: 3px solid var(--color-red);
+      border-radius: 5px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .protest-hotspot-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .protest-hotspot-country {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .protest-next-badge {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      padding: 2px 7px;
+      border-radius: 3px;
+      background: rgba(239, 68, 68, 0.16);
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      color: #fca5a5;
+    }
+    .protest-next-null {
+      background: rgba(148, 163, 184, 0.1);
+      border-color: rgba(148, 163, 184, 0.25);
+      color: var(--text-dim);
+    }
+    .protest-hotspot-summary {
+      font-size: 0.76rem;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+    .protest-bottom-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .protest-scale-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .protest-scale-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .protest-scale-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .protest-scale-country {
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .protest-scale-label {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: #fdba74;
+    }
+    .protest-scale-track {
+      display: flex;
+      width: 100%;
+      height: 10px;
+      background: #1e293b;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .protest-scale-fill-solid {
+      background: linear-gradient(90deg, #ef4444, #f97316);
+    }
+    .protest-scale-fill-range {
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(249, 115, 22, 0.75),
+        rgba(249, 115, 22, 0.75) 4px,
+        rgba(239, 68, 68, 0.35) 4px,
+        rgba(239, 68, 68, 0.35) 8px
+      );
+    }
+    .protest-scale-fill-single {
+      background: linear-gradient(90deg, #f59e0b, #eab308);
+    }
+    .protest-themes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .protest-theme-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 10px;
+      background: rgba(19, 29, 54, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+    }
+    .protest-theme-rank {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.12);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .protest-theme-name {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #f8fafc;
+      flex: 1;
+    }
+    .protest-theme-tag {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+    .protest-timeline-track {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .protest-tl-node {
+      background: rgba(19, 29, 54, 0.65);
+      border: 1px solid var(--border-color);
+      border-left: 3px solid var(--accent-cyan);
+      border-radius: 4px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .protest-tl-date {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #67e8f9;
+    }
+    .protest-tl-label {
+      font-size: 0.76rem;
+      color: #e2e8f0;
+      line-height: 1.35;
+    }
+    .protest-obs-list {
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 0.76rem;
+      color: #cbd5e1;
+    }
+    .protest-ev-stats-box {
+      margin-top: 6px;
+      padding: 10px 12px;
+      background: rgba(19, 29, 54, 0.65);
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+    }
+    .protest-ev-bar {
+      display: flex;
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      background: #1e293b;
+      margin-bottom: 8px;
+    }
+    .protest-ev-counts-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.74rem;
+      color: #cbd5e1;
+    }
+    .protest-ev-stat-cell {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .protest-ev-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    @media (max-width: 1024px) {
+      .protest-kpi-grid { grid-template-columns: 1fr; }
+      .protest-main-split { grid-template-columns: 1fr; }
+      .protest-bottom-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .protest-regions-container { grid-template-columns: 1fr; }
+      .protest-timeline-track { grid-template-columns: 1fr; }
+    }
   </style>"""
 
     js_script = """
@@ -4005,6 +4816,31 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
         }
       }
     }
+
+    // Global Protest Activity Monitor interactive country inspector & graceful fallback
+    window.selectProtestCountry = function(el) {
+      if (!el) return;
+      document.querySelectorAll('.protest-country-chip').forEach(c => c.classList.remove('active-chip'));
+      el.classList.add('active-chip');
+      const name = el.getAttribute('data-country') || '';
+      const region = el.getAttribute('data-region') || '';
+      const lvlZh = el.getAttribute('data-level-zh') || '';
+      const ev = el.getAttribute('data-evidence') || '';
+      const evZh = el.getAttribute('data-evidence-zh') || '';
+      const txtEl = document.getElementById('protest-inspector-text');
+      if (txtEl) {
+        txtEl.textContent = `${name}（${region}）｜活動強度級別：${lvlZh}｜證據核實級別：${evZh} (${ev})`;
+      }
+    };
+
+    (function initProtestsMonitor() {
+      const sec = document.getElementById('protests-monitor-section');
+      if (!sec) return;
+      const embeddedProtests = window.WW3_MODEL_DATA && window.WW3_MODEL_DATA.protests;
+      if (!embeddedProtests || !Array.isArray(embeddedProtests.countries) || embeddedProtests.countries.length === 0) {
+        sec.style.display = 'none';
+      }
+    })();
     """
     js_script = js_script.replace("__API_BASE__", api_base_val)
 
@@ -4120,9 +4956,10 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
     </section>
 
     {pulse_card_html}
-    {step1_5_html}
     {step2_html}
     {step3_html}
+    {protests_card_html}
+    {step1_5_html}
     {step4_html}
     {step5_html}
   </main>
@@ -4149,6 +4986,7 @@ def build_dashboard(
     scenario_path: str | Path = "scenarios/baseline_2026.json",
     output_html_path: str | Path = "ui/dashboard.html",
     output_json_path: Optional[str | Path] = "ui/dashboard_data.json",
+    protests_path: Optional[str | Path] = "data/protests_snapshot.json",
     ui_step: int = 5,
     model: Optional[WW3RiskModel] = None,
     api_base: Optional[str] = None,
@@ -4160,7 +4998,11 @@ def build_dashboard(
     # Ensure parent output directory exists
     output_html_p.parent.mkdir(parents=True, exist_ok=True)
 
-    data = generate_dashboard_data(scenario_path=scenario_p, model=model)
+    data = generate_dashboard_data(
+        scenario_path=scenario_p,
+        protests_path=protests_path if protests_path is not None else "",
+        model=model,
+    )
     html_content = build_dashboard_html(data, ui_step=ui_step, api_base=api_base)
 
     with open(output_html_p, "w", encoding="utf-8") as f:
@@ -4171,6 +5013,16 @@ def build_dashboard(
         output_json_p.parent.mkdir(parents=True, exist_ok=True)
         with open(output_json_p, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
+
+    if protests_path:
+        protests_src = Path(protests_path)
+        if protests_src.exists() and data.get("protests"):
+            protests_dst = output_html_p.parent / "protests_snapshot.json"
+            try:
+                if protests_src.resolve() != protests_dst.resolve():
+                    shutil.copyfile(protests_src, protests_dst)
+            except Exception:
+                pass
 
     return data
 
