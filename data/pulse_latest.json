@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-10-23T15:18:48Z",
-  "pulse_adjustment": 4.23,
+  "computed_at": "2026-10-23T15:26:33Z",
+  "pulse_adjustment": 4.19,
   "range": [
     -10.0,
     10.0
@@ -22,8 +22,8 @@
       "source_url": "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json",
       "weight": 0.4,
       "status": "live",
-      "fetched_at": "2026-10-23T15:18:46Z",
-      "raw_value": 21.9193,
+      "fetched_at": "2026-10-23T15:26:32Z",
+      "raw_value": 22.8458,
       "raw_unit": "% (全球新聞總量佔比)",
       "normalized_score": 1.0,
       "contribution": 4.0,
@@ -42,7 +42,7 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-10-23T15:18:47Z",
+      "fetched_at": "2026-10-23T15:26:32Z",
       "raw_value": 3.78,
       "raw_unit": "% (Yes 隱含機率)",
       "normalized_score": -0.1217,
@@ -83,13 +83,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-10-23T15:18:48Z",
-      "raw_value": 2.64,
+      "fetched_at": "2026-10-23T15:26:33Z",
+      "raw_value": 2.49,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": 0.2641,
-      "contribution": 0.66,
+      "normalized_score": 0.2494,
+      "contribution": 0.62,
       "details": {
-        "price_usd": 111.53,
+        "price_usd": 111.37,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
