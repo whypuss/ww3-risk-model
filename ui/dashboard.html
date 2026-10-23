@@ -2019,18 +2019,18 @@
       <text x="285" y="165" fill="#64748b" font-size="11" font-weight="600" text-anchor="middle">100</text>
 
       <!-- Needle pointer -->
-      <line x1="160" y1="145" x2="247.2" y2="96.0" stroke="#f8fafc" stroke-width="3.5" stroke-linecap="round" filter="url(#needleGlow)"/>
+      <line x1="160" y1="145" x2="252.6" y2="107.3" stroke="#f8fafc" stroke-width="3.5" stroke-linecap="round" filter="url(#needleGlow)"/>
       <circle cx="160" cy="145" r="7" fill="#f8fafc" stroke="#0f172a" stroke-width="2"/>
       <circle cx="160" cy="145" r="3" fill="#ef4444"/>
     </svg>
     
         </div>
-        <div class="score-big" id="score-display">83.7</div>
+        <div class="score-big" id="score-display">87.7</div>
         <div class="score-label">戰爭綜合指數 · 戰爭風險指數（War Risk Index）100/100</div>
         <div class="score-sub" id="score-sub-split" style="font-family:var(--font-mono);font-size:0.8rem;margin-top:6px;color:var(--text-dim);display:flex;justify-content:center;align-items:center;gap:8px;">
           <span>結構基準 <strong id="structural-display" style="color:var(--text-bright);">83.5</strong></span>
           <span>·</span>
-          <span>即時脈搏 <strong id="pulse-display" style="color:var(--color-red);">+0.21</strong></span>
+          <span>即時脈搏 <strong id="pulse-display" style="color:var(--color-red);">+4.19</strong></span>
         </div>
         
         <div class="gauge-meta-pills">
@@ -2154,7 +2154,7 @@
         <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-color);border-radius:6px;padding:12px;">
           <div style="font-size:0.75rem;color:var(--text-dim);font-family:var(--font-mono);letter-spacing:0.5px;">即時脈搏修正 (PULSE ADJUSTMENT)</div>
           <div style="font-size:1.8rem;font-weight:700;font-family:var(--font-mono);margin-top:4px;" id="pulse-card-val">
-            <span style="color:#ef4444;">+0.21</span>
+            <span style="color:#ef4444;">+4.19</span>
             <span style="font-size:0.85rem;font-weight:400;color:var(--text-dim);">分 (clamp ±10.0)</span>
           </div>
           <div style="font-size:0.72rem;color:var(--text-dim);margin-top:2px;">對應 3 大訊號加權合成數值</div>
@@ -2163,17 +2163,17 @@
         <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-color);border-radius:6px;padding:12px;">
           <div style="font-size:0.75rem;color:var(--text-dim);font-family:var(--font-mono);letter-spacing:0.5px;">訊號連通覆蓋 (SOURCE HEALTH)</div>
           <div style="font-size:1.4rem;font-weight:700;font-family:var(--font-mono);color:#38bdf8;margin-top:4px;" id="pulse-card-status">
-            2/3 訊號在庫 (OPERATIONAL)
+            3/3 訊號在庫 (OPERATIONAL)
           </div>
           <div style="font-size:0.72rem;color:var(--text-dim);margin-top:2px;" id="pulse-card-time">
-            抓取時間: 2026-10-23T14:27:24Z
+            抓取時間: 2026-10-23T15:26:33Z
           </div>
         </div>
 
         <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-color);border-radius:6px;padding:12px;">
           <div style="font-size:0.75rem;color:var(--text-dim);font-family:var(--font-mono);letter-spacing:0.5px;">雙層合成架構 (TWO-TIER SYNTHESIS)</div>
           <div style="font-size:0.82rem;color:var(--text-muted);margin-top:6px;font-family:var(--font-mono);">
-            綜合指數 = clamp(結構 <strong>83.5</strong> + 脈搏 <strong>+0.21</strong>, 0, 100) = <strong style="color:var(--color-orange);">83.7</strong>
+            綜合指數 = clamp(結構 <strong>83.5</strong> + 脈搏 <strong>+4.19</strong>, 0, 100) = <strong style="color:var(--color-orange);">87.7</strong>
           </div>
           <div style="font-size:0.72rem;color:var(--text-dim);margin-top:4px;">
             定性：情境合成修正值，非統計勝率預測。
@@ -2199,11 +2199,11 @@
       <tr>
         <td><strong>GDELT 2.0 全球衝突聲量</strong><br><span style="font-size:0.7rem;color:var(--text-dim);">Global Conflict News Volume</span></td>
         <td>GDELT Doc TimelineVol</td>
-        <td><code>None / 逾時</code></td>
-        <td><code>+0.0000</code></td>
+        <td><code>22.8458 %</code></td>
+        <td><code>+1.0000</code></td>
         <td>40% (0.40)</td>
-        <td style="font-weight:700;color:var(--text-muted);">+0.00 分</td>
-        <td><span class="status-badge status-stale">UNAVAILABLE</span></td>
+        <td style="font-weight:700;color:#ef4444;">+4.00 分</td>
+        <td><span class="status-badge status-fresh">LIVE</span></td>
       </tr>
     
 
@@ -2221,10 +2221,10 @@
       <tr>
         <td><strong>Brent 原油 24 小時價格變動</strong><br><span style="font-size:0.7rem;color:var(--text-dim);">Brent Crude 24h Price Change</span></td>
         <td>Yahoo Finance (BZ=F)</td>
-        <td><code>+2.55 %</code></td>
-        <td><code>+0.2549</code></td>
+        <td><code>+2.49 %</code></td>
+        <td><code>+0.2494</code></td>
         <td>25% (0.25)</td>
-        <td style="font-weight:700;color:#ef4444;">+0.64 分</td>
+        <td style="font-weight:700;color:#ef4444;">+0.62 分</td>
         <td><span class="status-badge status-fresh">LIVE</span></td>
       </tr>
     
@@ -2516,7 +2516,7 @@
           <div class="insight-box" style="margin-top:16px;padding:12px;background:rgba(15, 23, 42, 0.6);border-left:3px solid var(--color-orange);border-radius:4px;">
             <div style="font-size:0.8rem;font-weight:700;color:#fed7aa;margin-bottom:4px;">戰略防務分析員洞察：</div>
             <p style="font-size:0.78rem;color:#cbd5e1;line-height:1.45;">
-              當前風險總分高達 <strong>83.7</strong>（進入階段三），核心驅動並非單一傳統軍備競賽，而是<strong>「算力晶圓與技術壟斷 (82.0)」</strong>與<strong>「多點領土引信 (80.0)」</strong>相互鎖死。外交互信緩衝（僅 36.0）與多邊仲裁（28.0）極度孱弱，導致任何邊境摩擦或技術先發管制均極易跨越防火牆直接升級。
+              當前風險總分高達 <strong>87.7</strong>（進入階段三），核心驅動並非單一傳統軍備競賽，而是<strong>「算力晶圓與技術壟斷 (82.0)」</strong>與<strong>「多點領土引信 (80.0)」</strong>相互鎖死。外交互信緩衝（僅 36.0）與多邊仲裁（28.0）極度孱弱，導致任何邊境摩擦或技術先發管制均極易跨越防火牆直接升級。
             </p>
           </div>
         </div>
@@ -3575,7 +3575,7 @@
             <span class="protest-inspector-tag">證據檢視</span>
             <span id="protest-inspector-text">將游標移至或點擊上方任一國家，即可檢視該國之抗議強度、事件簡述與來源連結（預設：法國 · 歐洲 · 嚴重衝突 · 多源核實）。</span>
             <div id="protest-inspector-detail">
-              <div class="protest-inspector-summary">10/17 全國「憤怒日」：工會與學生抗議生活成本高企與學校資源不足，官方估計約 55 萬人上街（CGT 稱 80 萬）；巴黎、馬賽、里昂等地出現縱火與衝突，約 2,400 人被捕，多地實施局部宵禁。</div>
+              <div class="protest-inspector-summary">10/17 全國「憤怒日」：工會與學生抗議生活成本高企與學校資源不足，官方估計約 55 萬人上街（CGT 稱 80 萬）；巴黎、馬賽、里昂等地出現縱火與衝突，約 2,400 人被捕，多地實施局部宵禁。</div><div class="protest-source-list"><span class="protest-source-label">來源：</span><a href="https://aitimeline.in/france-protests-timeline-social-unrest-16880/" target="_blank" rel="noopener noreferrer">AITimeline</a><a href="https://thebostonreport.com/geopolitics/france-protest-tracker/" target="_blank" rel="noopener noreferrer">The Boston Report</a></div>
             </div>
           </div>
         </div>
@@ -3794,7 +3794,7 @@
           <span class="panel-tag">EXACT MATHEMATICAL TRACEABILITY</span>
         </div>
         <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:14px;">
-          指數由 50 升至當前 <strong>83.7</strong> 係由以下核心結構與機制共同決定，每一項均可向上回溯至指標原始數據與計算公式：
+          指數由 50 升至當前 <strong>87.7</strong> 係由以下核心結構與機制共同決定，每一項均可向上回溯至指標原始數據與計算公式：
         </p>
         <div class="driver-steps-grid">
           <div class="driver-step-box">
@@ -3831,10 +3831,10 @@
             <div class="driver-step-head">
               <span class="driver-step-num">04</span>
               <span class="driver-step-name">高位平滑飽和映射 (Soft-Clamp)</span>
-              <span class="driver-step-val" id="driver-clamp-val">84.6 → 83.7</span>
+              <span class="driver-step-val" id="driver-clamp-val">84.6 → 87.7</span>
             </div>
             <div class="driver-step-desc">
-              未夾持得分 84.6 超越 70 閾值，經雙曲正切 Tanh 飽和函數平滑壓縮，防止無界發散，收斂為 83.7（進入 Stage 3 階段三：和平解決機制失效）。
+              未夾持得分 84.6 超越 70 閾值，經雙曲正切 Tanh 飽和函數平滑壓縮，防止無界發散，收斂為 87.7（進入 Stage 3 階段三：和平解決機制失效）。
             </div>
           </div>
         </div>
@@ -3954,24 +3954,24 @@
           
     <svg viewBox="0 0 760 180" class="trend-svg" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">
       <line x1="55" y1="140.0" x2="715" y2="140.0" stroke="rgba(255,255,255,0.07)" stroke-width="1" /><text x="45" y="143.0" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">80.0</text>
-<line x1="55" y1="111.2" x2="715" y2="111.2" stroke="rgba(255,255,255,0.07)" stroke-width="1" /><text x="45" y="114.2" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">82.5</text>
-<line x1="55" y1="82.5" x2="715" y2="82.5" stroke="rgba(255,255,255,0.07)" stroke-width="1" /><text x="45" y="85.5" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">85.0</text>
-<line x1="55" y1="53.8" x2="715" y2="53.8" stroke="rgba(255,255,255,0.07)" stroke-width="1" /><text x="45" y="56.8" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">87.5</text>
-<line x1="55" y1="25.0" x2="715" y2="25.0" stroke="rgba(255,255,255,0.07)" stroke-width="1" /><text x="45" y="28.0" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">90.0</text>
-      <polyline points="55.0,104.7 385.0,99.8 715.0,99.8" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.8" stroke-dasharray="4,4" stroke-linecap="round" />
-      <polyline points="55.0,104.7 385.0,59.5 715.0,97.3" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-      <circle cx="55.0" cy="104.7" r="3" fill="rgba(255,255,255,0.6)"><title>2026-10-21 | 綜合: 83.07 | 結構: 83.07</title></circle>
-<circle cx="385.0" cy="99.8" r="3" fill="rgba(255,255,255,0.6)"><title>2026-10-22 | 綜合: 87.00 | 結構: 83.50</title></circle>
-<circle cx="715.0" cy="99.8" r="3" fill="rgba(255,255,255,0.6)"><title>2026-10-23 | 綜合: 83.71 | 結構: 83.50</title></circle>
-<circle cx="55.0" cy="104.7" r="4.5" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5"><title>2026-10-21 | 綜合: 83.07 | 結構: 83.07</title></circle>
-<circle cx="385.0" cy="59.5" r="4.5" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5"><title>2026-10-22 | 綜合: 87.00 | 結構: 83.50</title></circle>
-<circle cx="715.0" cy="97.3" r="4.5" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5"><title>2026-10-23 | 綜合: 83.71 | 結構: 83.50</title></circle>
+<line x1="55" y1="110.7" x2="715" y2="110.7" stroke="rgba(255,255,255,0.07)" stroke-width="1" /><text x="45" y="113.7" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">82.8</text>
+<line x1="55" y1="82.5" x2="715" y2="82.5" stroke="rgba(255,255,255,0.07)" stroke-width="1" /><text x="45" y="85.5" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">85.5</text>
+<line x1="55" y1="54.3" x2="715" y2="54.3" stroke="rgba(255,255,255,0.07)" stroke-width="1" /><text x="45" y="57.3" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">88.2</text>
+<line x1="55" y1="25.0" x2="715" y2="25.0" stroke="rgba(255,255,255,0.07)" stroke-width="1" /><text x="45" y="28.0" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">91.0</text>
+      <polyline points="55.0,107.9 385.0,103.4 715.0,103.4" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.8" stroke-dasharray="4,4" stroke-linecap="round" />
+      <polyline points="55.0,107.9 385.0,66.8 715.0,59.6" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="55.0" cy="107.9" r="3" fill="rgba(255,255,255,0.6)"><title>2026-10-21 | 綜合: 83.07 | 結構: 83.07</title></circle>
+<circle cx="385.0" cy="103.4" r="3" fill="rgba(255,255,255,0.6)"><title>2026-10-22 | 綜合: 87.00 | 結構: 83.50</title></circle>
+<circle cx="715.0" cy="103.4" r="3" fill="rgba(255,255,255,0.6)"><title>2026-10-23 | 綜合: 87.69 | 結構: 83.50</title></circle>
+<circle cx="55.0" cy="107.9" r="4.5" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5"><title>2026-10-21 | 綜合: 83.07 | 結構: 83.07</title></circle>
+<circle cx="385.0" cy="66.8" r="4.5" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5"><title>2026-10-22 | 綜合: 87.00 | 結構: 83.50</title></circle>
+<circle cx="715.0" cy="59.6" r="4.5" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5"><title>2026-10-23 | 綜合: 87.69 | 結構: 83.50</title></circle>
 <text x="55.0" y="162" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="monospace">2026-10-21</text>
 <text x="385.0" y="162" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="monospace">2026-10-22</text>
 <text x="715.0" y="162" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="monospace">2026-10-23</text>
-<text x="55.0" y="96.7" fill="#f59e0b" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">83.1</text>
-<text x="385.0" y="51.5" fill="#f59e0b" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">87.0</text>
-<text x="715.0" y="89.3" fill="#f59e0b" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">83.7</text>
+<text x="55.0" y="99.9" fill="#f59e0b" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">83.1</text>
+<text x="385.0" y="58.8" fill="#f59e0b" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">87.0</text>
+<text x="715.0" y="51.6" fill="#f59e0b" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">87.7</text>
       <text x="380.0" y="176" fill="#64748b" font-size="8" text-anchor="middle">Y 軸按數據範圍動態縮放（非 0–100）</text>
     </svg>
     
@@ -5979,14 +5979,14 @@
   },
   "pulse": {
     "version": "0.6.0",
-    "computed_at": "2026-10-23T14:27:24Z",
-    "pulse_adjustment": 0.21,
+    "computed_at": "2026-10-23T15:26:33Z",
+    "pulse_adjustment": 4.19,
     "range": [
       -10.0,
       10.0
     ],
     "status": "operational",
-    "active_signals_count": 2,
+    "active_signals_count": 3,
     "total_signals_count": 3,
     "weights": {
       "gdelt_conflict": 0.4,
@@ -6000,14 +6000,19 @@
         "source": "GDELT 2.0 Doc TimelineVol API",
         "source_url": "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json",
         "weight": 0.4,
-        "status": "unavailable",
-        "fetched_at": null,
-        "raw_value": null,
+        "status": "live",
+        "fetched_at": "2026-10-23T15:26:32Z",
+        "raw_value": 22.8458,
         "raw_unit": "% (全球新聞總量佔比)",
-        "normalized_score": 0.0,
-        "contribution": 0.0,
-        "details": {},
-        "error": "HTTP Error 429: Too Many Requests"
+        "normalized_score": 1.0,
+        "contribution": 4.0,
+        "details": {
+          "latest_date": "20261023T000000Z",
+          "history_points": 69,
+          "baseline_30d": 15.4056,
+          "formula": "clamp((raw - 15.41) / 1.75, -1.0, 1.0)"
+        },
+        "error": null
       },
       "polymarket_war_risk": {
         "signal_id": "polymarket_war_risk",
@@ -6016,7 +6021,7 @@
         "source_url": "https://gamma-api.polymarket.com/markets",
         "weight": 0.35,
         "status": "live",
-        "fetched_at": "2026-10-23T14:27:23Z",
+        "fetched_at": "2026-10-23T15:26:32Z",
         "raw_value": 3.78,
         "raw_unit": "% (Yes 隱含機率)",
         "normalized_score": -0.1217,
@@ -6057,13 +6062,13 @@
         "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
         "weight": 0.25,
         "status": "live",
-        "fetched_at": "2026-10-23T14:27:24Z",
-        "raw_value": 2.55,
+        "fetched_at": "2026-10-23T15:26:33Z",
+        "raw_value": 2.49,
         "raw_unit": "% (24h 漲跌幅)",
-        "normalized_score": 0.2549,
-        "contribution": 0.64,
+        "normalized_score": 0.2494,
+        "contribution": 0.62,
         "details": {
-          "price_usd": 111.43,
+          "price_usd": 111.37,
           "scale_anchor_pct": 10.0,
           "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
         },
@@ -6696,8 +6701,8 @@
     ]
   },
   "structural_index": 83.5,
-  "pulse_adjustment": 0.21,
-  "composite_index": 83.71,
+  "pulse_adjustment": 4.19,
+  "composite_index": 87.69,
   "initial_trend_points": [
     {
       "date": "2026-10-21",
@@ -6717,10 +6722,10 @@
     },
     {
       "date": "2026-10-23",
-      "computed_at": "2026-10-23T14:27:24Z",
-      "composite_index": 83.71,
+      "computed_at": "2026-10-23T15:26:33Z",
+      "composite_index": 87.69,
       "structural_index": 83.5,
-      "pulse_adjustment": 0.21,
+      "pulse_adjustment": 4.19,
       "stage": 3
     }
   ],
@@ -9375,9 +9380,6 @@
         if (franceChip) {
           window.selectProtestCountry(franceChip);
         }
-        // Ensure target="_blank" string exists in JS for test detection
-        const TARGET_BLANK_ATTR = 'target="_blank" rel="noopener noreferrer"';
-        (void)TARGET_BLANK_ATTR;
       }
     })();
     

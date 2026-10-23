@@ -7,6 +7,58 @@ import json
 import re
 from pathlib import Path
 
+
+def assert_zero_external_resources(html_content: str) -> None:
+    """
+    Assert that HTML contains zero external resource dependencies.
+
+    Allowed: <a href="https://..."> citation links.
+    Blocked: <script src>, <link href>, <img src>, <source src>, <video src>,
+             <audio src>, <iframe src>, <embed src>, <object data>, <object src>,
+             style attributes with url(https://...), <style> blocks with @import url(https://...).
+    """
+    # 1. Check resource tags (script, link, img, source, video, audio, iframe, embed, object)
+    # Match opening tag of resource elements with src/href/data pointing to https://
+    resource_tag_pattern = re.compile(
+        r'<(script|link|img|source|video|audio|iframe|embed|object)\b[^>]*'
+        r'(?:src|href|data)\s*=\s*["\']https?://[^"\']+["\']',
+        re.IGNORECASE,
+    )
+    resource_matches = resource_tag_pattern.findall(html_content)
+    assert len(resource_matches) == 0, (
+        f"Found external resource dependencies in tags: {resource_matches}"
+    )
+
+    # 2. Check style attributes for url(https://...)
+    style_url_pattern = re.compile(
+        r'style\s*=\s*["\'][^"\']*url\(\s*["\']?https?://[^"\')]+["\']?\s*\)',
+        re.IGNORECASE,
+    )
+    style_url_matches = style_url_pattern.findall(html_content)
+    assert len(style_url_matches) == 0, (
+        f"Found external URLs in style attributes: {style_url_matches}"
+    )
+
+    # 3. Check <style> blocks for @import url(https://...) or @import "https://..."
+    style_blocks = re.findall(r'<style[^>]*>(.*?)</style>', html_content, re.DOTALL | re.IGNORECASE)
+    for block in style_blocks:
+        import_matches = re.findall(
+            r'@import\s+(?:url\(\s*)?["\']https?://[^"\')]+["\']?\s*\)?',
+            block,
+            re.IGNORECASE,
+        )
+        assert len(import_matches) == 0, (
+            f"Found @import of external URL in <style> block: {import_matches}"
+        )
+        url_matches = re.findall(
+            r'url\(\s*["\']?https?://[^"\')]+["\']?\s*\)',
+            block,
+            re.IGNORECASE,
+        )
+        assert len(url_matches) == 0, (
+            f"Found url(https://...) in <style> block: {url_matches}"
+        )
+
 from ww3_risk import __version__
 from ww3_risk.dashboard import (
     build_dashboard,
@@ -104,9 +156,8 @@ def test_build_dashboard_offline_zero_cdn(tmp_path):
 
     content = out_html.read_text(encoding="utf-8")
 
-    # Strict Zero CDN verification: no external script/link tags
-    external_links = re.findall(r'(src|href)=["\']https?://[^"\']+["\']', content)
-    assert len(external_links) == 0, f"Found external web dependencies: {external_links}"
+    # Strict Zero CDN verification: no external script/link/img/iframe/etc tags
+    assert_zero_external_resources(content)
 
     # Embedded data is parseable JSON
     match = re.search(r'<script id="ww3-model-data" type="application/json">\s*(.*?)\s*</script>', content, re.DOTALL)
@@ -539,8 +590,7 @@ def test_pulse_layer_card_and_trend_svg_rendering(tmp_path):
     assert "嚴禁補造歷史" in content
 
     # 4. Zero external CDN scripts or stylesheets
-    external_links = re.findall(r'(src|href)=["\']https?://[^"\']+["\']', content)
-    assert len(external_links) == 0, f"Found external web dependencies: {external_links}"
+    assert_zero_external_resources(content)
 
 
 def test_dashboard_header_version_matches_package_version(tmp_path):

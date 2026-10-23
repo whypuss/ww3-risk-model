@@ -150,14 +150,14 @@
   },
   "pulse": {
     "version": "0.6.0",
-    "computed_at": "2026-10-23T14:27:24Z",
-    "pulse_adjustment": 0.21,
+    "computed_at": "2026-10-23T15:26:33Z",
+    "pulse_adjustment": 4.19,
     "range": [
       -10.0,
       10.0
     ],
     "status": "operational",
-    "active_signals_count": 2,
+    "active_signals_count": 3,
     "total_signals_count": 3,
     "weights": {
       "gdelt_conflict": 0.4,
@@ -171,14 +171,19 @@
         "source": "GDELT 2.0 Doc TimelineVol API",
         "source_url": "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json",
         "weight": 0.4,
-        "status": "unavailable",
-        "fetched_at": null,
-        "raw_value": null,
+        "status": "live",
+        "fetched_at": "2026-10-23T15:26:32Z",
+        "raw_value": 22.8458,
         "raw_unit": "% (全球新聞總量佔比)",
-        "normalized_score": 0.0,
-        "contribution": 0.0,
-        "details": {},
-        "error": "HTTP Error 429: Too Many Requests"
+        "normalized_score": 1.0,
+        "contribution": 4.0,
+        "details": {
+          "latest_date": "20261023T000000Z",
+          "history_points": 69,
+          "baseline_30d": 15.4056,
+          "formula": "clamp((raw - 15.41) / 1.75, -1.0, 1.0)"
+        },
+        "error": null
       },
       "polymarket_war_risk": {
         "signal_id": "polymarket_war_risk",
@@ -187,7 +192,7 @@
         "source_url": "https://gamma-api.polymarket.com/markets",
         "weight": 0.35,
         "status": "live",
-        "fetched_at": "2026-10-23T14:27:23Z",
+        "fetched_at": "2026-10-23T15:26:32Z",
         "raw_value": 3.78,
         "raw_unit": "% (Yes 隱含機率)",
         "normalized_score": -0.1217,
@@ -228,13 +233,13 @@
         "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
         "weight": 0.25,
         "status": "live",
-        "fetched_at": "2026-10-23T14:27:24Z",
-        "raw_value": 2.55,
+        "fetched_at": "2026-10-23T15:26:33Z",
+        "raw_value": 2.49,
         "raw_unit": "% (24h 漲跌幅)",
-        "normalized_score": 0.2549,
-        "contribution": 0.64,
+        "normalized_score": 0.2494,
+        "contribution": 0.62,
         "details": {
-          "price_usd": 111.43,
+          "price_usd": 111.37,
           "scale_anchor_pct": 10.0,
           "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
         },
@@ -867,8 +872,8 @@
     ]
   },
   "structural_index": 83.5,
-  "pulse_adjustment": 0.21,
-  "composite_index": 83.71,
+  "pulse_adjustment": 4.19,
+  "composite_index": 87.69,
   "initial_trend_points": [
     {
       "date": "2026-10-21",
@@ -888,10 +893,10 @@
     },
     {
       "date": "2026-10-23",
-      "computed_at": "2026-10-23T14:27:24Z",
-      "composite_index": 83.71,
+      "computed_at": "2026-10-23T15:26:33Z",
+      "composite_index": 87.69,
       "structural_index": 83.5,
-      "pulse_adjustment": 0.21,
+      "pulse_adjustment": 4.19,
       "stage": 3
     }
   ],
