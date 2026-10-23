@@ -141,26 +141,30 @@
     {
       "name_zh": "德國",
       "region": "歐洲",
-      "level": "active",
-      "evidence": "unverified"
+      "level": "large",
+      "evidence": "verified",
+      "note": "柏林學校封鎖及聲援法國集會；全國學校罷工浪潮（9/25 約 4.5 萬人）；已號召 10/31 二十一城示威（DW／Anadolu）"
     },
     {
       "name_zh": "奧地利",
       "region": "歐洲",
-      "level": "active",
-      "evidence": "unverified"
+      "level": "large",
+      "evidence": "verified",
+      "note": "10/22 維也納 ÖH 遊行，主辦估計 2–3 萬人，反對大學預算削減（ORF 等）"
     },
     {
       "name_zh": "瑞士",
       "region": "歐洲",
       "level": "active",
-      "evidence": "unverified"
+      "evidence": "verified",
+      "note": "僅動員籌備：洛桑學生大會約百人、已號召 11/20 青年罷工；瑞士媒體明言大規模抗議浪潮未出現（NZZ／20min／Le Temps）"
     },
     {
       "name_zh": "愛爾蘭",
       "region": "歐洲",
-      "level": "active",
-      "evidence": "unverified"
+      "level": "large",
+      "evidence": "verified",
+      "note": "都柏林數千大學生遊行，要求降學費、增高教經費及可負擔住屋（RTE）"
     },
     {
       "name_zh": "美國",

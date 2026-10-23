@@ -13,6 +13,7 @@ from ww3_risk.dashboard import (
     build_dashboard_html,
     calculate_regional_pressures,
     generate_dashboard_data,
+    render_trend_svg,
     UNCONNECTED_DATA_SOURCES,
     REGIONAL_INDICATOR_MAPPINGS,
 )
@@ -709,6 +710,153 @@ def test_dashboard_protests_panel_graceful_hide_when_snapshot_missing(tmp_path):
     assert 'data-protests-status="missing"' in content
     assert 'style="display:none;margin-top:24px;"' in content
     assert "全球抗議活動監測" not in content
+
+
+def test_protests_snapshot_four_countries_updated_values_and_notes():
+    """Verify the four updated countries (DE, AT, IE, CH) have correct level, evidence, and note fields."""
+    protests_file = Path("data/protests_snapshot.json")
+    protests = json.loads(protests_file.read_text(encoding="utf-8"))
+    countries = {c["name_zh"]: c for c in protests["countries"]}
+
+    # Germany: level large, evidence verified, with note
+    de = countries["德國"]
+    assert de["level"] == "large"
+    assert de["evidence"] == "verified"
+    assert "note" in de
+    assert "柏林學校封鎖" in de["note"]
+    assert "9/25" in de["note"]
+    assert "10/31" in de["note"]
+    assert "DW" in de["note"] or "Anadolu" in de["note"]
+
+    # Austria: level large, evidence verified, with note
+    at = countries["奧地利"]
+    assert at["level"] == "large"
+    assert at["evidence"] == "verified"
+    assert "note" in at
+    assert "10/22" in at["note"]
+    assert "維也納" in at["note"]
+    assert "ÖH" in at["note"]
+    assert "ORF" in at["note"]
+
+    # Ireland: level large, evidence verified, with note
+    ie = countries["愛爾蘭"]
+    assert ie["level"] == "large"
+    assert ie["evidence"] == "verified"
+    assert "note" in ie
+    assert "都柏林" in ie["note"]
+    assert "學費" in ie["note"]
+    assert "RTE" in ie["note"]
+
+    # Switzerland: level active (unchanged), evidence verified, with note
+    ch = countries["瑞士"]
+    assert ch["level"] == "active"
+    assert ch["evidence"] == "verified"
+    assert "note" in ch
+    assert "洛桑" in ch["note"]
+    assert "11/20" in ch["note"]
+    assert "NZZ" in ch["note"] or "20min" in ch["note"] or "Le Temps" in ch["note"]
+
+
+def test_protests_snapshot_aggregate_statistics():
+    """Verify aggregate statistics after updates: 33 countries, evidence 22/11/0, level 3/14/16."""
+    protests_file = Path("data/protests_snapshot.json")
+    protests = json.loads(protests_file.read_text(encoding="utf-8"))
+    countries = protests["countries"]
+
+    assert len(countries) == 33
+
+    verified = sum(1 for c in countries if c["evidence"] == "verified")
+    single = sum(1 for c in countries if c["evidence"] == "single")
+    unverified = sum(1 for c in countries if c["evidence"] == "unverified")
+    assert verified == 22
+    assert single == 11
+    assert unverified == 0
+
+    severe = sum(1 for c in countries if c["level"] == "severe")
+    large = sum(1 for c in countries if c["level"] == "large")
+    active = sum(1 for c in countries if c["level"] == "active")
+    assert severe == 3
+    assert large == 14
+    assert active == 16
+
+
+def test_generate_dashboard_data_initial_trend_points_matches_worker_api():
+    """Verify initial_trend_points matches Worker API daily trend definition:
+    - Group by UTC date, take last snapshot per day
+    - 10-21 → composite 83.07 (last snapshot 13:44:41Z, pulse 0.0)
+    - 10-22 → composite 87.0 (last snapshot 23:26:36Z, pulse +3.5)
+    - 10-23 → composite 87.1 (last snapshot 08:26:31Z, pulse +3.6)
+    - Each point's date equals its computed_at UTC date
+    - No duplicate dates
+    """
+    model = WW3RiskModel()
+    data = generate_dashboard_data(scenario_path="scenarios/baseline_2026.json", model=model)
+
+    points = data["initial_trend_points"]
+    assert len(points) == 3
+
+    # Check each point's date matches computed_at UTC date
+    for pt in points:
+        computed_at = pt["computed_at"]
+        expected_date = computed_at[:10]  # YYYY-MM-DD
+        assert pt["date"] == expected_date, f"date {pt['date']} != computed_at date {expected_date}"
+
+    # No duplicate dates
+    dates = [pt["date"] for pt in points]
+    assert len(dates) == len(set(dates)), "Duplicate dates in initial_trend_points"
+
+    # Verify authoritative values
+    pt_21 = next(p for p in points if p["date"] == "2026-10-21")
+    pt_22 = next(p for p in points if p["date"] == "2026-10-22")
+    pt_23 = next(p for p in points if p["date"] == "2026-10-23")
+
+    assert pt_21["composite_index"] == 83.07
+    assert pt_21["structural_index"] == 83.07
+    assert pt_21["pulse_adjustment"] == 0.0
+    assert pt_21["computed_at"] == "2026-10-21T13:44:41Z"
+
+    assert pt_22["composite_index"] == 87.0
+    assert pt_22["structural_index"] == 83.5
+    assert pt_22["pulse_adjustment"] == 3.5
+    assert pt_22["computed_at"] == "2026-10-22T23:26:36Z"
+
+    assert pt_23["composite_index"] == 87.1
+    assert pt_23["structural_index"] == 83.5
+    assert pt_23["pulse_adjustment"] == 3.6
+    assert pt_23["computed_at"] == "2026-10-23T08:26:31Z"
+
+
+def test_render_trend_svg_dynamic_y_axis_and_value_labels():
+    """Verify render_trend_svg produces dynamic Y-axis, value labels, and handles monthly single point."""
+    # Daily mode with 3 points
+    daily_points = [
+        {"date": "2026-10-21", "computed_at": "2026-10-21T13:44:41Z", "composite_index": 83.07, "structural_index": 83.07, "pulse_adjustment": 0.0, "stage": 3},
+        {"date": "2026-10-22", "computed_at": "2026-10-22T23:26:36Z", "composite_index": 87.0, "structural_index": 83.5, "pulse_adjustment": 3.5, "stage": 3},
+        {"date": "2026-10-23", "computed_at": "2026-10-23T08:26:31Z", "composite_index": 87.1, "structural_index": 83.5, "pulse_adjustment": 3.6, "stage": 3},
+    ]
+    svg = render_trend_svg(daily_points, granularity="daily")
+    # Dynamic Y-axis note
+    assert "Y 軸按數據範圍動態縮放（非 0–100）" in svg
+    # Value labels on composite points (1 decimal)
+    assert "83.1" in svg or "83.0" in svg  # 83.07 rounded to 1 decimal
+    assert "87.0" in svg
+    assert "87.1" in svg
+    # X-axis labels for all points (≤7)
+    assert "2026-10-21" in svg
+    assert "2026-10-22" in svg
+    assert "2026-10-23" in svg
+    # Both composite and structural lines
+    assert "f59e0b" in svg  # composite color
+    assert "rgba(255,255,255,0.4)" in svg  # structural color
+
+    # Monthly mode with single point
+    monthly_single = [{"month": "2026-10", "composite_index": 85.5, "structural_index": 83.5, "n_days": 3}]
+    svg_monthly = render_trend_svg(monthly_single, granularity="monthly")
+    # Single point: dot + value + hint, no line
+    assert "資料累積中" in svg_monthly
+    assert "85.5" in svg_monthly
+    # No polyline for single point
+    assert "polyline" not in svg_monthly or "points=" not in svg_monthly
 
 
 

@@ -463,18 +463,31 @@ def generate_dashboard_data(
     composite_index = round(max(0.0, min(100.0, structural_index + pulse_adj)), 2)
 
     # Operational trend points (starting from 2026-10-21, strictly no fabricated history)
+    # Must match Worker API daily trend definition: group by UTC date, take last snapshot per day
+    # Authoritative daily trend (verified from D1 index_snapshots):
+    # 10-21 → composite 83.07 (last snapshot 13:44:41Z, pulse 0.0)
+    # 10-22 → composite 87.0 (last snapshot 23:26:36Z, pulse +3.5)
+    # 10-23 → composite 87.1 (last snapshot 08:26:31Z, pulse +3.6)
     initial_trend_points = [
         {
             "date": "2026-10-21",
-            "computed_at": "2026-10-21T14:38:00Z",
-            "composite_index": 83.5,
-            "structural_index": 83.5,
+            "computed_at": "2026-10-21T13:44:41Z",
+            "composite_index": 83.07,
+            "structural_index": 83.07,
             "pulse_adjustment": 0.0,
             "stage": 3,
         },
         {
             "date": "2026-10-22",
-            "computed_at": pulse_data.get("computed_at", "2026-10-22T02:30:00Z") if pulse_data else "2026-10-22T02:30:00Z",
+            "computed_at": "2026-10-22T23:26:36Z",
+            "composite_index": 87.0,
+            "structural_index": 83.5,
+            "pulse_adjustment": 3.5,
+            "stage": 3,
+        },
+        {
+            "date": "2026-10-23",
+            "computed_at": pulse_data.get("computed_at", "2026-10-23T08:26:31Z") if pulse_data else "2026-10-23T08:26:31Z",
             "composite_index": composite_index,
             "structural_index": structural_index,
             "pulse_adjustment": pulse_adj,
@@ -577,20 +590,40 @@ def render_trend_svg(points: List[Dict[str, Any]], width: int = 760, height: int
     """Generate pure inline SVG linear trend chart for operational risk scores.
 
     Strict zero CDN requirement. Shows composite solid line and structural dashed line.
+    Y-axis: dynamic domain [max(0, floor(min-3)), min(100, ceil(max+3))], min span 10, 4-5 ticks.
+    X-axis: ≤7 points → all date labels, sufficient padding left/right.
+    Each composite point shows value label (1 decimal).
+    Monthly mode with 1 point: dot + value + "資料累積中" hint, no fake line.
     """
     if not points:
         return '<div style="color:var(--text-dim);font-size:0.8rem;text-align:center;padding:40px;">無歷史快照數據 (No snapshots available)</div>'
 
-    pad_left = 45
-    pad_right = 35
+    pad_left = 55
+    pad_right = 45
     pad_top = 25
-    pad_bottom = 35
+    pad_bottom = 40
     plot_w = width - pad_left - pad_right
     plot_h = height - pad_top - pad_bottom
 
+    # Extract composite values for dynamic Y-axis domain
+    c_vals = [float(pt.get("composite_index", pt.get("total_index", 0.0))) for pt in points]
+    s_vals = [float(pt.get("structural_index", pt.get("total_index", 0.0))) for pt in points]
+    all_vals = c_vals + s_vals
+    data_min = min(all_vals)
+    data_max = max(all_vals)
+
+    # Dynamic Y-axis domain
+    y_min = max(0.0, math.floor(data_min - 3))
+    y_max = min(100.0, math.ceil(data_max + 3))
+    # Ensure minimum span of 10
+    if y_max - y_min < 10:
+        center = (y_min + y_max) / 2.0
+        y_min = max(0.0, center - 5)
+        y_max = min(100.0, center + 5)
+
     def y_coord(val: float) -> float:
-        clamped = max(0.0, min(100.0, val))
-        return pad_top + (1.0 - clamped / 100.0) * plot_h
+        clamped = max(y_min, min(y_max, val))
+        return pad_top + (1.0 - (clamped - y_min) / (y_max - y_min)) * plot_h
 
     n = len(points)
     coords = []
@@ -603,21 +636,35 @@ def render_trend_svg(points: List[Dict[str, Any]], width: int = 760, height: int
         lbl = pt.get("date") or pt.get("month") or f"P{i+1}"
         coords.append({"x": x, "yc": y_c, "ys": y_s, "c_val": c_val, "s_val": s_val, "label": lbl, "raw": pt})
 
+    # Monthly mode with single point: dot + value + hint, no line
+    is_monthly_single = (granularity == "monthly" and n == 1)
+
     comp_poly = " ".join(f"{c['x']:.1f},{c['yc']:.1f}" for c in coords)
     struct_poly = " ".join(f"{c['x']:.1f},{c['ys']:.1f}" for c in coords)
 
+    # Dynamic Y-axis ticks: 4-5 ticks evenly spaced
+    num_ticks = 5
+    tick_vals = []
+    for i in range(num_ticks):
+        tick_val = y_min + (y_max - y_min) * i / (num_ticks - 1)
+        tick_vals.append(round(tick_val, 1))
+
     grid_lines = []
-    for y_val, lbl_str in [(25, "25"), (50, "50"), (75, "75"), (85, "85"), (100, "100")]:
-        y_pos = y_coord(y_val)
+    for tick_val in tick_vals:
+        y_pos = y_coord(tick_val)
         grid_lines.append(
             f'<line x1="{pad_left}" y1="{y_pos:.1f}" x2="{width - pad_right}" y2="{y_pos:.1f}" stroke="rgba(255,255,255,0.07)" stroke-width="1" />'
-            f'<text x="{pad_left - 8}" y="{y_pos + 3:.1f}" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">{lbl_str}</text>'
+            f'<text x="{pad_left - 10}" y="{y_pos + 3:.1f}" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">{tick_val:.1f}</text>'
         )
     grid_svg = "\n".join(grid_lines)
+
+    # Y-axis dynamic scaling note
+    y_axis_note = f'<text x="{width / 2}" y="{height - 4}" fill="#64748b" font-size="8" text-anchor="middle">Y 軸按數據範圍動態縮放（非 0–100）</text>'
 
     circles_comp = []
     circles_struct = []
     x_labels = []
+    value_labels = []
     for c in coords:
         x_pos = c["x"]
         yc_pos = c["yc"]
@@ -632,13 +679,30 @@ def render_trend_svg(points: List[Dict[str, Any]], width: int = 760, height: int
         circles_comp.append(
             f'<circle cx="{x_pos:.1f}" cy="{yc_pos:.1f}" r="4.5" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5"><title>{hover_text}</title></circle>'
         )
+        # Value label above composite point (1 decimal)
+        value_labels.append(
+            f'<text x="{x_pos:.1f}" y="{yc_pos - 8:.1f}" fill="#f59e0b" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">{c["c_val"]:.1f}</text>'
+        )
+        # X-axis labels: show all if ≤7 points
         x_labels.append(
-            f'<text x="{x_pos:.1f}" y="{height - 12}" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="monospace">{lbl}</text>'
+            f'<text x="{x_pos:.1f}" y="{height - 18}" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="monospace">{lbl}</text>'
         )
 
-    points_svg = "\n".join(circles_struct + circles_comp + x_labels)
-    line_comp_svg = f'<polyline points="{comp_poly}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />' if n > 1 else ""
-    line_struct_svg = f'<polyline points="{struct_poly}" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.8" stroke-dasharray="4,4" stroke-linecap="round" />' if n > 1 else ""
+    if is_monthly_single:
+        # Single monthly point: dot + value + hint, no line
+        c = coords[0]
+        points_svg = "\n".join([
+            f'<circle cx="{c["x"]:.1f}" cy="{c["yc"]:.1f}" r="6" fill="#f59e0b" stroke="#0f172a" stroke-width="2"><title>{hover_text}</title></circle>',
+            f'<text x="{c["x"]:.1f}" y="{c["yc"] - 10:.1f}" fill="#f59e0b" font-size="10" font-weight="700" text-anchor="middle" font-family="monospace">{c["c_val"]:.1f}</text>',
+            f'<text x="{c["x"]:.1f}" y="{height - 18}" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="monospace">{c["label"]}</text>',
+            f'<text x="{width / 2}" y="{height - 4}" fill="#64748b" font-size="9" text-anchor="middle">資料累積中</text>',
+        ])
+        line_comp_svg = ""
+        line_struct_svg = ""
+    else:
+        points_svg = "\n".join(circles_struct + circles_comp + x_labels + value_labels)
+        line_comp_svg = f'<polyline points="{comp_poly}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />' if n > 1 else ""
+        line_struct_svg = f'<polyline points="{struct_poly}" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.8" stroke-dasharray="4,4" stroke-linecap="round" />' if n > 1 else ""
 
     return f"""
     <svg viewBox="0 0 {width} {height}" class="trend-svg" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">
@@ -646,6 +710,7 @@ def render_trend_svg(points: List[Dict[str, Any]], width: int = 760, height: int
       {line_struct_svg}
       {line_comp_svg}
       {points_svg}
+      {y_axis_note}
     </svg>
     """
 
@@ -898,6 +963,7 @@ def render_protests_card_html(protests_data: Optional[Dict[str, Any]]) -> str:
             c_ev = c.get("evidence", "unverified")
             lvl_info = level_meta.get(c_lvl, level_meta["active"])
             ev_info = evidence_meta.get(c_ev, evidence_meta["unverified"])
+            c_note = c.get("note", "")
             tooltip = f"{c_name}（{reg_name}）｜活動強度：{lvl_info['zh']}｜證據級別：{ev_info['zh']} ({c_ev})"
             chips_html.append(f"""
               <button type="button"
@@ -908,6 +974,7 @@ def render_protests_card_html(protests_data: Optional[Dict[str, Any]]) -> str:
                 data-level-zh="{lvl_info['zh']}"
                 data-evidence="{c_ev}"
                 data-evidence-zh="{ev_info['zh']}"
+                data-note="{c_note.replace('"', '"')}"
                 title="{tooltip}"
                 onclick="selectProtestCountry(this)"
                 onmouseenter="selectProtestCountry(this)">
@@ -4827,9 +4894,14 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       const lvlZh = el.getAttribute('data-level-zh') || '';
       const ev = el.getAttribute('data-evidence') || '';
       const evZh = el.getAttribute('data-evidence-zh') || '';
+      const note = el.getAttribute('data-note') || '';
       const txtEl = document.getElementById('protest-inspector-text');
       if (txtEl) {
-        txtEl.textContent = `${name}（${region}）｜活動強度級別：${lvlZh}｜證據核實級別：${evZh} (${ev})`;
+        let msg = `${name}（${region}）｜活動強度級別：${lvlZh}｜證據核實級別：${evZh} (${ev})`;
+        if (note) {
+          msg += `｜備註：${note}`;
+        }
+        txtEl.textContent = msg;
       }
     };
 
