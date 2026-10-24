@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-24T03:26:59Z",
+  "generated_at": "2026-10-24T04:26:38Z",
   "source": "World Bank Open Data API v2 (api.worldbank.org)",
   "disclaimer": "Candidate values generated for expert review. Not applied to baseline without manual rubric calibration.",
   "series_count": 5,
@@ -38,13 +38,13 @@
       "target_indicator_id": "l3_youth_unemployment",
       "target_indicator_name": "青年失業率與社會挫折階層規模",
       "applicability_rationale": "15-24歲青年失業率直接對應社會動員挫折感與衝突激化潛在群體規模。",
-      "candidate_year": null,
-      "candidate_raw_value": null,
+      "candidate_year": "2025",
+      "candidate_raw_value": 13.4088192694713,
       "current_model_raw_value": 20.4,
       "current_model_score": 68.0,
       "current_evidence_level": "verified",
-      "fetch_status": "fetch_failed_or_empty",
-      "diff_analysis": "No remote value retrieved; baseline unchanged."
+      "fetch_status": "success",
+      "diff_analysis": "Candidate WB value: 13.4088192694713 (2025) vs. current baseline: 20.4 (score: 68.0)"
     },
     {
       "wb_code": "EG.USE.COMM.FO.ZS",
