@@ -987,7 +987,7 @@ def render_protests_card_html(protests_data: Optional[Dict[str, Any]]) -> str:
                 data-evidence-zh="{ev_info['zh']}"
                 data-note="{c_note.replace('"', '"')}"
                 title="{tooltip}"
-                onclick="selectProtestCountry(this)"
+                onclick="selectProtestCountry(this, true)"
                 onmouseenter="selectProtestCountry(this)">
                 <span class="protest-chip-dot"></span>
                 <span class="protest-chip-name">{c_name}</span>
@@ -3779,10 +3779,15 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       background: rgba(15, 23, 42, 0.9);
       border: 1px solid var(--border-bright);
     }
-    .protest-country-chip:hover,
-    .protest-country-chip.active-chip {
+    .protest-country-chip:hover {
       transform: translateY(-1px);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+    }
+    .protest-country-chip.active-chip {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45), 0 0 0 2px var(--accent-cyan);
+      border-color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.15);
     }
     .protest-lvl-severe {
       border-color: rgba(239, 68, 68, 0.7);
@@ -4483,7 +4488,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
     }
 
     // Global Protest Activity Monitor interactive country inspector & graceful fallback
-    window.selectProtestCountry = function(el) {
+    window.selectProtestCountry = function(el, scrollIntoView) {
       if (!el) return;
       document.querySelectorAll('.protest-country-chip').forEach(c => c.classList.remove('active-chip'));
       el.classList.add('active-chip');
@@ -4538,6 +4543,13 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
             sourcesDiv.appendChild(a);
           });
           detailEl.appendChild(sourcesDiv);
+        }
+      }
+      // Scroll inspector into view on click (not hover)
+      if (scrollIntoView) {
+        const inspector = document.getElementById('protest-country-inspector');
+        if (inspector) {
+          inspector.scrollIntoView({behavior: 'smooth', block: 'center'});
         }
       }
     };
