@@ -209,6 +209,104 @@ def test_protests_verified_countries_sources_count():
         assert len(sources) >= 2, f"{c['name_zh']}: verified but only {len(sources)} sources"
 
 
+def test_dashboard_protests_modal_container_exists(tmp_path):
+    """Verify modal container HTML exists with id, close button, and required structure."""
+    out_html = tmp_path / "dashboard.html"
+
+    build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        ui_step=5,
+    )
+
+    content = out_html.read_text(encoding="utf-8")
+
+    # Modal container
+    assert 'id="protest-country-modal"' in content, "Missing protest-country-modal container"
+    assert 'class="protest-country-modal"' in content, "Missing protest-country-modal class"
+    assert 'role="dialog"' in content, "Missing role=dialog on modal"
+    assert 'aria-modal="true"' in content, "Missing aria-modal on modal"
+    assert 'aria-labelledby="protest-modal-title"' in content, "Missing aria-labelledby on modal"
+
+    # Backdrop
+    assert 'class="protest-modal-backdrop"' in content, "Missing protest-modal-backdrop"
+
+    # Modal card
+    assert 'class="protest-modal-card"' in content, "Missing protest-modal-card"
+
+    # Close button
+    assert 'class="protest-modal-close"' in content, "Missing protest-modal-close button"
+    assert 'aria-label="關閉"' in content, "Missing aria-label on close button"
+    assert "&times;" in content, "Missing close button × character"
+
+    # Content elements
+    assert 'id="protest-modal-title"' in content, "Missing protest-modal-title"
+    assert 'id="protest-modal-region"' in content, "Missing protest-modal-region"
+    assert 'id="protest-modal-level"' in content, "Missing protest-modal-level"
+    assert 'id="protest-modal-evidence"' in content, "Missing protest-modal-evidence"
+    assert 'id="protest-modal-note"' in content, "Missing protest-modal-note"
+    assert 'id="protest-modal-summary"' in content, "Missing protest-modal-summary"
+    assert 'id="protest-modal-sources"' in content, "Missing protest-modal-sources"
+
+
+def test_dashboard_chip_onclick_calls_modal_function(tmp_path):
+    """Verify chip onclick calls openProtestCountryModal, not selectProtestCountry with scroll flag."""
+    out_html = tmp_path / "dashboard.html"
+
+    build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        ui_step=5,
+    )
+
+    content = out_html.read_text(encoding="utf-8")
+
+    # Chip onclick should call openProtestCountryModal
+    assert 'onclick="openProtestCountryModal(this)"' in content, "Chip onclick should call openProtestCountryModal"
+
+    # onmouseenter should still call selectProtestCountry (hover updates inspector)
+    assert 'onmouseenter="selectProtestCountry(this)"' in content, "Chip onmouseenter should call selectProtestCountry"
+
+    # selectProtestCountry should NOT be called with scrollIntoView=true from onclick
+    # The old pattern was onclick="selectProtestCountry(this, true)" - this should be gone
+    assert 'onclick="selectProtestCountry(this, true)"' not in content, "Old onclick with scrollIntoView should be removed"
+
+
+def test_dashboard_js_modal_functions_and_handlers(tmp_path):
+    """Verify JS contains openProtestCountryModal, close handler, ESC handler, backdrop handler."""
+    out_html = tmp_path / "dashboard.html"
+
+    build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        ui_step=5,
+    )
+
+    content = out_html.read_text(encoding="utf-8")
+    script_blocks = extract_script_blocks(content)
+    all_js = "\n".join(script_blocks)
+
+    # openProtestCountryModal function must exist
+    assert "openProtestCountryModal" in all_js, "JS missing openProtestCountryModal function"
+
+    # closeProtestCountryModal function must exist
+    assert "closeProtestCountryModal" in all_js, "JS missing closeProtestCountryModal function"
+
+    # ESC key handler
+    assert "key === 'Escape'" in all_js or 'key === "Escape"' in all_js, "JS missing Escape key handler"
+
+    # Backdrop click handler
+    assert "protest-modal-backdrop" in all_js, "JS missing backdrop click handler"
+
+    # Body overflow lock/restore
+    assert "body.style.overflow" in all_js, "JS missing body overflow lock/restore"
+
+    # selectProtestCountry should NOT have scrollIntoView parameter anymore
+    # The function signature should be simplified to just (el)
+    assert "function(el, scrollIntoView)" not in all_js, "selectProtestCountry should not have scrollIntoView parameter"
+    assert "scrollIntoView" not in all_js, "JS should not contain scrollIntoView call"
+
+
 if __name__ == "__main__":
     import pytest
     pytest.main([__file__, "-v"])

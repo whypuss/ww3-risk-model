@@ -987,7 +987,7 @@ def render_protests_card_html(protests_data: Optional[Dict[str, Any]]) -> str:
                 data-evidence-zh="{ev_info['zh']}"
                 data-note="{c_note.replace('"', '"')}"
                 title="{tooltip}"
-                onclick="selectProtestCountry(this, true)"
+                onclick="openProtestCountryModal(this)"
                 onmouseenter="selectProtestCountry(this)">
                 <span class="protest-chip-dot"></span>
                 <span class="protest-chip-name">{c_name}</span>
@@ -1198,6 +1198,27 @@ def render_protests_card_html(protests_data: Optional[Dict[str, Any]]) -> str:
             <span id="protest-inspector-text">將游標移至或點擊上方任一國家，即可檢視該國之抗議強度、事件簡述與來源連結（預設：法國 · 歐洲 · 嚴重衝突 · 多源核實）。</span>
             <div id="protest-inspector-detail">
               {france_detail_html}
+            </div>
+          </div>
+
+          <!-- Country Detail Modal (Popup) -->
+          <div id="protest-country-modal" class="protest-country-modal" role="dialog" aria-modal="true" aria-labelledby="protest-modal-title" style="display:none;">
+            <div class="protest-modal-backdrop" tabindex="-1"></div>
+            <div class="protest-modal-card">
+              <button type="button" class="protest-modal-close" aria-label="關閉">&times;</button>
+              <div class="protest-modal-content">
+                <div class="protest-modal-header">
+                  <span id="protest-modal-title" class="protest-modal-title"></span>
+                  <span id="protest-modal-region" class="protest-modal-region"></span>
+                </div>
+                <div class="protest-modal-badges">
+                  <span id="protest-modal-level" class="protest-modal-level-badge"></span>
+                  <span id="protest-modal-evidence" class="protest-modal-evidence-badge"></span>
+                </div>
+                <div id="protest-modal-note" class="protest-modal-note" style="display:none;"></div>
+                <div id="protest-modal-summary" class="protest-modal-summary"></div>
+                <div id="protest-modal-sources" class="protest-modal-sources" style="display:none;"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -4087,6 +4108,198 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       border-radius: 50%;
       display: inline-block;
     }
+    /* Protest Country Detail Modal */
+    .protest-country-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .protest-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(2px);
+    }
+    .protest-modal-card {
+      position: relative;
+      width: 100%;
+      max-width: min(92vw, 560px);
+      max-height: 80vh;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(6, 182, 212, 0.2);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .protest-modal-close {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      color: var(--text-main);
+      font-size: 1.4rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+    .protest-modal-close:hover {
+      background: rgba(239, 68, 68, 0.2);
+      transform: scale(1.1);
+    }
+    .protest-modal-close:focus {
+      outline: 2px solid var(--accent-cyan);
+      outline-offset: 2px;
+    }
+    .protest-modal-content {
+      padding: 16px 20px 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .protest-modal-header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .protest-modal-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+    }
+    .protest-modal-region {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .protest-modal-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .protest-modal-level-badge,
+    .protest-modal-evidence-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+    .protest-modal-level-badge {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+    .protest-modal-level-badge.large {
+      background: rgba(249, 115, 22, 0.15);
+      border-color: rgba(249, 115, 22, 0.4);
+      color: #fdba74;
+    }
+    .protest-modal-level-badge.active {
+      background: rgba(234, 179, 8, 0.15);
+      border-color: rgba(234, 179, 8, 0.4);
+      color: #fef08a;
+    }
+    .protest-modal-evidence-badge {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--color-green);
+      color: #6ee7b7;
+    }
+    .protest-modal-evidence-badge.single {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--accent-blue);
+      color: #7dd3fc;
+    }
+    .protest-modal-evidence-badge.unverified {
+      background: rgba(148, 163, 184, 0.2);
+      border-color: #64748b;
+      color: #cbd5e1;
+    }
+    .protest-modal-note {
+      font-size: 0.76rem;
+      color: #fde047;
+      background: rgba(234, 179, 8, 0.1);
+      border: 1px solid rgba(234, 179, 8, 0.3);
+      border-radius: 4px;
+      padding: 8px 10px;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .protest-modal-summary {
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+    .protest-modal-sources {
+      padding-top: 10px;
+      border-top: 1px solid var(--border-color);
+    }
+    .protest-modal-source-label {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-right: 8px;
+      text-transform: uppercase;
+    }
+    .protest-modal-sources-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .protest-modal-sources-list a {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      border-radius: 4px;
+      color: #67e8f9;
+      text-decoration: none;
+      font-size: 0.74rem;
+      font-weight: 500;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .protest-modal-sources-list a:hover {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: var(--accent-cyan);
+      color: #38bdf8;
+    }
+    @media (max-width: 480px) {
+      .protest-modal-card {
+        max-height: 85vh;
+        border-radius: 8px;
+      }
+      .protest-modal-content {
+        padding: 14px 16px 18px;
+      }
+      .protest-modal-title {
+        font-size: 1.1rem;
+      }
+    }
     @media (max-width: 1024px) {
       .protest-kpi-grid { grid-template-columns: 1fr; }
       .protest-main-split { grid-template-columns: 1fr; }
@@ -4488,7 +4701,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
     }
 
     // Global Protest Activity Monitor interactive country inspector & graceful fallback
-    window.selectProtestCountry = function(el, scrollIntoView) {
+    window.selectProtestCountry = function(el) {
       if (!el) return;
       document.querySelectorAll('.protest-country-chip').forEach(c => c.classList.remove('active-chip'));
       el.classList.add('active-chip');
@@ -4545,14 +4758,125 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
           detailEl.appendChild(sourcesDiv);
         }
       }
-      // Scroll inspector into view on click (not hover)
-      if (scrollIntoView) {
-        const inspector = document.getElementById('protest-country-inspector');
-        if (inspector) {
-          inspector.scrollIntoView({behavior: 'smooth', block: 'center'});
+    };
+
+    // Protest Country Detail Modal
+    window.openProtestCountryModal = function(el) {
+      if (!el) return;
+      const name = el.getAttribute('data-country') || '';
+      const region = el.getAttribute('data-region') || '';
+      const lvl = el.getAttribute('data-level') || '';
+      const lvlZh = el.getAttribute('data-level-zh') || '';
+      const ev = el.getAttribute('data-evidence') || '';
+      const evZh = el.getAttribute('data-evidence-zh') || '';
+      const note = el.getAttribute('data-note') || '';
+
+      const protestsData = window.WW3_MODEL_DATA && window.WW3_MODEL_DATA.protests;
+      if (!protestsData || !Array.isArray(protestsData.countries)) {
+        return;
+      }
+      const country = protestsData.countries.find(c => c.name_zh === name);
+      if (!country) {
+        return;
+      }
+
+      const modal = document.getElementById('protest-country-modal');
+      const titleEl = document.getElementById('protest-modal-title');
+      const regionEl = document.getElementById('protest-modal-region');
+      const levelEl = document.getElementById('protest-modal-level');
+      const evidenceEl = document.getElementById('protest-modal-evidence');
+      const noteEl = document.getElementById('protest-modal-note');
+      const summaryEl = document.getElementById('protest-modal-summary');
+      const sourcesEl = document.getElementById('protest-modal-sources');
+
+      if (!modal || !titleEl || !regionEl || !levelEl || !evidenceEl || !noteEl || !summaryEl || !sourcesEl) {
+        return;
+      }
+
+      // Fill content
+      titleEl.textContent = name;
+      regionEl.textContent = region;
+
+      levelEl.textContent = lvlZh;
+      levelEl.className = 'protest-modal-level-badge ' + lvl;
+
+      evidenceEl.textContent = evZh + ' (' + ev + ')';
+      evidenceEl.className = 'protest-modal-evidence-badge ' + ev;
+
+      if (note) {
+        noteEl.textContent = '備註：' + note;
+        noteEl.style.display = 'block';
+      } else {
+        noteEl.textContent = '';
+        noteEl.style.display = 'none';
+      }
+
+      if (country.summary) {
+        summaryEl.textContent = country.summary;
+      } else {
+        summaryEl.textContent = '';
+      }
+
+      // Sources
+      const sources = country.sources;
+      if (Array.isArray(sources) && sources.length > 0) {
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'protest-modal-source-label';
+        labelSpan.textContent = '來源：';
+        const listDiv = document.createElement('div');
+        listDiv.className = 'protest-modal-sources-list';
+        sources.forEach(src => {
+          const a = document.createElement('a');
+          a.href = src.url;
+          a.textContent = src.name;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          listDiv.appendChild(a);
+        });
+        sourcesEl.innerHTML = '';
+        sourcesEl.appendChild(labelSpan);
+        sourcesEl.appendChild(listDiv);
+        sourcesEl.style.display = 'block';
+      } else {
+        sourcesEl.innerHTML = '';
+        sourcesEl.style.display = 'none';
+      }
+
+      // Show modal
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+
+      // Focus close button for accessibility
+      const closeBtn = modal.querySelector('.protest-modal-close');
+      if (closeBtn) closeBtn.focus();
+    };
+
+    function closeProtestCountryModal() {
+      const modal = document.getElementById('protest-country-modal');
+      if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    }
+
+    // ESC key and backdrop click to close
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('protest-country-modal');
+        if (modal && modal.style.display === 'flex') {
+          closeProtestCountryModal();
         }
       }
-    };
+    });
+
+    document.addEventListener('click', function(e) {
+      const modal = document.getElementById('protest-country-modal');
+      if (modal && modal.style.display === 'flex') {
+        if (e.target.classList.contains('protest-modal-backdrop') || e.target.classList.contains('protest-modal-close')) {
+          closeProtestCountryModal();
+        }
+      }
+    });
 
     (function initProtestsMonitor() {
       const sec = document.getElementById('protests-monitor-section');
