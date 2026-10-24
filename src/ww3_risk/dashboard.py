@@ -13,6 +13,7 @@ import html
 import json
 import math
 import shutil
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -469,6 +470,15 @@ def generate_dashboard_data(
     # 10-21 → composite 83.07 (last snapshot 13:44:41Z, pulse 0.0)
     # 10-22 → composite 87.0 (last snapshot 23:26:36Z, pulse +3.5)
     # 10-23 → composite 87.1 (last snapshot 08:26:31Z, pulse +3.6)
+    # Determine today's trend point date from pulse_latest.json computed_at (UTC date)
+    today_trend_date = (
+        pulse_data.get("computed_at", "")[:10]
+        if pulse_data and pulse_data.get("computed_at")
+        else datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    )
+    today_computed_at = (
+        pulse_data.get("computed_at", "2026-10-23T08:26:31Z") if pulse_data else "2026-10-23T08:26:31Z"
+    )
     initial_trend_points = [
         {
             "date": "2026-10-21",
@@ -487,8 +497,8 @@ def generate_dashboard_data(
             "stage": 3,
         },
         {
-            "date": "2026-10-23",
-            "computed_at": pulse_data.get("computed_at", "2026-10-23T08:26:31Z") if pulse_data else "2026-10-23T08:26:31Z",
+            "date": today_trend_date,
+            "computed_at": today_computed_at,
             "composite_index": composite_index,
             "structural_index": structural_index,
             "pulse_adjustment": pulse_adj,
@@ -511,7 +521,7 @@ def generate_dashboard_data(
             "title": "WW3 戰爭風險指數儀表板",
             "title_en": "WW3 War Risk Index Dashboard",
             "model_version": __version__,
-            "generated_at": "2026-10-23",
+            "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
             "active_scenario_id": main_scenario.id,
             "active_scenario_title": main_scenario.title,
             "active_scenario_year": main_scenario.year,
