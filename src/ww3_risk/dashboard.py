@@ -4480,12 +4480,26 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       const plotW = width - padLeft - padRight;
       const plotH = height - padTop - padBottom;
 
+      const n = points.length;
+      const cVals = points.map(pt => Number(pt.composite_index !== undefined ? pt.composite_index : pt.total_index));
+      const sVals = points.map(pt => Number(pt.structural_index !== undefined ? pt.structural_index : pt.total_index));
+      const allVals = cVals.concat(sVals);
+      const dataMin = Math.min(...allVals);
+      const dataMax = Math.max(...allVals);
+
+      let yMin = Math.max(0, Math.floor(dataMin - 3));
+      let yMax = Math.min(100, Math.ceil(dataMax + 3));
+      if (yMax - yMin < 10) {
+        const center = (yMin + yMax) / 2.0;
+        yMin = Math.max(0, center - 5);
+        yMax = Math.min(100, center + 5);
+      }
+
       const yCoord = (val) => {
-        const clamped = Math.max(0, Math.min(100, val));
-        return padTop + (1.0 - clamped / 100.0) * plotH;
+        const clamped = Math.max(yMin, Math.min(yMax, val));
+        return padTop + (1.0 - (clamped - yMin) / (yMax - yMin)) * plotH;
       };
 
-      const n = points.length;
       const coords = points.map((pt, i) => {
         const x = n > 1 ? padLeft + i * (plotW / (n - 1)) : padLeft + plotW / 2;
         const cVal = Number(pt.composite_index !== undefined ? pt.composite_index : pt.total_index);
@@ -4499,11 +4513,13 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
 
       let svgHtml = `<svg viewBox="0 0 ${width} ${height}" class="trend-svg" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">`;
 
-      [25, 50, 75, 85, 100].forEach(yVal => {
-        const yPos = yCoord(yVal);
+      const numTicks = 5;
+      for (let i = 0; i < numTicks; i++) {
+        const tickVal = yMin + (yMax - yMin) * i / (numTicks - 1);
+        const yPos = yCoord(tickVal);
         svgHtml += `<line x1="${padLeft}" y1="${yPos.toFixed(1)}" x2="${width - padRight}" y2="${yPos.toFixed(1)}" stroke="rgba(255,255,255,0.07)" stroke-width="1" />`;
-        svgHtml += `<text x="${padLeft - 8}" y="${(yPos + 3).toFixed(1)}" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">${yVal}</text>`;
-      });
+        svgHtml += `<text x="${padLeft - 8}" y="${(yPos + 3).toFixed(1)}" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">${tickVal.toFixed(1)}</text>`;
+      }
 
       if (n > 1) {
         svgHtml += `<polyline points="${structPoly}" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.8" stroke-dasharray="4,4" stroke-linecap="round" />`;
@@ -4515,8 +4531,11 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
         const hover = `${c.label}${nDaysStr} | 綜合: ${c.cVal.toFixed(2)} | 結構: ${c.sVal.toFixed(2)}`;
         svgHtml += `<circle cx="${c.x.toFixed(1)}" cy="${c.ys.toFixed(1)}" r="3" fill="rgba(255,255,255,0.6)"><title>${hover}</title></circle>`;
         svgHtml += `<circle cx="${c.x.toFixed(1)}" cy="${c.yc.toFixed(1)}" r="4.5" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5"><title>${hover}</title></circle>`;
+        svgHtml += `<text x="${c.x.toFixed(1)}" y="${c.yc.toFixed(1) - 8}" fill="#f59e0b" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">${c.cVal.toFixed(1)}</text>`;
         svgHtml += `<text x="${c.x.toFixed(1)}" y="${height - 12}" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="monospace">${c.label}</text>`;
       });
+
+      svgHtml += `<text x="${width / 2}" y="${height - 4}" fill="#64748b" font-size="8" text-anchor="middle">Y 軸按數據範圍動態縮放（非 0–100）</text>`;
 
       svgHtml += `</svg>`;
       container.innerHTML = svgHtml;

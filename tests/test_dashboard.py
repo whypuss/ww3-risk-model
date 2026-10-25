@@ -942,6 +942,194 @@ def test_render_trend_svg_dynamic_y_axis_and_value_labels():
     assert "polyline" not in svg_monthly or "points=" not in svg_monthly
 
 
+def test_render_dynamic_trend_svg_js_dynamic_y_axis(tmp_path):
+    """Verify JS renderDynamicTrendSvg uses dynamic Y-axis (not fixed 0-100), value labels, and visible fluctuation.
+
+    Extraction: pull renderDynamicTrendSvg from generated HTML script blocks,
+    execute in Node with a stub document.getElementById returning a mock container
+    with innerHTML setter/getter. Feed sample points with span ~4 (83.07, 87.0, 87.1, 83.7).
+    Assert: (a) Y tick labels max - min <= 20 (not 0-100); (b) two composite points
+    differing by >=3 have y pixel distance >= 15% of plot height; (c) composite
+    value label text present in output SVG.
+    """
+    import json
+    import re
+    import shutil
+    import subprocess
+    import tempfile
+    from pathlib import Path
+
+    # Build dashboard to get the JS
+    out_html = tmp_path / "dashboard.html"
+    build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        output_json_path=tmp_path / "dashboard_data.json",
+        ui_step=5,
+    )
+    content = out_html.read_text(encoding="utf-8")
+
+    # Extract script blocks (excluding JSON data block)
+    script_blocks = re.findall(
+        r'<script(?![^>]*type="application/json")[^>]*>(.*?)</script>',
+        content,
+        re.DOTALL | re.IGNORECASE,
+    )
+    all_js = "\n".join([s.strip() for s in script_blocks if s.strip()])
+
+    # Find renderDynamicTrendSvg function using brace matching
+    fn_name = "renderDynamicTrendSvg"
+    start_idx = all_js.find(f"function {fn_name}")
+    if start_idx == -1:
+        start_idx = all_js.find(f"const {fn_name} =")
+    if start_idx == -1:
+        start_idx = all_js.find(f"{fn_name} = function")
+    assert start_idx != -1, "renderDynamicTrendSvg function not found in JS"
+
+    # Find the opening brace of the function
+    brace_idx = all_js.find("{", start_idx)
+    assert brace_idx != -1, "Function opening brace not found"
+
+    # Match braces to extract full function
+    depth = 0
+    end_idx = -1
+    for i in range(brace_idx, len(all_js)):
+        if all_js[i] == "{":
+            depth += 1
+        elif all_js[i] == "}":
+            depth -= 1
+            if depth == 0:
+                end_idx = i
+                break
+    assert end_idx != -1, "Could not find matching closing brace for renderDynamicTrendSvg"
+
+    fn_source = all_js[start_idx:end_idx + 1]
+
+    # Node must be available
+    node_path = shutil.which("node")
+    if not node_path:
+        import pytest
+        pytest.skip("node not available in PATH, skipping JS dynamic Y-axis test")
+
+    # Sample points with span ~4 (similar to issue: 83-87 range)
+    sample_points = json.dumps([
+        {"date": "2026-10-21", "composite_index": 83.07, "structural_index": 83.07},
+        {"date": "2026-10-22", "composite_index": 87.0, "structural_index": 83.5},
+        {"date": "2026-10-23", "composite_index": 87.1, "structural_index": 83.5},
+        {"date": "2026-10-24", "composite_index": 83.7, "structural_index": 83.0},
+    ])
+
+    # Node test script: stub document.getElementById, call function, parse SVG output
+    test_script = f"""
+{fn_source}
+
+// Stub document.getElementById
+const mockContainer = {{
+  innerHTML: '',
+  set innerHTML(val) {{ this._innerHTML = val; }},
+  get innerHTML() {{ return this._innerHTML; }}
+}};
+global.document = {{
+  getElementById: (id) => id === 'trend-chart-container' ? mockContainer : null
+}};
+
+// Call the function with sample points
+const points = {sample_points};
+renderDynamicTrendSvg(points, 'daily');
+
+// Get the generated SVG
+const svg = mockContainer.innerHTML;
+if (!svg) {{
+  console.error('No SVG generated');
+  process.exit(1);
+}}
+
+// Parse Y-axis tick labels from SVG text elements (before the note text)
+const tickRegex = /<text x="[^"]*" y="[^"]*" fill="#64748b" font-size="9" text-anchor="end" font-family="monospace">([\\d.]+)<\\/text>/g;
+const ticks = [];
+let match;
+while ((match = tickRegex.exec(svg)) !== null) {{
+  ticks.push(parseFloat(match[1]));
+}}
+if (ticks.length < 2) {{
+  console.error('Less than 2 Y ticks found:', ticks);
+  process.exit(1);
+}}
+const yMin = Math.min(...ticks);
+const yMax = Math.max(...ticks);
+const ySpan = yMax - yMin;
+
+// Assertion (a): Y tick span <= 20 (not 0-100)
+if (ySpan > 20) {{
+  console.error(`Y tick span ${{ySpan}} > 20 (ticks: ${{ticks.join(',')}})`);
+  process.exit(1);
+}}
+
+// Parse composite point y coordinates and value labels
+// Circle: <circle cx="X" cy="Y" ...>
+// Value label: <text x="X" y="Y" ...>VALUE</text>
+const circleRegex = /<circle cx="([\\d.]+)" cy="([\\d.]+)" r="4\\.5" fill="#f59e0b"/g;
+const labelRegex = /<text x="[\\d.]+" y="[\\d.]+" fill="#f59e0b" font-size="9" font-weight="600" text-anchor="middle" font-family="monospace">([\\d.]+)<\\/text>/g;
+
+const circles = [];
+while ((match = circleRegex.exec(svg)) !== null) {{
+  circles.push({{ cx: parseFloat(match[1]), cy: parseFloat(match[2]) }});
+}}
+const labels = [];
+while ((match = labelRegex.exec(svg)) !== null) {{
+  labels.push(parseFloat(match[1]));
+}}
+
+// Assertion (c): composite value labels present
+if (labels.length === 0) {{
+  console.error('No composite value labels found in SVG');
+  process.exit(1);
+}}
+
+// Assertion (b): two composite points differing by >=3 have y pixel distance >= 15% of plot height
+// Plot height = 180 - 25 - 35 = 120, 15% = 18px
+const plotHeight = 120;
+const minPixelDist = plotHeight * 0.15;
+let found = false;
+for (let i = 0; i < circles.length; i++) {{
+  for (let j = i + 1; j < circles.length; j++) {{
+    const valDiff = Math.abs(labels[i] - labels[j]);
+    const pixelDist = Math.abs(circles[i].cy - circles[j].cy);
+    if (valDiff >= 3 && pixelDist >= minPixelDist) {{
+      found = true;
+      break;
+    }}
+  }}
+  if (found) break;
+}}
+if (!found) {{
+  console.error(`No pair with value diff >=3 has pixel distance >= ${{minPixelDist}}px`);
+  console.error('Circles:', JSON.stringify(circles));
+  console.error('Labels:', JSON.stringify(labels));
+  process.exit(1);
+}}
+
+console.log('PASS: ySpan=' + ySpan.toFixed(2) + ', labels=' + labels.join(',') + ', circles=' + circles.map(c=>c.cy.toFixed(1)).join(','));
+"""
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".js", delete=False) as f:
+        f.write(test_script)
+        temp_js = f.name
+
+    try:
+        result = subprocess.run(
+            [node_path, temp_js],
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        assert result.returncode == 0, f"JS dynamic Y-axis test failed:\n{result.stderr}\n{result.stdout}"
+        # Verify the PASS message
+        assert "PASS" in result.stdout
+    finally:
+        Path(temp_js).unlink(missing_ok=True)
+
+
 
 
 
