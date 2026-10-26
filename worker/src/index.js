@@ -666,6 +666,15 @@ async function handleFeedsPolymarket(db) {
   return jsonResponse({ markets, error: null, fallback: false });
 }
 
+function shouldFetchOpenSky(row, now) {
+  if (!row) return true;
+  if (row.status !== "ok") return true;
+  if (!row.fetched_at) return true;
+  const fetchedAt = new Date(row.fetched_at);
+  const ageMinutes = (now - fetchedAt) / 60000;
+  return ageMinutes > 50;
+}
+
 async function scheduledHandler(event, env, ctx) {
   const db = env.DB;
   if (!db) return;
@@ -677,7 +686,6 @@ async function scheduledHandler(event, env, ctx) {
     .run();
 
   const now = new Date();
-  const minute = now.getUTCMinutes();
 
   // Every tick: GDELT + Hormuz
   try {
@@ -694,8 +702,13 @@ async function scheduledHandler(event, env, ctx) {
     await upsertFeedSnapshot(db, "hormuz", "error", null, e.message);
   }
 
-  // Hourly (minute == 0): OpenSky
-  if (minute === 0) {
+  // OpenSky: freshness gate instead of minute === 0
+  const openskyRow = await db
+    .prepare("SELECT feed_id, fetched_at, status FROM live_feed_snapshots WHERE feed_id = ?")
+    .bind("opensky")
+    .first();
+
+  if (shouldFetchOpenSky(openskyRow, now)) {
     try {
       const openskyData = await fetchOpenSky();
       await upsertFeedSnapshot(db, "opensky", "ok", openskyData);
@@ -786,4 +799,7 @@ export default {
   async scheduled(event, env, ctx) {
     await scheduledHandler(event, env, ctx);
   },
+
+  // Exported for unit testing
+  shouldFetchOpenSky,
 };

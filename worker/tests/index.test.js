@@ -655,3 +655,44 @@ describe("WW3 Risk Model Worker API", () => {
     assert.ok(data.error && data.error.includes("Gamma API unavailable"));
   });
 });
+
+describe("shouldFetchOpenSky freshness gate", () => {
+  const FIXED_NOW = new Date("2026-10-26T11:00:00Z");
+
+  it("returns true when row is null (never fetched)", () => {
+    assert.equal(worker.shouldFetchOpenSky(null, FIXED_NOW), true);
+  });
+
+  it("returns true when row status is not ok", () => {
+    const row = { feed_id: "opensky", fetched_at: "2026-10-26T10:00:00Z", status: "error" };
+    assert.equal(worker.shouldFetchOpenSky(row, FIXED_NOW), true);
+  });
+
+  it("returns true when row status is stale (429)", () => {
+    const row = { feed_id: "opensky", fetched_at: "2026-10-26T10:00:00Z", status: "stale" };
+    assert.equal(worker.shouldFetchOpenSky(row, FIXED_NOW), true);
+  });
+
+  it("returns true when fetched_at is missing", () => {
+    const row = { feed_id: "opensky", fetched_at: null, status: "ok" };
+    assert.equal(worker.shouldFetchOpenSky(row, FIXED_NOW), true);
+  });
+
+  it("returns true when age exceeds 50 minutes", () => {
+    // 51 minutes old
+    const row = { feed_id: "opensky", fetched_at: "2026-10-26T10:09:00Z", status: "ok" };
+    assert.equal(worker.shouldFetchOpenSky(row, FIXED_NOW), true);
+  });
+
+  it("returns false when row is fresh ok (age < 50 minutes)", () => {
+    // 30 minutes old
+    const row = { feed_id: "opensky", fetched_at: "2026-10-26T10:30:00Z", status: "ok" };
+    assert.equal(worker.shouldFetchOpenSky(row, FIXED_NOW), false);
+  });
+
+  it("returns false when row is fresh ok (age exactly 50 minutes)", () => {
+    // Exactly 50 minutes old - should NOT fetch (gate is > 50, not >= 50)
+    const row = { feed_id: "opensky", fetched_at: "2026-10-26T10:10:00Z", status: "ok" };
+    assert.equal(worker.shouldFetchOpenSky(row, FIXED_NOW), false);
+  });
+});
