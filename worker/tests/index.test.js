@@ -696,3 +696,104 @@ describe("shouldFetchOpenSky freshness gate", () => {
     assert.equal(worker.shouldFetchOpenSky(row, FIXED_NOW), false);
   });
 });
+
+describe("fetchOpenSky", () => {
+  it("throws when all boxes fail with detailed error message", async () => {
+    const originalFetch = global.fetch;
+    let callCount = 0;
+    global.fetch = async (url) => {
+      callCount++;
+      return {
+        ok: false,
+        status: 522,
+        json: async () => ({}),
+      };
+    };
+
+    try {
+      await worker.fetchOpenSky();
+      assert.fail("Expected fetchOpenSky to throw");
+    } catch (e) {
+      assert.ok(e.message.includes("OpenSky all boxes failed:"));
+      assert.ok(e.message.includes("baltic"));
+      assert.ok(e.message.includes("black_sea"));
+      assert.ok(e.message.includes("persian_gulf"));
+      assert.ok(e.message.includes("taiwan_strait"));
+      assert.ok(e.message.includes("HTTP 522"));
+    }
+    assert.equal(callCount, 4);
+    global.fetch = originalFetch;
+  });
+
+  it("returns ok with error details when some boxes succeed", async () => {
+    const originalFetch = global.fetch;
+    let callCount = 0;
+    global.fetch = async (url) => {
+      callCount++;
+      // baltic: lamin=53, lamax=60, lomin=10, lomax=30
+      if (url.includes("lamin=53") && url.includes("lamax=60")) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ states: [[null, null, null, null, null, 10.0, 20.0]] }),
+        };
+      }
+      // black_sea: lamin=41, lamax=47, lomin=28, lomax=42
+      if (url.includes("lamin=41") && url.includes("lamax=47")) {
+        return {
+          ok: false,
+          status: 522,
+          json: async () => ({}),
+        };
+      }
+      // persian_gulf: lamin=24, lamax=30, lomin=48, lomax=57
+      if (url.includes("lamin=24") && url.includes("lamax=30")) {
+        return {
+          ok: false,
+          status: 503,
+          json: async () => ({}),
+        };
+      }
+      // taiwan_strait: lamin=22, lamax=27, lomin=117, lomax=121
+      if (url.includes("lamin=22") && url.includes("lamax=27")) {
+        return {
+          ok: false,
+          status: 504,
+          json: async () => ({}),
+        };
+      }
+      return { ok: false, status: 404 };
+    };
+
+    const result = await worker.fetchOpenSky();
+    assert.ok(result);
+    assert.equal(result.total_visible, 1);
+    assert.ok(result.boxes.baltic);
+    assert.equal(result.boxes.baltic.visible, 1);
+    assert.ok(result.boxes.black_sea.error);
+    assert.ok(result.boxes.black_sea.error.includes("HTTP 522"));
+    assert.ok(result.boxes.persian_gulf.error);
+    assert.ok(result.boxes.persian_gulf.error.includes("HTTP 503"));
+    assert.ok(result.boxes.taiwan_strait.error);
+    assert.ok(result.boxes.taiwan_strait.error.includes("HTTP 504"));
+    assert.equal(callCount, 4);
+    global.fetch = originalFetch;
+  });
+
+  it("throws OPENSKY_429 on rate limit", async () => {
+    const originalFetch = global.fetch;
+    global.fetch = async () => ({
+      ok: false,
+      status: 429,
+      json: async () => ({}),
+    });
+
+    try {
+      await worker.fetchOpenSky();
+      assert.fail("Expected fetchOpenSky to throw OPENSKY_429");
+    } catch (e) {
+      assert.equal(e.message, "OPENSKY_429");
+    }
+    global.fetch = originalFetch;
+  });
+});

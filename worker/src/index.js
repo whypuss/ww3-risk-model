@@ -521,23 +521,48 @@ async function fetchOpenSky() {
 
   const results = {};
   let totalVisible = 0;
+  let hasSuccess = false;
 
   for (const box of boxes) {
     const url = `https://opensky-network.org/api/states/all?lamin=${box.lamin}&lamax=${box.lamax}&lomin=${box.lomin}&lomax=${box.lomax}`;
-    const response = await fetch(url, { headers: { "User-Agent": "WW3-Risk-Worker/1.0" } });
-    if (response.status === 429) {
-      throw new Error("OPENSKY_429");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    try {
+      const response = await fetch(url, {
+        headers: { "User-Agent": "WW3-Risk-Worker/1.0" },
+        signal: controller.signal,
+      });
+      if (response.status === 429) {
+        throw new Error("OPENSKY_429");
+      }
+      if (response.status !== 200) {
+        results[box.name] = { error: `HTTP ${response.status}`, visible: 0 };
+        continue;
+      }
+      const data = await response.json();
+      const states = data?.states || [];
+      const visible = states.filter((s) => s[5] !== null && s[6] !== null).length;
+      results[box.name] = { visible };
+      totalVisible += visible;
+      hasSuccess = true;
+    } catch (e) {
+      if (e.name === "AbortError" || e.message?.includes("timeout")) {
+        results[box.name] = { error: "timeout", visible: 0 };
+      } else if (e.message === "OPENSKY_429") {
+        throw e;
+      } else {
+        results[box.name] = { error: e.message || String(e), visible: 0 };
+      }
+    } finally {
+      clearTimeout(timeoutId);
     }
-    if (response.status !== 200) {
-      results[box.name] = { error: `HTTP ${response.status}`, visible: 0 };
-      continue;
-    }
-    const data = await response.json();
-    const states = data?.states || [];
-    const visible = states.filter((s) => s[5] !== null && s[6] !== null).length;
-    results[box.name] = { visible };
-    totalVisible += visible;
   }
+
+  if (!hasSuccess) {
+    const errorParts = Object.entries(results).map(([name, r]) => `${name} ${r.error}`);
+    throw new Error(`OpenSky all boxes failed: ${errorParts.join(", ")}`);
+  }
+
   return { boxes: results, total_visible: totalVisible };
 }
 
@@ -802,4 +827,5 @@ export default {
 
   // Exported for unit testing
   shouldFetchOpenSky,
+  fetchOpenSky,
 };
