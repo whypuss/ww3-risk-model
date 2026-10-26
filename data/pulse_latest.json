@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-10-26T09:38:20Z",
-  "pulse_adjustment": -0.8,
+  "computed_at": "2026-10-26T10:26:24Z",
+  "pulse_adjustment": -0.68,
   "range": [
     -10.0,
     10.0
@@ -37,7 +37,7 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-10-26T09:38:19Z",
+      "fetched_at": "2026-10-26T10:26:23Z",
       "raw_value": 4.18,
       "raw_unit": "% (Yes 隱含機率)",
       "normalized_score": -0.0817,
@@ -49,21 +49,21 @@
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
             "yes_price": 0.035,
-            "volume": 1087714.982201
+            "volume": 1087714.9822010002
           },
           {
             "id": "2749367",
             "question": "Will Russia invade a NATO country by December 31, 2026?",
             "short": "RU-NATO Invasion",
             "yes_price": 0.045,
-            "volume": 438542.612857
+            "volume": 438642.612857
           },
           {
             "id": "2749382",
             "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
             "short": "NATO Troops in UA",
             "yes_price": 0.0455,
-            "volume": 159381.67471200004
+            "volume": 159381.674712
           }
         ],
         "baseline_anchor": 0.05,
@@ -78,13 +78,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-10-26T09:38:20Z",
-      "raw_value": -2.05,
+      "fetched_at": "2026-10-26T10:26:24Z",
+      "raw_value": -1.56,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": -0.205,
-      "contribution": -0.51,
+      "normalized_score": -0.1558,
+      "contribution": -0.39,
       "details": {
-        "price_usd": 109.41,
+        "price_usd": 109.96,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },

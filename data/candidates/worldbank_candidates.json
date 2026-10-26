@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-26T09:38:37Z",
+  "generated_at": "2026-10-26T10:26:26Z",
   "source": "World Bank Open Data API v2 (api.worldbank.org)",
   "disclaimer": "Candidate values generated for expert review. Not applied to baseline without manual rubric calibration.",
   "series_count": 5,
@@ -10,13 +10,13 @@
       "target_indicator_id": "l4_military_expenditure_growth",
       "target_indicator_name": "全球軍費實質增長率與GDP佔比",
       "applicability_rationale": "世銀全球軍費佔GDP比率提供全球宏觀軍事化負擔之客觀量化基準，反映體系資源轉移至安全困境之程度。",
-      "candidate_year": null,
-      "candidate_raw_value": null,
+      "candidate_year": "2025",
+      "candidate_raw_value": 2.47893026852095,
       "current_model_raw_value": "24,430 億美元 (+6.8% 實質年增)",
       "current_model_score": 72.0,
       "current_evidence_level": "verified",
-      "fetch_status": "fetch_failed_or_empty",
-      "diff_analysis": "No remote value retrieved; baseline unchanged."
+      "fetch_status": "success",
+      "diff_analysis": "Candidate WB value: 2.47893026852095 (2025) vs. current baseline: 24,430 億美元 (+6.8% 實質年增) (score: 72.0)"
     },
     {
       "wb_code": "SL.UEM.TOTL.ZS",
