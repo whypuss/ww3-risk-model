@@ -3,7 +3,7 @@
     "title": "WW3 戰爭風險指數儀表板",
     "title_en": "WW3 War Risk Index Dashboard",
     "model_version": "0.7.0",
-    "generated_at": "2026-10-25",
+    "generated_at": "2026-10-26",
     "active_scenario_id": "baseline_2026",
     "active_scenario_title": "2026 全球結構風險基準情境",
     "active_scenario_year": 2026
@@ -150,8 +150,8 @@
   },
   "pulse": {
     "version": "0.6.0",
-    "computed_at": "2026-10-24T09:26:27Z",
-    "pulse_adjustment": 0.17,
+    "computed_at": "2026-10-26T06:26:29Z",
+    "pulse_adjustment": -0.77,
     "range": [
       -10.0,
       10.0
@@ -187,33 +187,33 @@
         "source_url": "https://gamma-api.polymarket.com/markets",
         "weight": 0.35,
         "status": "live",
-        "fetched_at": "2026-10-24T09:26:27Z",
-        "raw_value": 3.48,
+        "fetched_at": "2026-10-26T06:26:28Z",
+        "raw_value": 4.18,
         "raw_unit": "% (Yes 隱含機率)",
-        "normalized_score": -0.1517,
-        "contribution": -0.53,
+        "normalized_score": -0.0817,
+        "contribution": -0.29,
         "details": {
           "monitored_markets": [
             {
               "id": "1124834",
               "question": "US x Russia military clash by December 31, 2026?",
               "short": "US-RU Clash",
-              "yes_price": 0.029,
-              "volume": 1087452.3939800002
+              "yes_price": 0.035,
+              "volume": 1087714.9822010002
             },
             {
               "id": "2749367",
               "question": "Will Russia invade a NATO country by December 31, 2026?",
               "short": "RU-NATO Invasion",
               "yes_price": 0.045,
-              "volume": 428627.7153819999
+              "volume": 438542.612857
             },
             {
               "id": "2749382",
               "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
               "short": "NATO Troops in UA",
-              "yes_price": 0.0305,
-              "volume": 159278.98171099997
+              "yes_price": 0.0455,
+              "volume": 159381.674712
             }
           ],
           "baseline_anchor": 0.05,
@@ -228,13 +228,13 @@
         "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
         "weight": 0.25,
         "status": "live",
-        "fetched_at": "2026-10-24T09:26:27Z",
-        "raw_value": 2.8,
+        "fetched_at": "2026-10-26T06:26:29Z",
+        "raw_value": -1.91,
         "raw_unit": "% (24h 漲跌幅)",
-        "normalized_score": 0.2798,
-        "contribution": 0.7,
+        "normalized_score": -0.1907,
+        "contribution": -0.48,
         "details": {
-          "price_usd": 111.7,
+          "price_usd": 109.57,
           "scale_anchor_pct": 10.0,
           "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
         },
@@ -867,8 +867,8 @@
     ]
   },
   "structural_index": 83.5,
-  "pulse_adjustment": 0.17,
-  "composite_index": 83.67,
+  "pulse_adjustment": -0.77,
+  "composite_index": 82.73,
   "initial_trend_points": [
     {
       "date": "2026-10-21",
@@ -887,11 +887,11 @@
       "stage": 3
     },
     {
-      "date": "2026-10-24",
-      "computed_at": "2026-10-24T09:26:27Z",
-      "composite_index": 83.67,
+      "date": "2026-10-26",
+      "computed_at": "2026-10-26T06:26:29Z",
+      "composite_index": 82.73,
       "structural_index": 83.5,
-      "pulse_adjustment": 0.17,
+      "pulse_adjustment": -0.77,
       "stage": 3
     }
   ],

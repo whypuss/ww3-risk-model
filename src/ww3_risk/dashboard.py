@@ -763,6 +763,24 @@ def render_trend_chart_section(initial_points: List[Dict[str, Any]]) -> str:
         <div id="trend-chart-container" style="width:100%;min-height:160px;overflow-x:auto;">
           {trend_svg}
         </div>
+
+        <!-- 綜合指數升跌主因 Log -->
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+            <div>
+              <div style="font-size:0.9rem;font-weight:700;color:var(--text-bright);display:flex;align-items:center;gap:8px;">
+                <span>綜合指數升跌主因 Log</span>
+                <span class="panel-tag" style="font-size:0.65rem;">DAILY UTC LAST SNAPSHOT</span>
+              </div>
+              <div style="font-size:0.72rem;color:var(--text-dim);margin-top:2px;font-family:var(--font-mono);">
+                按日線（UTC 當日最後快照）逐日對照計算；今日一點為當日至今最後快照，日內仍會更新
+              </div>
+            </div>
+          </div>
+          <div id="trend-drivers-log" style="min-height:60px;">
+            <div style="color:var(--text-dim);font-size:0.8rem;text-align:center;padding:12px;">API 未連接，暫未能顯示升跌主因</div>
+          </div>
+        </div>
       </div>
     """
 
@@ -4541,6 +4559,212 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       container.innerHTML = svgHtml;
     }
 
+    // ==========================================================================
+    // Trend Drivers Log: 綜合指數升跌主因逐日分解
+    // ==========================================================================
+
+    function computeTrendDrivers(points) {
+      // 輸入：history daily points（按日期升序）
+      // 輸出：每一步 {from_date, to_date, prev_composite, composite, delta, drivers: [...], baseline?, flat?}
+      if (!points || points.length === 0) return [];
+
+      const steps = [];
+      for (let i = 0; i < points.length; i++) {
+        const curr = points[i];
+        if (i === 0) {
+          // 第一個點為基線日
+          steps.push({
+            from_date: curr.date,
+            to_date: curr.date,
+            prev_composite: Number(curr.composite_index),
+            composite: Number(curr.composite_index),
+            delta: 0.0,
+            drivers: [],
+            baseline: true,
+          });
+          continue;
+        }
+
+        const prev = points[i - 1];
+        const prevComposite = Number(prev.composite_index);
+        const currComposite = Number(curr.composite_index);
+        const delta = currComposite - prevComposite;
+
+        const prevStructural = Number(prev.structural_index);
+        const currStructural = Number(curr.structural_index);
+        const structuralDelta = currStructural - prevStructural;
+
+        // 收集候選驅動
+        const candidates = [];
+
+        // 1. 結構指數變動
+        if (Math.abs(structuralDelta) > 0.001) {
+          candidates.push({
+            label: "結構指數（36 項年度指標）",
+            delta: structuralDelta,
+            prev_contribution: prevStructural,
+            contribution: currStructural,
+            prev_raw: prevStructural,
+            raw: currStructural,
+            raw_unit: "分",
+            data_gap: false,
+          });
+        }
+
+        // 2. 各 pulse 訊號貢獻變動
+        const prevSignals = (prev.signals && Array.isArray(prev.signals)) ? prev.signals : [];
+        const currSignals = (curr.signals && Array.isArray(curr.signals)) ? curr.signals : [];
+
+        // 建立 signal_id 到訊號的映射
+        const prevSigMap = {};
+        for (const s of prevSignals) {
+          prevSigMap[s.signal_id] = s;
+        }
+        const currSigMap = {};
+        for (const s of currSignals) {
+          currSigMap[s.signal_id] = s;
+        }
+
+        // 所有出現過的 signal_id
+        const allSignalIds = new Set([...Object.keys(prevSigMap), ...Object.keys(currSigMap)]);
+
+        for (const sid of allSignalIds) {
+          const ps = prevSigMap[sid];
+          const cs = currSigMap[sid];
+
+          const prevContrib = ps ? Number(ps.contribution) : 0;
+          const currContrib = cs ? Number(cs.contribution) : 0;
+          const contribDelta = currContrib - prevContrib;
+
+          if (Math.abs(contribDelta) < 0.001) continue;
+
+          const prevRaw = ps && ps.raw_value !== null ? ps.raw_value : null;
+          const currRaw = cs && cs.raw_value !== null ? cs.raw_value : null;
+          const rawUnit = (cs && cs.raw_unit) || (ps && ps.raw_unit) || "";
+
+          // 數據缺失誠實標記：任一邊 status !== 'live'
+          const prevLive = ps && ps.status === "live";
+          const currLive = cs && cs.status === "live";
+          const dataGap = !prevLive || !currLive;
+
+          const name = (cs && cs.name) || (ps && ps.name) || sid;
+
+          candidates.push({
+            label: name,
+            delta: contribDelta,
+            prev_contribution: prevContrib,
+            contribution: currContrib,
+            prev_raw: prevRaw,
+            raw: currRaw,
+            raw_unit: rawUnit,
+            data_gap: dataGap,
+          });
+        }
+
+        // 按 |Δ| 由大到小排序，最多取 3 個
+        candidates.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+        const topDrivers = candidates.slice(0, 3);
+
+        // clamp 註記
+        const sumParts = currStructural + (curr.pulse_adjustment || 0);
+        const clampNote = Math.abs(sumParts - currComposite) > 0.01;
+
+        let flat = false;
+        if (topDrivers.length === 0) {
+          flat = true;
+        }
+
+        steps.push({
+          from_date: prev.date,
+          to_date: curr.date,
+          prev_composite: prevComposite,
+          composite: currComposite,
+          delta: delta,
+          drivers: topDrivers,
+          flat: flat,
+          clamp_note: clampNote,
+        });
+      }
+      return steps;
+    }
+
+    function renderTrendDriversLog(steps) {
+      const container = document.getElementById('trend-drivers-log');
+      if (!container) return;
+
+      if (!steps || steps.length === 0) {
+        container.innerHTML = '<div style="color:var(--text-dim);font-size:0.8rem;padding:12px;text-align:center;">API 未連接，暫未能顯示升跌主因</div>';
+        return;
+      }
+
+      // 過濾掉 baseline，最新在最前
+      const displaySteps = steps.filter(s => !s.baseline).reverse();
+
+      let html = '';
+      for (const step of displaySteps) {
+        const deltaStr = step.delta >= 0 ? '+' + step.delta.toFixed(2) : step.delta.toFixed(2);
+        const deltaColor = step.delta >= 0 ? 'var(--color-red)' : 'var(--color-green)';
+
+        html += `
+          <div class="trend-driver-step" style="margin-bottom:16px;padding:12px;background:rgba(15,23,42,0.5);border:1px solid var(--border-color);border-radius:6px;">
+            <div class="step-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-family:var(--font-mono);font-size:0.75rem;">
+              <span>${step.from_date} → ${step.to_date}</span>
+              <span style="color:${deltaColor};font-weight:700;">
+                綜合 ${step.prev_composite.toFixed(2)} → ${step.composite.toFixed(2)} <strong>(${deltaStr})</strong>
+              </span>
+            </div>
+        `;
+
+        if (step.flat) {
+          html += '<div style="color:var(--text-dim);font-size:0.8rem;">持平，無明顯主因</div>';
+        } else {
+          html += '<div class="drivers-list" style="display:flex;flex-direction:column;gap:6px;">';
+          for (let di = 0; di < step.drivers.length; di++) {
+            const d = step.drivers[di];
+            const dDeltaStr = d.delta >= 0 ? '+' + d.delta.toFixed(2) : d.delta.toFixed(2);
+            const dDeltaColor = d.delta >= 0 ? 'var(--color-red)' : 'var(--color-green)';
+
+            // 原始值顯示
+            let rawStr = '';
+            if (d.prev_raw !== null && d.prev_raw !== undefined && d.raw !== null && d.raw !== undefined) {
+              const unit = d.raw_unit ? ' ' + d.raw_unit : '';
+              rawStr = `${Number(d.prev_raw).toFixed(2)} → ${Number(d.raw).toFixed(2)}${unit}`;
+            } else if (d.prev_raw !== null && d.prev_raw !== undefined) {
+              const unit = d.raw_unit ? ' ' + d.raw_unit : '';
+              rawStr = `${Number(d.prev_raw).toFixed(2)}${unit} → 缺失`;
+            } else if (d.raw !== null && d.raw !== undefined) {
+              const unit = d.raw_unit ? ' ' + d.raw_unit : '';
+              rawStr = `缺失 → ${Number(d.raw).toFixed(2)}${unit}`;
+            } else {
+              rawStr = '缺失';
+            }
+
+            const gapNote = d.data_gap ? ' <span style="color:var(--color-yellow);font-size:0.7rem;">（訊號缺失／恢復影響，貢獻歸零／回復，非市場真實變動）</span>' : '';
+
+            html += `
+              <div class="driver-item" style="display:flex;flex-direction:column;gap:2px;padding:8px 10px;background:rgba(8,13,26,0.5);border-radius:4px;border:1px solid rgba(255,255,255,0.05);">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                  <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--accent-cyan);background:rgba(6,182,212,0.15);padding:1px 6px;border-radius:3px;">${di + 1}</span>
+                  <span style="font-weight:600;color:var(--text-bright);">${d.label}</span>
+                  <span style="font-family:var(--font-mono);font-size:0.75rem;color:${dDeltaColor};font-weight:700;">貢獻 ${Number(d.prev_contribution).toFixed(2)} → ${Number(d.contribution).toFixed(2)} <strong>（Δ ${dDeltaStr}）</strong></span>
+                </div>
+                <div style="font-size:0.72rem;color:var(--text-muted);font-family:var(--font-mono);margin-left:28px;">原始值 ${rawStr}${gapNote}</div>
+              </div>
+            `;
+          }
+          html += '</div>';
+        }
+
+        if (step.clamp_note) {
+          html += '<div style="margin-top:8px;padding:6px 10px;background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.3);border-radius:4px;font-size:0.7rem;color:#fdba74;font-family:var(--font-mono);">已觸 0–100 上限／下限</div>';
+        }
+
+        html += '</div>';
+      }
+
+      container.innerHTML = html;
+    }
+
     function applyApiData(latest, layersData, dataStatus, historyDaily) {
       // 1. Update Top Bar Data Source Badge and Date
       const badge = document.getElementById('top-data-source-badge');
@@ -4639,6 +4863,15 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
       // 3.6 Update Trend SVG Chart
       if (historyDaily && historyDaily.points) {
         renderDynamicTrendSvg(historyDaily.points, 'daily');
+        // 3.7 Compute and render trend drivers log
+        const steps = computeTrendDrivers(historyDaily.points);
+        renderTrendDriversLog(steps);
+      } else {
+        // API 連接但無 historyDaily points 時顯示提示
+        const driversContainer = document.getElementById('trend-drivers-log');
+        if (driversContainer) {
+          driversContainer.innerHTML = '<div style="color:var(--text-dim);font-size:0.8rem;text-align:center;padding:12px;">API 未連接，暫未能顯示升跌主因</div>';
+        }
       }
 
       // 4. Update Stage Progression Tracker & Top Stage Badge

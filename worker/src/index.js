@@ -225,7 +225,8 @@ async function handleRiskHistory(db, granularity = null) {
              COALESCE(s.composite_index, s.total_index) AS composite_index,
              COALESCE(s.structural_index, s.total_index) AS structural_index,
              COALESCE(s.pulse_adjustment, 0.0) AS pulse_adjustment,
-             s.stage
+             s.stage,
+             s.pulse_json
       FROM index_snapshots s
       INNER JOIN (
           SELECT substr(computed_at, 1, 10) AS day, MAX(computed_at) AS max_computed_at
@@ -238,14 +239,37 @@ async function handleRiskHistory(db, granularity = null) {
     if (!results || results.length === 0) {
       return errorUnavailable();
     }
-    const points = results.map((r) => ({
-      date: r.date,
-      computed_at: r.computed_at,
-      composite_index: Number(r.composite_index),
-      structural_index: Number(r.structural_index),
-      pulse_adjustment: Number(r.pulse_adjustment),
-      stage: Number(r.stage),
-    }));
+    const points = results.map((r) => {
+      let signals = [];
+      try {
+        const pulse = JSON.parse(r.pulse_json || "{}");
+        if (pulse && pulse.signals && typeof pulse.signals === "object") {
+          for (const [signalId, sig] of Object.entries(pulse.signals)) {
+            if (sig && typeof sig === "object") {
+              signals.push({
+                signal_id: signalId,
+                name: sig.name || signalId,
+                contribution: Number(sig.contribution) || 0,
+                status: sig.status || "unavailable",
+                raw_value: sig.raw_value !== undefined && sig.raw_value !== null ? Number(sig.raw_value) : null,
+                raw_unit: sig.raw_unit || "",
+              });
+            }
+          }
+        }
+      } catch (e) {
+        signals = [];
+      }
+      return {
+        date: r.date,
+        computed_at: r.computed_at,
+        composite_index: Number(r.composite_index),
+        structural_index: Number(r.structural_index),
+        pulse_adjustment: Number(r.pulse_adjustment),
+        stage: Number(r.stage),
+        signals,
+      };
+    });
     return jsonResponse({
       granularity: "daily",
       timezone: "UTC",

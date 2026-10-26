@@ -1130,6 +1130,426 @@ console.log('PASS: ySpan=' + ySpan.toFixed(2) + ', labels=' + labels.join(',') +
         Path(temp_js).unlink(missing_ok=True)
 
 
+def test_compute_trend_drivers_js_behavior(tmp_path):
+    """Verify JS computeTrendDrivers pure function behavior with various fixtures.
+
+    Extraction: pull computeTrendDrivers from generated HTML script blocks,
+    execute in Node with test fixtures.
+    """
+    import json
+    import re
+    import shutil
+    import subprocess
+    import tempfile
+    from pathlib import Path
+
+    # Build dashboard to get the JS
+    out_html = tmp_path / "dashboard.html"
+    build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        output_json_path=tmp_path / "dashboard_data.json",
+        ui_step=5,
+    )
+    content = out_html.read_text(encoding="utf-8")
+
+    # Extract script blocks (excluding JSON data block)
+    script_blocks = re.findall(
+        r'<script(?![^>]*type="application/json")[^>]*>(.*?)</script>',
+        content,
+        re.DOTALL | re.IGNORECASE,
+    )
+    all_js = "\n".join([s.strip() for s in script_blocks if s.strip()])
+
+    # Find computeTrendDrivers function using brace matching
+    fn_name = "computeTrendDrivers"
+    start_idx = all_js.find(f"function {fn_name}")
+    if start_idx == -1:
+        start_idx = all_js.find(f"const {fn_name} =")
+    if start_idx == -1:
+        start_idx = all_js.find(f"{fn_name} = function")
+    assert start_idx != -1, "computeTrendDrivers function not found in JS"
+
+    # Find the opening brace of the function
+    brace_idx = all_js.find("{", start_idx)
+    assert brace_idx != -1, "Function opening brace not found"
+
+    # Match braces to extract full function
+    depth = 0
+    end_idx = -1
+    for i in range(brace_idx, len(all_js)):
+        if all_js[i] == "{":
+            depth += 1
+        elif all_js[i] == "}":
+            depth -= 1
+            if depth == 0:
+                end_idx = i
+                break
+    assert end_idx != -1, "Could not find matching closing brace for computeTrendDrivers"
+
+    fn_source = all_js[start_idx:end_idx + 1]
+
+    # Node must be available
+    node_path = shutil.which("node")
+    if not node_path:
+        import pytest
+        pytest.skip("node not available in PATH, skipping JS computeTrendDrivers test")
+
+    # Fixture 1: Normal three signals + structural change mixed, top 3 by |Δ| and correct order
+    fixture1 = json.dumps([
+        {
+            "date": "2026-10-24",
+            "computed_at": "2026-10-24T12:00:00Z",
+            "composite_index": 87.18,
+            "structural_index": 83.5,
+            "pulse_adjustment": 3.68,
+            "stage": 3,
+            "signals": [
+                {"signal_id": "gdelt_conflict", "name": "GDELT 衝突新聞聲量", "contribution": 2.00, "status": "live", "raw_value": 15.5, "raw_unit": "%"},
+                {"signal_id": "polymarket_war_risk", "name": "Polymarket 戰爭預測", "contribution": 1.00, "status": "live", "raw_value": 45.0, "raw_unit": "%"},
+                {"signal_id": "brent_oil_24h", "name": "Brent 原油 24h", "contribution": 0.68, "status": "live", "raw_value": 1.5, "raw_unit": "%"},
+            ],
+        },
+        {
+            "date": "2026-10-25",
+            "computed_at": "2026-10-25T12:00:00Z",
+            "composite_index": 82.98,
+            "structural_index": 83.5,
+            "pulse_adjustment": -0.52,
+            "stage": 3,
+            "signals": [
+                {"signal_id": "gdelt_conflict", "name": "GDELT 衝突新聞聲量", "contribution": -2.00, "status": "live", "raw_value": 8.2, "raw_unit": "%"},
+                {"signal_id": "polymarket_war_risk", "name": "Polymarket 戰爭預測", "contribution": 0.50, "status": "live", "raw_value": 52.0, "raw_unit": "%"},
+                {"signal_id": "brent_oil_24h", "name": "Brent 原油 24h", "contribution": 0.98, "status": "live", "raw_value": 2.8, "raw_unit": "%"},
+            ],
+        },
+    ])
+
+    # Fixture 2: More than 3 candidates → only top 3
+    fixture2 = json.dumps([
+        {
+            "date": "2026-10-24",
+            "computed_at": "2026-10-24T12:00:00Z",
+            "composite_index": 80.0,
+            "structural_index": 80.0,
+            "pulse_adjustment": 0.0,
+            "stage": 3,
+            "signals": [],
+        },
+        {
+            "date": "2026-10-25",
+            "computed_at": "2026-10-25T12:00:00Z",
+            "composite_index": 85.0,
+            "structural_index": 81.0,
+            "pulse_adjustment": 4.0,
+            "stage": 3,
+            "signals": [
+                {"signal_id": "s1", "name": "Signal 1", "contribution": 1.0, "status": "live", "raw_value": 10.0, "raw_unit": ""},
+                {"signal_id": "s2", "name": "Signal 2", "contribution": 2.0, "status": "live", "raw_value": 20.0, "raw_unit": ""},
+                {"signal_id": "s3", "name": "Signal 3", "contribution": 0.5, "status": "live", "raw_value": 5.0, "raw_unit": ""},
+                {"signal_id": "s4", "name": "Signal 4", "contribution": 0.5, "status": "live", "raw_value": 5.0, "raw_unit": ""},
+            ],
+        },
+    ])
+
+    # Fixture 3: Signal missing (status !== live) on one side → data_gap: true
+    fixture3 = json.dumps([
+        {
+            "date": "2026-10-24",
+            "computed_at": "2026-10-24T12:00:00Z",
+            "composite_index": 80.0,
+            "structural_index": 80.0,
+            "pulse_adjustment": 0.0,
+            "stage": 3,
+            "signals": [
+                {"signal_id": "gdelt_conflict", "name": "GDELT 衝突新聞聲量", "contribution": 0.0, "status": "unavailable", "raw_value": None, "raw_unit": "%"},
+            ],
+        },
+        {
+            "date": "2026-10-25",
+            "computed_at": "2026-10-25T12:00:00Z",
+            "composite_index": 82.0,
+            "structural_index": 80.0,
+            "pulse_adjustment": 2.0,
+            "stage": 3,
+            "signals": [
+                {"signal_id": "gdelt_conflict", "name": "GDELT 衝突新聞聲量", "contribution": 2.0, "status": "live", "raw_value": 10.0, "raw_unit": "%"},
+            ],
+        },
+    ])
+
+    # Fixture 4: Baseline (first point) and flat (all deltas zero)
+    fixture4 = json.dumps([
+        {
+            "date": "2026-10-24",
+            "computed_at": "2026-10-24T12:00:00Z",
+            "composite_index": 80.0,
+            "structural_index": 80.0,
+            "pulse_adjustment": 0.0,
+            "stage": 3,
+            "signals": [],
+        },
+        {
+            "date": "2026-10-25",
+            "computed_at": "2026-10-25T12:00:00Z",
+            "composite_index": 80.0,
+            "structural_index": 80.0,
+            "pulse_adjustment": 0.0,
+            "stage": 3,
+            "signals": [],
+        },
+    ])
+
+    test_script = f"""
+{fn_source}
+
+// Test fixture 1: normal three signals + structural change mixed
+const points1 = {fixture1};
+const steps1 = computeTrendDrivers(points1);
+console.log("=== Fixture 1: Normal mixed ===");
+console.log(JSON.stringify(steps1, null, 2));
+
+// Assertions for fixture 1
+if (steps1.length !== 2) throw new Error("Expected 2 steps (baseline + 1 transition)");
+if (!steps1[0].baseline) throw new Error("First step should be baseline");
+if (steps1[0].drivers.length !== 0) throw new Error("Baseline should have no drivers");
+if (steps1[1].baseline) throw new Error("Second step should not be baseline");
+if (steps1[1].drivers.length > 3) throw new Error("Should have at most 3 drivers");
+
+// Check order by |Δ| descending
+const deltas1 = steps1[1].drivers.map(d => Math.abs(d.delta));
+for (let i = 0; i < deltas1.length - 1; i++) {{
+  if (deltas1[i] < deltas1[i + 1]) throw new Error("Drivers not sorted by |Δ| descending");
+}}
+
+// Fixture 2: More than 3 candidates → only top 3
+const points2 = {fixture2};
+const steps2 = computeTrendDrivers(points2);
+console.log("=== Fixture 2: >3 candidates ===");
+console.log(JSON.stringify(steps2, null, 2));
+
+if (steps2[1].drivers.length !== 3) throw new Error("Should have exactly 3 drivers when >3 candidates");
+const deltas2 = steps2[1].drivers.map(d => Math.abs(d.delta));
+for (let i = 0; i < deltas2.length - 1; i++) {{
+  if (deltas2[i] < deltas2[i + 1]) throw new Error("Drivers not sorted by |Δ| descending");
+}}
+
+// Fixture 3: Signal missing → data_gap: true
+const points3 = {fixture3};
+const steps3 = computeTrendDrivers(points3);
+console.log("=== Fixture 3: Signal missing ===");
+console.log(JSON.stringify(steps3, null, 2));
+
+if (!steps3[1].drivers[0].data_gap) throw new Error("Signal missing should have data_gap: true");
+
+// Fixture 4: Baseline and flat
+const points4 = {fixture4};
+const steps4 = computeTrendDrivers(points4);
+console.log("=== Fixture 4: Baseline + flat ===");
+console.log(JSON.stringify(steps4, null, 2));
+
+if (!steps4[0].baseline) throw new Error("First step should be baseline");
+if (!steps4[1].flat) throw new Error("Second step should be flat when all deltas zero");
+if (steps4[1].drivers.length !== 0) throw new Error("Flat step should have no drivers");
+
+console.log("ALL TESTS PASSED");
+"""
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".js", delete=False) as f:
+        f.write(test_script)
+        temp_js = f.name
+
+    try:
+        result = subprocess.run(
+            [node_path, temp_js],
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        assert result.returncode == 0, f"JS computeTrendDrivers test failed:\\n{result.stderr}\\n{result.stdout}"
+        assert "ALL TESTS PASSED" in result.stdout
+    finally:
+        Path(temp_js).unlink(missing_ok=True)
+
+
+def test_render_trend_drivers_log_js_renders(tmp_path):
+    """Verify JS renderTrendDriversLog produces expected HTML structure."""
+    import json
+    import re
+    import shutil
+    import subprocess
+    import tempfile
+    from pathlib import Path
+
+    # Build dashboard to get the JS
+    out_html = tmp_path / "dashboard.html"
+    build_dashboard(
+        scenario_path="scenarios/baseline_2026.json",
+        output_html_path=out_html,
+        output_json_path=tmp_path / "dashboard_data.json",
+        ui_step=5,
+    )
+    content = out_html.read_text(encoding="utf-8")
+
+    # Extract script blocks (excluding JSON data block)
+    script_blocks = re.findall(
+        r'<script(?![^>]*type="application/json")[^>]*>(.*?)</script>',
+        content,
+        re.DOTALL | re.IGNORECASE,
+    )
+    all_js = "\n".join([s.strip() for s in script_blocks if s.strip()])
+
+    # Find renderTrendDriversLog function
+    fn_name = "renderTrendDriversLog"
+    start_idx = all_js.find(f"function {fn_name}")
+    if start_idx == -1:
+        start_idx = all_js.find(f"const {fn_name} =")
+    if start_idx == -1:
+        start_idx = all_js.find(f"{fn_name} = function")
+    assert start_idx != -1, "renderTrendDriversLog function not found in JS"
+
+    # Find the opening brace
+    brace_idx = all_js.find("{", start_idx)
+    assert brace_idx != -1, "Function opening brace not found"
+
+    # Match braces
+    depth = 0
+    end_idx = -1
+    for i in range(brace_idx, len(all_js)):
+        if all_js[i] == "{":
+            depth += 1
+        elif all_js[i] == "}":
+            depth -= 1
+            if depth == 0:
+                end_idx = i
+                break
+    assert end_idx != -1, "Could not find matching closing brace for renderTrendDriversLog"
+
+    fn_source = all_js[start_idx:end_idx + 1]
+
+    # Also need computeTrendDrivers
+    fn_name2 = "computeTrendDrivers"
+    start_idx2 = all_js.find(f"function {fn_name2}")
+    if start_idx2 == -1:
+        start_idx2 = all_js.find(f"const {fn_name2} =")
+    if start_idx2 == -1:
+        start_idx2 = all_js.find(f"{fn_name2} = function")
+    assert start_idx2 != -1, "computeTrendDrivers function not found in JS"
+
+    brace_idx2 = all_js.find("{", start_idx2)
+    assert brace_idx2 != -1, "Function opening brace not found"
+
+    depth = 0
+    end_idx2 = -1
+    for i in range(brace_idx2, len(all_js)):
+        if all_js[i] == "{":
+            depth += 1
+        elif all_js[i] == "}":
+            depth -= 1
+            if depth == 0:
+                end_idx2 = i
+                break
+    assert end_idx2 != -1, "Could not find matching closing brace for computeTrendDrivers"
+
+    fn_source2 = all_js[start_idx2:end_idx2 + 1]
+
+    node_path = shutil.which("node")
+    if not node_path:
+        import pytest
+        pytest.skip("node not available in PATH, skipping JS renderTrendDriversLog test")
+
+    # Test data
+    test_points = json.dumps([
+        {
+            "date": "2026-10-24",
+            "computed_at": "2026-10-24T12:00:00Z",
+            "composite_index": 87.18,
+            "structural_index": 83.5,
+            "pulse_adjustment": 3.68,
+            "stage": 3,
+            "signals": [
+                {"signal_id": "gdelt_conflict", "name": "GDELT 衝突新聞聲量", "contribution": 2.00, "status": "live", "raw_value": 15.5, "raw_unit": "%"},
+            ],
+        },
+        {
+            "date": "2026-10-25",
+            "computed_at": "2026-10-25T12:00:00Z",
+            "composite_index": 82.98,
+            "structural_index": 83.5,
+            "pulse_adjustment": -0.52,
+            "stage": 3,
+            "signals": [
+                {"signal_id": "gdelt_conflict", "name": "GDELT 衝突新聞聲量", "contribution": -2.00, "status": "live", "raw_value": 8.2, "raw_unit": "%"},
+            ],
+        },
+    ])
+
+    test_script = f"""
+{fn_source2}
+{fn_source}
+
+// Stub document.getElementById
+const mockContainer = {{
+  innerHTML: '',
+  set innerHTML(val) {{ this._innerHTML = val; }},
+  get innerHTML() {{ return this._innerHTML; }}
+}};
+global.document = {{
+  getElementById: (id) => id === 'trend-drivers-log' ? mockContainer : null
+}};
+
+const points = {test_points};
+const steps = computeTrendDrivers(points);
+renderTrendDriversLog(steps);
+
+const html = mockContainer.innerHTML;
+if (!html) {{
+  console.error('No HTML generated');
+  process.exit(1);
+}}
+
+// Check for key elements
+if (!html.includes('2026-10-24 → 2026-10-25')) {{
+  console.error('Missing date range');
+  process.exit(1);
+}}
+if (!html.includes('綜合 87.18 → 82.98')) {{
+  console.error('Missing composite values');
+  process.exit(1);
+}}
+if (!html.includes('GDELT 衝突新聞聲量')) {{
+  console.error('Missing signal name');
+  process.exit(1);
+}}
+if (!html.includes('貢獻 2.00 → -2.00')) {{
+  console.error('Missing contribution delta');
+  process.exit(1);
+}}
+if (!html.includes('原始值 15.50 → 8.20 %')) {{
+  console.error('Missing raw values');
+  process.exit(1);
+}}
+
+console.log('RENDER TEST PASSED');
+"""
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".js", delete=False) as f:
+        f.write(test_script)
+        temp_js = f.name
+
+    try:
+        result = subprocess.run(
+            [node_path, temp_js],
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        assert result.returncode == 0, f"JS renderTrendDriversLog test failed:\\n{result.stderr}\\n{result.stdout}"
+        assert "RENDER TEST PASSED" in result.stdout
+    finally:
+        Path(temp_js).unlink(missing_ok=True)
+
+
 
 
 
