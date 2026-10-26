@@ -45,3 +45,11 @@ CREATE TABLE IF NOT EXISTS indicator_observations (
 CREATE INDEX IF NOT EXISTS idx_snapshots_computed_at ON index_snapshots(computed_at DESC);
 CREATE INDEX IF NOT EXISTS idx_observations_snapshot_id ON indicator_observations(snapshot_id);
 CREATE INDEX IF NOT EXISTS idx_observations_indicator_id ON indicator_observations(indicator_id);
+
+CREATE TABLE IF NOT EXISTS live_feed_snapshots (
+    feed_id TEXT PRIMARY KEY,
+    fetched_at TEXT,
+    status TEXT,
+    payload_json TEXT,
+    error TEXT
+);

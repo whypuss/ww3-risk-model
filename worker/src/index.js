@@ -6,6 +6,8 @@
  * - GET /api/risk/history
  * - GET /api/risk/layers
  * - GET /api/data-status
+ * - GET /api/feeds/latest
+ * - GET /api/feeds/polymarket
  *
  * Zero external dependencies. Uses Cloudflare D1 database binding 'DB'.
  */
@@ -169,7 +171,7 @@ async function handleRiskLatest(db) {
     structural_index: structuralIndex,
     pulse_adjustment: pulseAdjustment,
     pulse,
-    total_index: compositeIndex, // backward compatibility
+    total_index: compositeIndex,
     stage: getStageInfo(row.stage),
     base_score: Number(row.base_score),
     interaction_bonus: Number(row.interaction_bonus),
@@ -477,6 +479,200 @@ async function handleDataStatus(db) {
   });
 }
 
+const FEED_IDS = ["gdelt", "opensky", "hormuz", "polymarket"];
+
+async function upsertFeedSnapshot(db, feedId, status, payload, error = null) {
+  const fetchedAt = new Date().toISOString();
+  await db
+    .prepare(
+      "INSERT INTO live_feed_snapshots (feed_id, fetched_at, status, payload_json, error) VALUES (?, ?, ?, ?, ?) " +
+      "ON CONFLICT(feed_id) DO UPDATE SET fetched_at = excluded.fetched_at, status = excluded.status, payload_json = excluded.payload_json, error = excluded.error"
+    )
+    .bind(feedId, fetchedAt, status, JSON.stringify(payload), error)
+    .run();
+}
+
+async function fetchGdelt() {
+  const url = "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json";
+  const response = await fetch(url, { headers: { "User-Agent": "WW3-Risk-Worker/1.0" } });
+  if (response.status !== 200) {
+    throw new Error(`GDELT HTTP ${response.status}`);
+  }
+  const data = await response.json();
+  const timeline = data?.timeline?.[0]?.data || [];
+  if (!timeline.length) {
+    throw new Error("GDELT response missing timeline data");
+  }
+  const latest = timeline[timeline.length - 1];
+  return {
+    value: latest.value,
+    date: latest.date,
+    history_points: timeline.length,
+  };
+}
+
+async function fetchOpenSky() {
+  const boxes = [
+    { name: "baltic", lamin: 53, lamax: 60, lomin: 10, lomax: 30 },
+    { name: "black_sea", lamin: 41, lamax: 47, lomin: 28, lomax: 42 },
+    { name: "persian_gulf", lamin: 24, lamax: 30, lomin: 48, lomax: 57 },
+    { name: "taiwan_strait", lamin: 22, lamax: 27, lomin: 117, lomax: 121 },
+  ];
+
+  const results = {};
+  let totalVisible = 0;
+
+  for (const box of boxes) {
+    const url = `https://opensky-network.org/api/states/all?lamin=${box.lamin}&lamax=${box.lamax}&lomin=${box.lomin}&lomax=${box.lomax}`;
+    const response = await fetch(url, { headers: { "User-Agent": "WW3-Risk-Worker/1.0" } });
+    if (response.status === 429) {
+      throw new Error("OPENSKY_429");
+    }
+    if (response.status !== 200) {
+      results[box.name] = { error: `HTTP ${response.status}`, visible: 0 };
+      continue;
+    }
+    const data = await response.json();
+    const states = data?.states || [];
+    const visible = states.filter((s) => s[5] !== null && s[6] !== null).length;
+    results[box.name] = { visible };
+    totalVisible += visible;
+  }
+  return { boxes: results, total_visible: totalVisible };
+}
+
+async function fetchHormuz() {
+  const url = "https://hormuz.now/status.json";
+  const response = await fetch(url, { headers: { "User-Agent": "WW3-Risk-Worker/1.0" } });
+  if (response.status !== 200) {
+    throw new Error(`Hormuz HTTP ${response.status}`);
+  }
+  const data = await response.json();
+  return {
+    last24h: data.last24h,
+    fleet: data.fleet,
+    feed: data.feed,
+    generatedAt: data.generatedAt,
+  };
+}
+
+async function fetchPolymarketMarkets(db, marketIds) {
+  const results = [];
+  for (const mid of marketIds) {
+    const url = `https://gamma-api.polymarket.com/markets/${mid}`;
+    const response = await fetch(url, { headers: { "User-Agent": "WW3-Risk-Worker/1.0" } });
+    if (response.status !== 200) {
+      continue;
+    }
+    const data = await response.json();
+    const outcomes = data?.outcomes || [];
+    const clobTokenIds = data?.clobTokenIds || [];
+    let yesTokenId = null;
+    for (let i = 0; i < outcomes.length; i++) {
+      if (outcomes[i] === "Yes" && clobTokenIds[i]) {
+        yesTokenId = clobTokenIds[i];
+        break;
+      }
+    }
+    const prices = data?.outcomePrices ? JSON.parse(data.outcomePrices) : [];
+    const yesPrice = prices[0] !== undefined ? parseFloat(prices[0]) : null;
+    results.push({
+      id: mid,
+      question: data?.question || "",
+      short: data?.question?.split("?")[0]?.substring(0, 50) || "",
+      yes_token_id: yesTokenId,
+      midpoint: yesPrice !== null ? (yesPrice * 100).toFixed(2) : null,
+      fetched_at: new Date().toISOString(),
+    });
+  }
+  return results;
+}
+
+async function handleFeedsLatest(db) {
+  const feedIds = ["gdelt", "opensky", "hormuz", "polymarket"];
+  const feeds = [];
+  for (const fid of feedIds) {
+    const row = await db.prepare("SELECT * FROM live_feed_snapshots WHERE feed_id = ?").bind(fid).first();
+    if (!row) {
+      feeds.push({ feed_id: fid, fetched_at: null, status: "never_fetched", payload: null, error: null });
+    } else {
+      let payload = null;
+      try {
+        payload = JSON.parse(row.payload_json || "null");
+      } catch (e) {
+        payload = null;
+      }
+      feeds.push({
+        feed_id: row.feed_id,
+        fetched_at: row.fetched_at,
+        status: row.status,
+        payload,
+        error: row.error,
+      });
+    }
+  }
+  return jsonResponse({ feeds });
+}
+
+async function handleFeedsPolymarket(db) {
+  const snap = await db
+    .prepare("SELECT pulse_json FROM index_snapshots ORDER BY computed_at DESC LIMIT 1")
+    .first();
+  let marketIds = ["1124834", "2749367", "2749382"];
+  if (snap?.pulse_json) {
+    try {
+      const pulse = JSON.parse(snap.pulse_json);
+      const details = pulse.signals?.polymarket_war_risk?.details;
+      if (details?.monitored_markets) {
+        marketIds = details.monitored_markets.map((m) => m.id).filter(Boolean);
+      }
+    } catch (e) {
+    }
+  }
+  const markets = await fetchPolymarketMarkets(db, marketIds);
+  if (markets.length === 0) {
+    return jsonResponse({ markets: [], error: "Gamma API unavailable; showing hourly pulse snapshot fallback", fallback: true });
+  }
+  return jsonResponse({ markets, error: null, fallback: false });
+}
+
+async function scheduledHandler(event, env, ctx) {
+  const db = env.DB;
+  if (!db) return;
+
+  const now = new Date();
+  const minute = now.getUTCMinutes();
+
+  // Every tick: GDELT + Hormuz
+  try {
+    const gdeltData = await fetchGdelt();
+    await upsertFeedSnapshot(db, "gdelt", "ok", gdeltData);
+  } catch (e) {
+    await upsertFeedSnapshot(db, "gdelt", "error", null, e.message);
+  }
+
+  try {
+    const hormuzData = await fetchHormuz();
+    await upsertFeedSnapshot(db, "hormuz", "ok", hormuzData);
+  } catch (e) {
+    await upsertFeedSnapshot(db, "hormuz", "error", null, e.message);
+  }
+
+  // Hourly (minute == 0): OpenSky
+  if (minute === 0) {
+    try {
+      const openskyData = await fetchOpenSky();
+      await upsertFeedSnapshot(db, "opensky", "ok", openskyData);
+    } catch (e) {
+      if (e.message === "OPENSKY_429") {
+        await upsertFeedSnapshot(db, "opensky", "stale", null, "rate limited (429)");
+      } else {
+        await upsertFeedSnapshot(db, "opensky", "error", null, e.message);
+      }
+    }
+  }
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -525,12 +721,16 @@ export default {
           return await handleRiskLayers(db);
         case "/api/data-status":
           return await handleDataStatus(db);
+        case "/api/feeds/latest":
+          return await handleFeedsLatest(db);
+        case "/api/feeds/polymarket":
+          return await handleFeedsPolymarket(db);
         default:
           return jsonResponse(
             {
               error: "Not Found",
               status: 404,
-              message: `Endpoint '${pathname}' not found. Available: /api/risk/latest, /api/pulse/latest, /api/risk/history, /api/risk/layers, /api/data-status`,
+              message: `Endpoint '${pathname}' not found. Available: /api/risk/latest, /api/pulse/latest, /api/risk/history, /api/risk/layers, /api/data-status, /api/feeds/latest, /api/feeds/polymarket`,
             },
             404
           );
@@ -545,5 +745,9 @@ export default {
         500
       );
     }
+  },
+
+  async scheduled(event, env, ctx) {
+    await scheduledHandler(event, env, ctx);
   },
 };

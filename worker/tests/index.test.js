@@ -450,4 +450,152 @@ describe("WW3 Risk Model Worker API", () => {
     assert.equal(data.completeness_pct, 100.0);
     assert.equal(data.indicators.length, 3);
   });
+
+  it("GET /api/feeds/latest returns all 4 feeds with correct shape", async () => {
+    const mockFeeds = [
+      { feed_id: "gdelt", fetched_at: "2026-10-26T06:00:00Z", status: "ok", payload_json: JSON.stringify({ value: 5.2, date: "2026-10-26" }), error: null },
+      { feed_id: "opensky", fetched_at: "2026-10-26T05:00:00Z", status: "ok", payload_json: JSON.stringify({ total_visible: 123, boxes: {} }), error: null },
+      { feed_id: "hormuz", fetched_at: "2026-10-26T06:15:00Z", status: "ok", payload_json: JSON.stringify({ last24h: { in: 10, out: 8, total: 18, tankers: 5 }, fleet: { vessels: 42 }, feed: { health: "ok" } }), error: null },
+      { feed_id: "polymarket", fetched_at: "2026-10-26T06:20:00Z", status: "ok", payload_json: JSON.stringify({ markets: [] }), error: null },
+    ];
+    const db = createMockDb({ snapshots: [MOCK_SNAPSHOT], observations: MOCK_OBSERVATIONS });
+    db.prepare = function(sql) {
+      let boundParams = [];
+      return {
+        bind(...args) { boundParams = args; return this; },
+        async first() {
+          if (sql.includes("FROM live_feed_snapshots")) {
+            const fid = boundParams[0];
+            return mockFeeds.find(f => f.feed_id === fid) || null;
+          }
+          return MOCK_SNAPSHOT;
+        },
+        async all() { return { results: [] }; },
+      };
+    };
+    const req = new Request("https://api.ww3risk.org/api/feeds/latest");
+    const res = await worker.fetch(req, { DB: db }, {});
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.ok(data.feeds);
+    assert.equal(data.feeds.length, 4);
+    for (const feed of data.feeds) {
+      assert.ok(feed.feed_id);
+      assert.ok(["gdelt", "opensky", "hormuz", "polymarket"].includes(feed.feed_id));
+      assert.ok(["ok", "error", "stale", "never_fetched"].includes(feed.status));
+      assert.ok(typeof feed.fetched_at === "string" || feed.fetched_at === null);
+      assert.ok(feed.payload === null || typeof feed.payload === "object");
+      assert.ok(feed.error === null || typeof feed.error === "string");
+    }
+  });
+
+  it("GET /api/feeds/latest returns never_fetched for missing feed rows", async () => {
+    const db = createMockDb({ snapshots: [MOCK_SNAPSHOT], observations: MOCK_OBSERVATIONS });
+    db.prepare = function(sql) {
+      let boundParams = [];
+      return {
+        bind(...args) { boundParams = args; return this; },
+        async first() {
+          if (sql.includes("FROM live_feed_snapshots")) {
+            return null;
+          }
+          return MOCK_SNAPSHOT;
+        },
+        async all() { return { results: [] }; },
+      };
+    };
+    const req = new Request("https://api.ww3risk.org/api/feeds/latest");
+    const res = await worker.fetch(req, { DB: db }, {});
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.feeds.length, 4);
+    for (const feed of data.feeds) {
+      assert.equal(feed.status, "never_fetched");
+      assert.equal(feed.fetched_at, null);
+      assert.equal(feed.payload, null);
+      assert.equal(feed.error, null);
+    }
+  });
+
+  it("GET /api/feeds/polymarket returns markets with yes_token_id when Gamma succeeds", async () => {
+    const mockPulseWithMarkets = {
+      ...MOCK_SNAPSHOT,
+      pulse_json: JSON.stringify({
+        computed_at: "2026-10-21T14:38:00Z",
+        pulse_adjustment: -0.4,
+        signals: {
+          polymarket_war_risk: {
+            contribution: -0.4,
+            details: {
+              monitored_markets: [
+                { id: "1124834", name: "US x Russia military clash by December 31, 2026?", short: "US-RU Clash" },
+                { id: "2749367", name: "Will Russia invade a NATO country by December 31, 2026?", short: "RU-NATO Invasion" },
+                { id: "2749382", name: "NATO/EU troops fighting in Ukraine by December 31, 2026?", short: "NATO Troops in UA" },
+              ],
+            },
+          },
+        },
+      }),
+    };
+    const db = createMockDb({ snapshots: [mockPulseWithMarkets], observations: MOCK_OBSERVATIONS });
+    // Mock fetch for Gamma API
+    const originalFetch = global.fetch;
+    global.fetch = async (url) => {
+      if (url.includes("gamma-api.polymarket.com/markets/")) {
+        const mid = url.split("/").pop();
+        const mockMarket = {
+          question: "Test Market",
+          outcomes: ["No", "Yes"],
+          clobTokenIds: ["token_no", "token_yes"],
+          outcomePrices: JSON.stringify(["0.95", "0.05"]),
+          volume: "1000000",
+        };
+        return {
+          ok: true,
+          status: 200,
+          json: async () => mockMarket,
+        };
+      }
+      return { ok: false, status: 404 };
+    };
+
+    const req = new Request("https://api.ww3risk.org/api/feeds/polymarket");
+    const res = await worker.fetch(req, { DB: db }, {});
+
+    global.fetch = originalFetch;
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.ok(data.markets);
+    assert.equal(data.markets.length, 3);
+    for (const m of data.markets) {
+      assert.ok(m.id);
+      assert.ok(m.question);
+      assert.ok(m.short);
+      assert.ok(m.yes_token_id === "token_yes");
+      assert.ok(typeof m.midpoint === "string");
+      assert.ok(m.fetched_at);
+    }
+    assert.equal(data.fallback, false);
+    assert.equal(data.error, null);
+  });
+
+  it("GET /api/feeds/polymarket returns fallback when Gamma fails", async () => {
+    const db = createMockDb({ snapshots: [MOCK_SNAPSHOT], observations: MOCK_OBSERVATIONS });
+    const originalFetch = global.fetch;
+    global.fetch = async () => ({ ok: false, status: 500 });
+
+    const req = new Request("https://api.ww3risk.org/api/feeds/polymarket");
+    const res = await worker.fetch(req, { DB: db }, {});
+
+    global.fetch = originalFetch;
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.markets.length, 0);
+    assert.equal(data.fallback, true);
+    assert.ok(data.error && data.error.includes("Gamma API unavailable"));
+  });
 });
