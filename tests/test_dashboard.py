@@ -1300,6 +1300,32 @@ def test_compute_trend_drivers_js_behavior(tmp_path):
         },
     ])
 
+    # Fixture 5: Exactly 4 candidates → 3 drivers, omitted_count = 1
+    fixture5 = json.dumps([
+        {
+            "date": "2026-10-24",
+            "computed_at": "2026-10-24T12:00:00Z",
+            "composite_index": 80.0,
+            "structural_index": 80.0,
+            "pulse_adjustment": 0.0,
+            "stage": 3,
+            "signals": [],
+        },
+        {
+            "date": "2026-10-25",
+            "computed_at": "2026-10-25T12:00:00Z",
+            "composite_index": 84.0,
+            "structural_index": 81.0,
+            "pulse_adjustment": 3.0,
+            "stage": 3,
+            "signals": [
+                {"signal_id": "s1", "name": "Signal 1", "contribution": 1.5, "status": "live", "raw_value": 15.0, "raw_unit": ""},
+                {"signal_id": "s2", "name": "Signal 2", "contribution": 1.0, "status": "live", "raw_value": 10.0, "raw_unit": ""},
+                {"signal_id": "s3", "name": "Signal 3", "contribution": 0.5, "status": "live", "raw_value": 5.0, "raw_unit": ""},
+            ],
+        },
+    ])
+
     test_script = f"""
 {fn_source}
 
@@ -1315,6 +1341,7 @@ if (!steps1[0].baseline) throw new Error("First step should be baseline");
 if (steps1[0].drivers.length !== 0) throw new Error("Baseline should have no drivers");
 if (steps1[1].baseline) throw new Error("Second step should not be baseline");
 if (steps1[1].drivers.length > 3) throw new Error("Should have at most 3 drivers");
+if (steps1[1].omitted_count !== 0) throw new Error("Fixture 1: expected omitted_count 0 (3 candidates)");
 
 // Check order by |Δ| descending
 const deltas1 = steps1[1].drivers.map(d => Math.abs(d.delta));
@@ -1329,10 +1356,20 @@ console.log("=== Fixture 2: >3 candidates ===");
 console.log(JSON.stringify(steps2, null, 2));
 
 if (steps2[1].drivers.length !== 3) throw new Error("Should have exactly 3 drivers when >3 candidates");
+if (steps2[1].omitted_count !== 2) throw new Error("Fixture 2: expected omitted_count 2 (5 candidates)");
 const deltas2 = steps2[1].drivers.map(d => Math.abs(d.delta));
 for (let i = 0; i < deltas2.length - 1; i++) {{
   if (deltas2[i] < deltas2[i + 1]) throw new Error("Drivers not sorted by |Δ| descending");
 }}
+
+// Fixture 5: Exactly 4 candidates → 3 drivers, omitted_count = 1
+const points5 = {fixture5};
+const steps5 = computeTrendDrivers(points5);
+console.log("=== Fixture 5: Exactly 4 candidates ===");
+console.log(JSON.stringify(steps5, null, 2));
+
+if (steps5[1].drivers.length !== 3) throw new Error("Fixture 5: Should have exactly 3 drivers when 4 candidates");
+if (steps5[1].omitted_count !== 1) throw new Error("Fixture 5: expected omitted_count 1 (4 candidates)");
 
 // Fixture 3: Signal missing → data_gap: true
 const points3 = {fixture3};
@@ -1351,6 +1388,7 @@ console.log(JSON.stringify(steps4, null, 2));
 if (!steps4[0].baseline) throw new Error("First step should be baseline");
 if (!steps4[1].flat) throw new Error("Second step should be flat when all deltas zero");
 if (steps4[1].drivers.length !== 0) throw new Error("Flat step should have no drivers");
+if (steps4[1].omitted_count !== 0) throw new Error("Fixture 4: expected omitted_count 0 (flat)");
 
 console.log("ALL TESTS PASSED");
 """

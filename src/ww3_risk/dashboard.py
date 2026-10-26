@@ -4664,6 +4664,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
         // 按 |Δ| 由大到小排序，最多取 3 個
         candidates.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
         const topDrivers = candidates.slice(0, 3);
+        const omittedCount = Math.max(0, candidates.length - 3);
 
         // clamp 註記
         const sumParts = currStructural + (curr.pulse_adjustment || 0);
@@ -4683,6 +4684,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
           drivers: topDrivers,
           flat: flat,
           clamp_note: clampNote,
+          omitted_count: omittedCount,
         });
       }
       return steps;
@@ -4753,6 +4755,11 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
             `;
           }
           html += '</div>';
+        }
+
+        // 未列出驅動註記
+        if (step.omitted_count && step.omitted_count > 0) {
+          html += '<div style="margin-top:8px;padding:6px 10px;background:rgba(148,163,184,0.1);border:1px solid rgba(148,163,184,0.3);border-radius:4px;font-size:0.7rem;color:#94a3b8;font-family:var(--font-mono);">另有 ' + step.omitted_count + ' 項較小變動未列出（只列 |Δ| 最大的 3 項）</div>';
         }
 
         if (step.clamp_note) {
