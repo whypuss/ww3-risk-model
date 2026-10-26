@@ -1343,6 +1343,12 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
     pulse_data = data.get("pulse")
     initial_trend_points = data.get("initial_trend_points") or []
 
+    # Load pure JS functions for embedding (testable via node --test)
+    pure_js_path = Path(__file__).parent / "dashboard_pure.js"
+    pure_js_functions = ""
+    if pure_js_path.exists():
+        pure_js_functions = pure_js_path.read_text(encoding="utf-8")
+
     stage = main["stage"]
     gauge_svg = render_gauge_svg(composite_index)
     pulse_card_html = render_pulse_card_html(pulse_data, structural_index, pulse_adj, composite_index)
@@ -4483,7 +4489,8 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
     .feed-markets tr:last-child { border-bottom: none; }
   </style>"""
 
-    js_script = """
+    js_script = pure_js_functions + """
+
     // Global Access to Embedded Scenario and Model Data
     window.WW3_MODEL_DATA = JSON.parse(document.getElementById('ww3-model-data').textContent);
     console.log("WW3 Model Data Loaded Successfully:", window.WW3_MODEL_DATA);
@@ -4716,133 +4723,7 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
     // ==========================================================================
     // Trend Drivers Log: 綜合指數升跌主因逐日分解
     // ==========================================================================
-
-    function computeTrendDrivers(points) {
-      // 輸入：history daily points（按日期升序）
-      // 輸出：每一步 {from_date, to_date, prev_composite, composite, delta, drivers: [...], baseline?, flat?}
-      if (!points || points.length === 0) return [];
-
-      const steps = [];
-      for (let i = 0; i < points.length; i++) {
-        const curr = points[i];
-        if (i === 0) {
-          // 第一個點為基線日
-          steps.push({
-            from_date: curr.date,
-            to_date: curr.date,
-            prev_composite: Number(curr.composite_index),
-            composite: Number(curr.composite_index),
-            delta: 0.0,
-            drivers: [],
-            baseline: true,
-          });
-          continue;
-        }
-
-        const prev = points[i - 1];
-        const prevComposite = Number(prev.composite_index);
-        const currComposite = Number(curr.composite_index);
-        const delta = currComposite - prevComposite;
-
-        const prevStructural = Number(prev.structural_index);
-        const currStructural = Number(curr.structural_index);
-        const structuralDelta = currStructural - prevStructural;
-
-        // 收集候選驅動
-        const candidates = [];
-
-        // 1. 結構指數變動
-        if (Math.abs(structuralDelta) > 0.001) {
-          candidates.push({
-            label: "結構指數（36 項年度指標）",
-            delta: structuralDelta,
-            prev_contribution: prevStructural,
-            contribution: currStructural,
-            prev_raw: prevStructural,
-            raw: currStructural,
-            raw_unit: "分",
-            data_gap: false,
-          });
-        }
-
-        // 2. 各 pulse 訊號貢獻變動
-        const prevSignals = (prev.signals && Array.isArray(prev.signals)) ? prev.signals : [];
-        const currSignals = (curr.signals && Array.isArray(curr.signals)) ? curr.signals : [];
-
-        // 建立 signal_id 到訊號的映射
-        const prevSigMap = {};
-        for (const s of prevSignals) {
-          prevSigMap[s.signal_id] = s;
-        }
-        const currSigMap = {};
-        for (const s of currSignals) {
-          currSigMap[s.signal_id] = s;
-        }
-
-        // 所有出現過的 signal_id
-        const allSignalIds = new Set([...Object.keys(prevSigMap), ...Object.keys(currSigMap)]);
-
-        for (const sid of allSignalIds) {
-          const ps = prevSigMap[sid];
-          const cs = currSigMap[sid];
-
-          const prevContrib = ps ? Number(ps.contribution) : 0;
-          const currContrib = cs ? Number(cs.contribution) : 0;
-          const contribDelta = currContrib - prevContrib;
-
-          if (Math.abs(contribDelta) < 0.001) continue;
-
-          const prevRaw = ps && ps.raw_value !== null ? ps.raw_value : null;
-          const currRaw = cs && cs.raw_value !== null ? cs.raw_value : null;
-          const rawUnit = (cs && cs.raw_unit) || (ps && ps.raw_unit) || "";
-
-          // 數據缺失誠實標記：任一邊 status !== 'live'
-          const prevLive = ps && ps.status === "live";
-          const currLive = cs && cs.status === "live";
-          const dataGap = !prevLive || !currLive;
-
-          const name = (cs && cs.name) || (ps && ps.name) || sid;
-
-          candidates.push({
-            label: name,
-            delta: contribDelta,
-            prev_contribution: prevContrib,
-            contribution: currContrib,
-            prev_raw: prevRaw,
-            raw: currRaw,
-            raw_unit: rawUnit,
-            data_gap: dataGap,
-          });
-        }
-
-        // 按 |Δ| 由大到小排序，最多取 3 個
-        candidates.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
-        const topDrivers = candidates.slice(0, 3);
-        const omittedCount = Math.max(0, candidates.length - 3);
-
-        // clamp 註記
-        const sumParts = currStructural + (curr.pulse_adjustment || 0);
-        const clampNote = Math.abs(sumParts - currComposite) > 0.01;
-
-        let flat = false;
-        if (topDrivers.length === 0) {
-          flat = true;
-        }
-
-        steps.push({
-          from_date: prev.date,
-          to_date: curr.date,
-          prev_composite: prevComposite,
-          composite: currComposite,
-          delta: delta,
-          drivers: topDrivers,
-          flat: flat,
-          clamp_note: clampNote,
-          omitted_count: omittedCount,
-        });
-      }
-      return steps;
-    }
+    // Pure function computeTrendDrivers is loaded from dashboard_pure.js (testable via node --test)
 
     function renderTrendDriversLog(steps) {
       const container = document.getElementById('trend-drivers-log');
@@ -5117,38 +4998,8 @@ def build_dashboard_html(data: Dict[str, Any], ui_step: int = 5, api_base: Optio
     // Live Feeds: Fetch /api/feeds/latest and /api/feeds/polymarket
     // ==========================================================================
 
-    // Pure function: Parse Polymarket WebSocket price message
-    // Exposed for node --check / node --test
-    window.parsePolymarketWsMessage = function(msg) {
-      try {
-        const data = JSON.parse(msg);
-        if (data.type !== "price" || !data.asset_id || data.midpoint === undefined) {
-          return null;
-        }
-        return {
-          asset_id: data.asset_id,
-          midpoint: Number(data.midpoint),
-          timestamp: data.timestamp || Date.now(),
-        };
-      } catch (e) {
-        return null;
-      }
-    };
-
-    // Pure function: Check if feed is stale based on expiry thresholds
-    window.isFeedStale = function(feedId, fetchedAt) {
-      if (!fetchedAt) return true;
-      const fetched = new Date(fetchedAt).getTime();
-      const now = Date.now();
-      const diffMinutes = (now - fetched) / 60000;
-      if (feedId === "gdelt" || feedId === "hormuz") {
-        return diffMinutes > 45;
-      }
-      if (feedId === "opensky") {
-        return diffMinutes > 180; // 3 hours
-      }
-      return false;
-    };
+    // Pure functions parsePolymarketWsMessage, isFeedStale, computeTrendDrivers
+    // are loaded from dashboard_pure.js (testable via node --test)
 
     // Render a single feed card
     function renderFeedCard(feed) {
