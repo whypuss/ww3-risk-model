@@ -556,6 +556,18 @@ async function fetchHormuz() {
   };
 }
 
+function parseJsonField(field) {
+  if (Array.isArray(field)) return field;
+  if (typeof field === "string" && field.trim()) {
+    try {
+      return JSON.parse(field);
+    } catch (e) {
+      return [];
+    }
+  }
+  return [];
+}
+
 async function fetchPolymarketMarkets(db, marketIds) {
   const results = [];
   for (const mid of marketIds) {
@@ -565,21 +577,25 @@ async function fetchPolymarketMarkets(db, marketIds) {
       continue;
     }
     const data = await response.json();
-    const outcomes = data?.outcomes || [];
-    const clobTokenIds = data?.clobTokenIds || [];
+    const outcomes = parseJsonField(data?.outcomes);
+    const clobTokenIds = parseJsonField(data?.clobTokenIds);
     let yesTokenId = null;
+    let yesIndex = -1;
     for (let i = 0; i < outcomes.length; i++) {
       if (outcomes[i] === "Yes" && clobTokenIds[i]) {
         yesTokenId = clobTokenIds[i];
+        yesIndex = i;
         break;
       }
     }
     const prices = data?.outcomePrices ? JSON.parse(data.outcomePrices) : [];
-    const yesPrice = prices[0] !== undefined ? parseFloat(prices[0]) : null;
+    const yesPrice = yesIndex >= 0 && prices[yesIndex] !== undefined ? parseFloat(prices[yesIndex]) : null;
+    const rawShort = data?.question?.split("?")[0]?.substring(0, 50) || "";
+    const short = rawShort.replace(/,\s*$/, "").trim();
     results.push({
       id: mid,
       question: data?.question || "",
-      short: data?.question?.split("?")[0]?.substring(0, 50) || "",
+      short,
       yes_token_id: yesTokenId,
       midpoint: yesPrice !== null ? (yesPrice * 100).toFixed(2) : null,
       fetched_at: new Date().toISOString(),
@@ -589,26 +605,40 @@ async function fetchPolymarketMarkets(db, marketIds) {
 }
 
 async function handleFeedsLatest(db) {
+  try {
+    await db
+      .prepare(
+        "CREATE TABLE IF NOT EXISTS live_feed_snapshots (feed_id TEXT PRIMARY KEY, fetched_at TEXT, status TEXT, payload_json TEXT, error TEXT)"
+      )
+      .run();
+  } catch (e) {
+    // Ignore CREATE TABLE errors, continue to read feeds
+  }
+
   const feedIds = ["gdelt", "opensky", "hormuz", "polymarket"];
   const feeds = [];
   for (const fid of feedIds) {
-    const row = await db.prepare("SELECT * FROM live_feed_snapshots WHERE feed_id = ?").bind(fid).first();
-    if (!row) {
-      feeds.push({ feed_id: fid, fetched_at: null, status: "never_fetched", payload: null, error: null });
-    } else {
-      let payload = null;
-      try {
-        payload = JSON.parse(row.payload_json || "null");
-      } catch (e) {
-        payload = null;
+    try {
+      const row = await db.prepare("SELECT * FROM live_feed_snapshots WHERE feed_id = ?").bind(fid).first();
+      if (!row) {
+        feeds.push({ feed_id: fid, fetched_at: null, status: "never_fetched", payload: null, error: null });
+      } else {
+        let payload = null;
+        try {
+          payload = JSON.parse(row.payload_json || "null");
+        } catch (e) {
+          payload = null;
+        }
+        feeds.push({
+          feed_id: row.feed_id,
+          fetched_at: row.fetched_at,
+          status: row.status,
+          payload,
+          error: row.error,
+        });
       }
-      feeds.push({
-        feed_id: row.feed_id,
-        fetched_at: row.fetched_at,
-        status: row.status,
-        payload,
-        error: row.error,
-      });
+    } catch (e) {
+      feeds.push({ feed_id: fid, fetched_at: null, status: "never_fetched", payload: null, error: null });
     }
   }
   return jsonResponse({ feeds });
@@ -639,6 +669,12 @@ async function handleFeedsPolymarket(db) {
 async function scheduledHandler(event, env, ctx) {
   const db = env.DB;
   if (!db) return;
+
+  await db
+    .prepare(
+      "CREATE TABLE IF NOT EXISTS live_feed_snapshots (feed_id TEXT PRIMARY KEY, fetched_at TEXT, status TEXT, payload_json TEXT, error TEXT)"
+    )
+    .run();
 
   const now = new Date();
   const minute = now.getUTCMinutes();

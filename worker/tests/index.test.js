@@ -582,6 +582,62 @@ describe("WW3 Risk Model Worker API", () => {
     assert.equal(data.error, null);
   });
 
+  it("Gamma API string fields: outcomes and clobTokenIds as JSON strings still parse correctly", async () => {
+    const mockPulseWithMarkets = {
+      ...MOCK_SNAPSHOT,
+      pulse_json: JSON.stringify({
+        computed_at: "2026-10-21T14:38:00Z",
+        pulse_adjustment: -0.4,
+        signals: {
+          polymarket_war_risk: {
+            contribution: -0.4,
+            details: {
+              monitored_markets: [
+                { id: "1124834", name: "Test Market?", short: "Test Market" },
+              ],
+            },
+          },
+        },
+      }),
+    };
+    const db = createMockDb({ snapshots: [mockPulseWithMarkets], observations: MOCK_OBSERVATIONS });
+    const originalFetch = global.fetch;
+    global.fetch = async (url) => {
+      if (url.includes("gamma-api.polymarket.com/markets/")) {
+        // Return outcomes and clobTokenIds as JSON-encoded STRINGS (the bug scenario)
+        const mockMarket = {
+          question: "Test Market?",
+          outcomes: '["No", "Yes"]', // JSON string, not array
+          clobTokenIds: '["token_no", "token_yes"]', // JSON string, not array
+          outcomePrices: JSON.stringify(["0.95", "0.05"]),
+          volume: "1000000",
+        };
+        return {
+          ok: true,
+          status: 200,
+          json: async () => mockMarket,
+        };
+      }
+      return { ok: false, status: 404 };
+    };
+
+    const req = new Request("https://api.ww3risk.org/api/feeds/polymarket");
+    const res = await worker.fetch(req, { DB: db }, {});
+
+    global.fetch = originalFetch;
+
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.ok(data.markets);
+    assert.equal(data.markets.length, 1);
+    const m = data.markets[0];
+    assert.equal(m.id, "1124834");
+    assert.equal(m.yes_token_id, "token_yes"); // Must correctly find Yes token even with string fields
+    assert.equal(m.midpoint, "5.00");
+    assert.ok(m.short);
+    assert.equal(data.fallback, false);
+  });
+
   it("GET /api/feeds/polymarket returns fallback when Gamma fails", async () => {
     const db = createMockDb({ snapshots: [MOCK_SNAPSHOT], observations: MOCK_OBSERVATIONS });
     const originalFetch = global.fetch;
