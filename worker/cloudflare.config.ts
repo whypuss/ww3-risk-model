@@ -1,4 +1,4 @@
-import { bindings, defineConfig } from "cf/config";
+import { bindings, defineConfig, triggers } from "cf/config";
 
 export default defineConfig({
 	worker: {
@@ -11,5 +11,6 @@ export default defineConfig({
 				id: "614ee93b-e679-4b1b-a874-7a8b7260d6d6",
 			}),
 		},
+		triggers: [triggers.scheduled({ schedule: "*/15 * * * *" })],
 	},
 });
