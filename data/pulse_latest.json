@@ -1,13 +1,13 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-10-26T00:26:31Z",
-  "pulse_adjustment": -0.68,
+  "computed_at": "2026-10-26T01:26:32Z",
+  "pulse_adjustment": 3.25,
   "range": [
     -10.0,
     10.0
   ],
   "status": "operational",
-  "active_signals_count": 2,
+  "active_signals_count": 3,
   "total_signals_count": 3,
   "weights": {
     "gdelt_conflict": 0.4,
@@ -21,14 +21,19 @@
       "source": "GDELT 2.0 Doc TimelineVol API",
       "source_url": "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json",
       "weight": 0.4,
-      "status": "unavailable",
-      "fetched_at": null,
-      "raw_value": null,
+      "status": "live",
+      "fetched_at": "2026-10-26T01:26:31Z",
+      "raw_value": 17.4222,
       "raw_unit": "% (全球新聞總量佔比)",
-      "normalized_score": 0.0,
-      "contribution": 0.0,
-      "details": {},
-      "error": "HTTP Error 429: Too Many Requests"
+      "normalized_score": 1.0,
+      "contribution": 4.0,
+      "details": {
+        "latest_date": "20261025T000000Z",
+        "history_points": 68,
+        "baseline_30d": 15.4854,
+        "formula": "clamp((raw - 15.49) / 1.75, -1.0, 1.0)"
+      },
+      "error": null
     },
     "polymarket_war_risk": {
       "signal_id": "polymarket_war_risk",
@@ -37,7 +42,7 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-10-26T00:26:25Z",
+      "fetched_at": "2026-10-26T01:26:32Z",
       "raw_value": 4.02,
       "raw_unit": "% (Yes 隱含機率)",
       "normalized_score": -0.0983,
@@ -49,7 +54,7 @@
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
             "yes_price": 0.0295,
-            "volume": 1087673.0006240003
+            "volume": 1087673.000624
           },
           {
             "id": "2749367",
@@ -78,13 +83,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-10-26T00:26:31Z",
-      "raw_value": -1.38,
+      "fetched_at": "2026-10-26T01:26:32Z",
+      "raw_value": -1.64,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": -0.1379,
-      "contribution": -0.34,
+      "normalized_score": -0.1638,
+      "contribution": -0.41,
       "details": {
-        "price_usd": 110.16,
+        "price_usd": 109.87,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
