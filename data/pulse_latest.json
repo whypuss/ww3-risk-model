@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-10-27T11:26:23Z",
-  "pulse_adjustment": -0.48,
+  "computed_at": "2026-10-27T12:26:24Z",
+  "pulse_adjustment": -0.44,
   "range": [
     -10.0,
     10.0
@@ -37,7 +37,7 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-10-27T11:26:23Z",
+      "fetched_at": "2026-10-27T12:26:24Z",
       "raw_value": 4.2,
       "raw_unit": "% (Yes 隱含機率)",
       "normalized_score": -0.08,
@@ -78,13 +78,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-10-27T11:26:23Z",
-      "raw_value": -0.8,
+      "fetched_at": "2026-10-27T12:26:24Z",
+      "raw_value": -0.62,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": -0.0795,
-      "contribution": -0.2,
+      "normalized_score": -0.0623,
+      "contribution": -0.16,
       "details": {
-        "price_usd": 109.86,
+        "price_usd": 110.05,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
