@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-10-27T21:26:29Z",
-  "pulse_adjustment": -0.55,
+  "computed_at": "2026-10-27T22:26:39Z",
+  "pulse_adjustment": -0.29,
   "range": [
     -10.0,
     10.0
@@ -37,7 +37,7 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-10-27T21:26:28Z",
+      "fetched_at": "2026-10-27T22:26:38Z",
       "raw_value": 4.08,
       "raw_unit": "% (Yes 隱含機率)",
       "normalized_score": -0.0917,
@@ -48,21 +48,21 @@
             "id": "1124834",
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
-            "yes_price": 0.0365,
-            "volume": 1087778.4951530003
+            "yes_price": 0.036,
+            "volume": 1087778.495153
           },
           {
             "id": "2749367",
             "question": "Will Russia invade a NATO country by December 31, 2026?",
             "short": "RU-NATO Invasion",
             "yes_price": 0.04,
-            "volume": 459370.86058899993
+            "volume": 459370.86058900005
           },
           {
             "id": "2749382",
             "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
             "short": "NATO Troops in UA",
-            "yes_price": 0.046,
+            "yes_price": 0.0465,
             "volume": 159381.674712
           }
         ],
@@ -78,13 +78,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-10-27T21:26:29Z",
-      "raw_value": -0.9,
+      "fetched_at": "2026-10-27T22:26:39Z",
+      "raw_value": 0.12,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": -0.0903,
-      "contribution": -0.23,
+      "normalized_score": 0.0119,
+      "contribution": 0.03,
       "details": {
-        "price_usd": 109.74,
+        "price_usd": 109.54,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
