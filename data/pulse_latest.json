@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-10-28T02:26:28Z",
-  "pulse_adjustment": 0.15,
+  "computed_at": "2026-10-28T03:26:22Z",
+  "pulse_adjustment": 0.04,
   "range": [
     -10.0,
     10.0
@@ -37,10 +37,10 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-10-28T02:26:27Z",
-      "raw_value": 4.25,
+      "fetched_at": "2026-10-28T03:26:22Z",
+      "raw_value": 4.27,
       "raw_unit": "% (Yes 隱含機率)",
-      "normalized_score": -0.075,
+      "normalized_score": -0.0733,
       "contribution": -0.26,
       "details": {
         "monitored_markets": [
@@ -48,7 +48,7 @@
             "id": "1124834",
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
-            "yes_price": 0.0365,
+            "yes_price": 0.037,
             "volume": 1087789.7819710001
           },
           {
@@ -78,13 +78,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-10-28T02:26:28Z",
-      "raw_value": 1.65,
+      "fetched_at": "2026-10-28T03:26:22Z",
+      "raw_value": 1.22,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": 0.1654,
-      "contribution": 0.41,
+      "normalized_score": 0.1216,
+      "contribution": 0.3,
       "details": {
-        "price_usd": 111.22,
+        "price_usd": 110.74,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
