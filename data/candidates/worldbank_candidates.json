@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-29T03:26:39Z",
+  "generated_at": "2026-10-29T04:26:47Z",
   "source": "World Bank Open Data API v2 (api.worldbank.org)",
   "disclaimer": "Candidate values generated for expert review. Not applied to baseline without manual rubric calibration.",
   "series_count": 5,
@@ -52,13 +52,13 @@
       "target_indicator_id": "l1_energy_vulnerability",
       "target_indicator_name": "化石能源與電網供應鏈脆弱性",
       "applicability_rationale": "全球化石能源消費佔比反映對碳氫化合物戰略航道（霍爾木茲/曼德海峽）之剛性依賴度。",
-      "candidate_year": "2024",
-      "candidate_raw_value": 80.0586496363126,
+      "candidate_year": null,
+      "candidate_raw_value": null,
       "current_model_raw_value": 80.2,
       "current_model_score": 60.0,
       "current_evidence_level": "inference",
-      "fetch_status": "success",
-      "diff_analysis": "Candidate WB value: 80.0586496363126 (2024) vs. current baseline: 80.2 (score: 60.0)"
+      "fetch_status": "fetch_failed_or_empty",
+      "diff_analysis": "No remote value retrieved; baseline unchanged."
     },
     {
       "wb_code": "SI.POV.GINI",
