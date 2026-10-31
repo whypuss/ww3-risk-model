@@ -1,6 +1,6 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-10-31T01:26:35Z",
+  "computed_at": "2026-10-31T02:26:29Z",
   "pulse_adjustment": 2.08,
   "range": [
     -10.0,
@@ -22,7 +22,7 @@
       "source_url": "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json",
       "weight": 0.4,
       "status": "live",
-      "fetched_at": "2026-10-31T01:26:33Z",
+      "fetched_at": "2026-10-31T02:26:28Z",
       "raw_value": 16.4563,
       "raw_unit": "% (全球新聞總量佔比)",
       "normalized_score": 0.5071,
@@ -42,7 +42,7 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-10-31T01:26:34Z",
+      "fetched_at": "2026-10-31T02:26:29Z",
       "raw_value": 4.13,
       "raw_unit": "% (Yes 隱含機率)",
       "normalized_score": -0.0867,
@@ -68,7 +68,7 @@
             "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
             "short": "NATO Troops in UA",
             "yes_price": 0.0445,
-            "volume": 159569.08020899998
+            "volume": 159569.080209
           }
         ],
         "baseline_anchor": 0.05,
@@ -83,7 +83,7 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-10-31T01:26:35Z",
+      "fetched_at": "2026-10-31T02:26:29Z",
       "raw_value": 1.38,
       "raw_unit": "% (24h 漲跌幅)",
       "normalized_score": 0.1381,
