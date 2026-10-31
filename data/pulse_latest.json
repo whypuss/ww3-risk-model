@@ -1,13 +1,13 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-10-31T02:26:29Z",
-  "pulse_adjustment": 2.08,
+  "computed_at": "2026-10-31T03:26:25Z",
+  "pulse_adjustment": 0.05,
   "range": [
     -10.0,
     10.0
   ],
   "status": "operational",
-  "active_signals_count": 3,
+  "active_signals_count": 2,
   "total_signals_count": 3,
   "weights": {
     "gdelt_conflict": 0.4,
@@ -21,19 +21,14 @@
       "source": "GDELT 2.0 Doc TimelineVol API",
       "source_url": "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json",
       "weight": 0.4,
-      "status": "live",
-      "fetched_at": "2026-10-31T02:26:28Z",
-      "raw_value": 16.4563,
+      "status": "unavailable",
+      "fetched_at": null,
+      "raw_value": null,
       "raw_unit": "% (全球新聞總量佔比)",
-      "normalized_score": 0.5071,
-      "contribution": 2.03,
-      "details": {
-        "latest_date": "20261027T000000Z",
-        "history_points": 65,
-        "baseline_30d": 15.5689,
-        "formula": "clamp((raw - 15.57) / 1.75, -1.0, 1.0)"
-      },
-      "error": null
+      "normalized_score": 0.0,
+      "contribution": 0.0,
+      "details": {},
+      "error": "HTTP Error 429: Too Many Requests"
     },
     "polymarket_war_risk": {
       "signal_id": "polymarket_war_risk",
@@ -42,7 +37,7 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-10-31T02:26:29Z",
+      "fetched_at": "2026-10-31T03:26:25Z",
       "raw_value": 4.13,
       "raw_unit": "% (Yes 隱含機率)",
       "normalized_score": -0.0867,
@@ -61,7 +56,7 @@
             "question": "Will Russia invade a NATO country by December 31, 2026?",
             "short": "RU-NATO Invasion",
             "yes_price": 0.0425,
-            "volume": 463345.06058899994
+            "volume": 463345.560589
           },
           {
             "id": "2749382",
@@ -83,7 +78,7 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-10-31T02:26:29Z",
+      "fetched_at": "2026-10-31T03:26:25Z",
       "raw_value": 1.38,
       "raw_unit": "% (24h 漲跌幅)",
       "normalized_score": 0.1381,
