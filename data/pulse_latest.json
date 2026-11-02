@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-11-02T01:26:27Z",
-  "pulse_adjustment": -1.1,
+  "computed_at": "2026-11-02T02:26:36Z",
+  "pulse_adjustment": -1.15,
   "range": [
     -10.0,
     10.0
@@ -37,7 +37,7 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-11-02T01:26:25Z",
+      "fetched_at": "2026-11-02T02:26:29Z",
       "raw_value": 3.47,
       "raw_unit": "% (Yes 隱含機率)",
       "normalized_score": -0.1533,
@@ -56,14 +56,14 @@
             "question": "Will Russia invade a NATO country by December 31, 2026?",
             "short": "RU-NATO Invasion",
             "yes_price": 0.0355,
-            "volume": 469612.9874769999
+            "volume": 469733.0915299999
           },
           {
             "id": "2749382",
             "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
             "short": "NATO Troops in UA",
             "yes_price": 0.032,
-            "volume": 159609.08020900004
+            "volume": 159609.080209
           }
         ],
         "baseline_anchor": 0.05,
@@ -78,13 +78,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-11-02T01:26:27Z",
-      "raw_value": -2.24,
+      "fetched_at": "2026-11-02T02:26:36Z",
+      "raw_value": -2.42,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": -0.2239,
-      "contribution": -0.56,
+      "normalized_score": -0.2424,
+      "contribution": -0.61,
       "details": {
-        "price_usd": 110.89,
+        "price_usd": 110.68,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
