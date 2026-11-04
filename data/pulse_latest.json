@@ -1,13 +1,13 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-11-04T09:26:25Z",
-  "pulse_adjustment": -0.65,
+  "computed_at": "2026-11-04T10:26:34Z",
+  "pulse_adjustment": -2.48,
   "range": [
     -10.0,
     10.0
   ],
   "status": "operational",
-  "active_signals_count": 2,
+  "active_signals_count": 3,
   "total_signals_count": 3,
   "weights": {
     "gdelt_conflict": 0.4,
@@ -21,14 +21,19 @@
       "source": "GDELT 2.0 Doc TimelineVol API",
       "source_url": "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json",
       "weight": 0.4,
-      "status": "unavailable",
-      "fetched_at": null,
-      "raw_value": null,
+      "status": "live",
+      "fetched_at": "2026-11-04T10:26:27Z",
+      "raw_value": 14.8977,
       "raw_unit": "% (全球新聞總量佔比)",
-      "normalized_score": 0.0,
-      "contribution": 0.0,
-      "details": {},
-      "error": "HTTP Error 429: Too Many Requests"
+      "normalized_score": -0.3994,
+      "contribution": -1.6,
+      "details": {
+        "latest_date": "20261103T000000Z",
+        "history_points": 62,
+        "baseline_30d": 15.5966,
+        "formula": "clamp((raw - 15.60) / 1.75, -1.0, 1.0)"
+      },
+      "error": null
     },
     "polymarket_war_risk": {
       "signal_id": "polymarket_war_risk",
@@ -37,18 +42,18 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-11-04T09:26:24Z",
-      "raw_value": 3.42,
+      "fetched_at": "2026-11-04T10:26:28Z",
+      "raw_value": 3.47,
       "raw_unit": "% (Yes 隱含機率)",
-      "normalized_score": -0.1583,
-      "contribution": -0.55,
+      "normalized_score": -0.1533,
+      "contribution": -0.54,
       "details": {
         "monitored_markets": [
           {
             "id": "1124834",
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
-            "yes_price": 0.0355,
+            "yes_price": 0.037,
             "volume": 1087949.7099000006
           },
           {
@@ -63,7 +68,7 @@
             "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
             "short": "NATO Troops in UA",
             "yes_price": 0.04,
-            "volume": 159628.080209
+            "volume": 159628.08020899998
           }
         ],
         "baseline_anchor": 0.05,
@@ -78,13 +83,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-11-04T09:26:25Z",
-      "raw_value": -0.4,
+      "fetched_at": "2026-11-04T10:26:34Z",
+      "raw_value": -1.38,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": -0.0396,
-      "contribution": -0.1,
+      "normalized_score": -0.138,
+      "contribution": -0.34,
       "details": {
-        "price_usd": 103.19,
+        "price_usd": 102.17,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
