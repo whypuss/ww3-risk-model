@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-11-04T20:26:34Z",
-  "pulse_adjustment": -2.57,
+  "computed_at": "2026-11-04T21:26:51Z",
+  "pulse_adjustment": -2.64,
   "range": [
     -10.0,
     10.0
@@ -37,7 +37,7 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-11-04T20:26:34Z",
+      "fetched_at": "2026-11-04T21:26:50Z",
       "raw_value": 3.3,
       "raw_unit": "% (Yes 隱含機率)",
       "normalized_score": -0.17,
@@ -48,21 +48,21 @@
             "id": "1124834",
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
-            "yes_price": 0.0375,
-            "volume": 1087970.2803620002
+            "yes_price": 0.0355,
+            "volume": 1087970.2803620005
           },
           {
             "id": "2749367",
             "question": "Will Russia invade a NATO country by December 31, 2026?",
             "short": "RU-NATO Invasion",
-            "yes_price": 0.0215,
-            "volume": 493166.58693099994
+            "yes_price": 0.023,
+            "volume": 493595.4445309999
           },
           {
             "id": "2749382",
             "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
             "short": "NATO Troops in UA",
-            "yes_price": 0.04,
+            "yes_price": 0.0405,
             "volume": 159631.946189
           }
         ],
@@ -78,13 +78,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-11-04T20:26:34Z",
-      "raw_value": -7.91,
+      "fetched_at": "2026-11-04T21:26:51Z",
+      "raw_value": -8.19,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": -0.7905,
-      "contribution": -1.98,
+      "normalized_score": -0.8185,
+      "contribution": -2.05,
       "details": {
-        "price_usd": 95.41,
+        "price_usd": 95.12,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
