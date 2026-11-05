@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-11-05T20:26:29Z",
-  "pulse_adjustment": -1.19,
+  "computed_at": "2026-11-05T21:26:39Z",
+  "pulse_adjustment": -1.17,
   "range": [
     -10.0,
     10.0
@@ -22,7 +22,7 @@
       "source_url": "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json",
       "weight": 0.4,
       "status": "live",
-      "fetched_at": "2026-11-05T20:26:27Z",
+      "fetched_at": "2026-11-05T21:26:33Z",
       "raw_value": 14.8977,
       "raw_unit": "% (全球新聞總量佔比)",
       "normalized_score": -0.3994,
@@ -42,7 +42,7 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-11-05T20:26:28Z",
+      "fetched_at": "2026-11-05T21:26:33Z",
       "raw_value": 3.25,
       "raw_unit": "% (Yes 隱含機率)",
       "normalized_score": -0.175,
@@ -54,21 +54,21 @@
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
             "yes_price": 0.0355,
-            "volume": 1087981.3803620003
+            "volume": 1087981.380362
           },
           {
             "id": "2749367",
             "question": "Will Russia invade a NATO country by December 31, 2026?",
             "short": "RU-NATO Invasion",
             "yes_price": 0.0215,
-            "volume": 500462.92861099995
+            "volume": 500462.928611
           },
           {
             "id": "2749382",
             "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
             "short": "NATO Troops in UA",
             "yes_price": 0.0405,
-            "volume": 159668.065898
+            "volume": 159668.06589799997
           }
         ],
         "baseline_anchor": 0.05,
@@ -83,13 +83,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-11-05T20:26:29Z",
-      "raw_value": 4.07,
+      "fetched_at": "2026-11-05T21:26:39Z",
+      "raw_value": 4.14,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": 0.4069,
-      "contribution": 1.02,
+      "normalized_score": 0.4143,
+      "contribution": 1.04,
       "details": {
-        "price_usd": 98.47,
+        "price_usd": 98.54,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
