@@ -1,0 +1,149 @@
+name: Watchdog (Missed Run Detection & Catch-up)
+
+on:
+  schedule:
+    # 每 6 小時 07 分檢查；若 GitHub scheduler 持續漏發，watchdog 自身也會漏跑（best-effort）。
+    - cron: "7 */6 * * *"
+  workflow_dispatch:
+
+# 限制：watchdog 自身亦靠 GitHub schedule 觸發，同樣受 scheduler 漏發影響，
+# 故補跑屬 best-effort，不能保證；若 scheduler 持續漏發，仍須靠 Support 工單／外部觸發兜底
+# （該判斷由我向用戶匯報，不在 workflow 內自動處理）。
+
+permissions:
+  actions: write
+  issues: write
+  contents: read
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+
+    env:
+      WW3_API_BASE: ${{ vars.WW3_API_BASE || 'https://ww3-risk-api.whymeymmy.workers.dev' }}
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get last successful update.yml run
+        id: last_run
+        run: |
+          RUN_INFO=$(gh run list --workflow update.yml --status success --limit 1 --json createdAt,conclusion 2>/dev/null || echo "[]")
+          echo "Raw run info: $RUN_INFO"
+          if [ "$RUN_INFO" != "[]" ] && [ -n "$RUN_INFO" ]; then
+            CREATED_AT=$(echo "$RUN_INFO" | python3 -c "import json, sys; data=json.load(sys.stdin); print(data[0].get('createdAt', '') if data else '')")
+            echo "LAST_SUCCESS_CREATED_AT=$CREATED_AT" >> $GITHUB_OUTPUT
+            echo "Last successful run at: $CREATED_AT"
+          else
+            echo "LAST_SUCCESS_CREATED_AT=" >> $GITHUB_OUTPUT
+            echo "No successful runs found"
+          fi
+
+      - name: Get API computed_at
+        id: api_status
+        run: |
+          API_BASE="${WW3_API_BASE:-https://ww3-risk-api.whymeymmy.workers.dev}"
+          echo "Querying $API_BASE/api/risk/latest..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" "$API_BASE/api/risk/latest" || echo -e "\n000")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            COMPUTED_AT=$(echo "$BODY" | python3 -c "import json, sys; data=json.load(sys.stdin); print(data.get('computed_at', ''))")
+            echo "API_COMPUTED_AT=$COMPUTED_AT" >> $GITHUB_OUTPUT
+            echo "API computed_at: $COMPUTED_AT"
+          else
+            echo "API_COMPUTED_AT=" >> $GITHUB_OUTPUT
+            echo "API request failed with HTTP $HTTP_CODE"
+          fi
+
+      - name: Evaluate staleness and trigger catch-up if needed
+        id: evaluate
+        run: |
+          LAST_RUN="${{ steps.last_run.outputs.LAST_SUCCESS_CREATED_AT }}"
+          API_TIME="${{ steps.api_status.outputs.API_COMPUTED_AT }}"
+          NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          echo "Current time: $NOW"
+          echo "Last successful run: $LAST_RUN"
+          echo "API computed_at: $API_TIME"
+          
+          STALE_RUN=false
+          STALE_API=false
+          
+          # Check if last successful run is older than 3 hours
+          if [ -n "$LAST_RUN" ]; then
+            RUN_EPOCH=$(date -u -d "$LAST_RUN" +%s 2>/dev/null || date -u -j -f "%Y-%m-%dT%H:%M:%SZ" "$LAST_RUN" +%s 2>/dev/null)
+            NOW_EPOCH=$(date -u +%s)
+            if [ -n "$RUN_EPOCH" ]; then
+              DIFF_HOURS=$(( (NOW_EPOCH - RUN_EPOCH) / 3600 ))
+              echo "Hours since last successful run: $DIFF_HOURS"
+              if [ $DIFF_HOURS -gt 3 ]; then
+                STALE_RUN=true
+              fi
+            fi
+          else
+            STALE_RUN=true
+            echo "No last successful run data, treating as stale"
+          fi
+          
+          # Check if API computed_at is older than 3 hours
+          if [ -n "$API_TIME" ]; then
+            API_EPOCH=$(date -u -d "$API_TIME" +%s 2>/dev/null || date -u -j -f "%Y-%m-%dT%H:%M:%SZ" "$API_TIME" +%s 2>/dev/null)
+            NOW_EPOCH=$(date -u +%s)
+            if [ -n "$API_EPOCH" ]; then
+              DIFF_HOURS=$(( (NOW_EPOCH - API_EPOCH) / 3600 ))
+              echo "Hours since API computed_at: $DIFF_HOURS"
+              if [ $DIFF_HOURS -gt 3 ]; then
+                STALE_API=true
+              fi
+            fi
+          else
+            STALE_API=true
+            echo "No API computed_at data, treating as stale"
+          fi
+          
+          echo "STALE_RUN=$STALE_RUN" >> $GITHUB_OUTPUT
+          echo "STALE_API=$STALE_API" >> $GITHUB_OUTPUT
+          
+          # Both must be stale to trigger catch-up
+          if [ "$STALE_RUN" = "true" ] && [ "$STALE_API" = "true" ]; then
+            echo "SHOULD_TRIGGER=true" >> $GITHUB_OUTPUT
+            echo "Both sources indicate staleness > 3 hours, will trigger catch-up"
+          else
+            echo "SHOULD_TRIGGER=false" >> $GITHUB_OUTPUT
+            echo "No catch-up needed (run_stale=$STALE_RUN, api_stale=$STALE_API)"
+          fi
+
+      - name: Check for existing open watchdog issue
+        id: check_issue
+        if: steps.evaluate.outputs.SHOULD_TRIGGER == 'true'
+        run: |
+          EXISTING=$(gh issue list --state open --label "watchdog" --json title --jq '.[] | select(.title | contains("[ww3-watchdog] 超過 3 小時無成功更新")) | .title' 2>/dev/null || echo "")
+          if [ -n "$EXISTING" ]; then
+            echo "ISSUE_EXISTS=true" >> $GITHUB_OUTPUT
+            echo "EXISTING_TITLE=$EXISTING" >> $GITHUB_OUTPUT
+            echo "Existing open watchdog issue found: $EXISTING"
+          else
+            echo "ISSUE_EXISTS=false" >> $GITHUB_OUTPUT
+            echo "No existing open watchdog issue"
+          fi
+
+      - name: Trigger catch-up run of update.yml
+        if: steps.evaluate.outputs.SHOULD_TRIGGER == 'true'
+        run: |
+          echo "Triggering catch-up run of update.yml..."
+          gh workflow run update.yml
+          echo "Catch-up run triggered"
+
+      - name: Create watchdog alert issue
+        if: steps.evaluate.outputs.SHOULD_TRIGGER == 'true' && steps.check_issue.outputs.ISSUE_EXISTS == 'false'
+        run: |
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+          TITLE="[ww3-watchdog] 超過 3 小時無成功更新"
+          BODY="Watchdog detected no successful update for over 3 hours at $TIMESTAMP UTC.\n\nLast successful update.yml run: ${{ steps.last_run.outputs.LAST_SUCCESS_CREATED_AT }}\nAPI computed_at: ${{ steps.api_status.outputs.API_COMPUTED_AT }}\n\nA catch-up run of update.yml has been triggered.\n\nIf this issue persists, GitHub Actions scheduler may be experiencing issues.\nConsider: GitHub Support ticket, external trigger fallback, or manual workflow_dispatch."
+
+          gh issue create --title "$TITLE" --body "$BODY" --label "watchdog"
+          echo "Watchdog alert issue created"

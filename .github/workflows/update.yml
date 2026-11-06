@@ -1,12 +1,19 @@
 name: Daily Update & Model Recalculation Pipeline
 
 on:
-  # 注意：GitHub schedule 觸發器於 2026-10-22 連續三輪未被 scheduler 認可（已嘗試重新註冊＋disable/enable 均無效），
-  # 現改由外部每小時觸發 workflow_dispatch；若日後 GitHub 修復 scheduler，勿同時恢復 schedule 以免重複跑。
+  schedule:
+    # 2026-11-06 Phase 2: 用戶批准恢復 GitHub 原生排程（每小時 37 分 off-peak）。
+    # 外部觸發（assistant cron）須同步停用，否則重複跑；停用外部觸發由我負責，不在本次 commit 做。
+    - cron: "37 * * * *"
   workflow_dispatch:
+
+concurrency:
+  group: ww3-update
+  cancel-in-progress: false
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   update-and-deploy:
@@ -94,11 +101,88 @@ jobs:
             cp data/protests_snapshot.json staging/protests_snapshot.json
           fi
 
-      - name: Deploy dynamic dashboard to Cloudflare Pages
+      - name: Deploy dynamic dashboard to Cloudflare Pages (with retry)
+        id: deploy
         run: |
           if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
             echo "Deploying staging/ directory to Cloudflare Pages project 'ww3-risk-model'..."
-            npx wrangler pages deploy staging --project-name=ww3-risk-model
+            MAX_ATTEMPTS=3
+            DELAY_SECONDS=60
+            for attempt in $(seq 1 $MAX_ATTEMPTS); do
+              echo "Attempt $attempt/$MAX_ATTEMPTS: npx wrangler pages deploy staging --project-name=ww3-risk-model"
+              if npx wrangler pages deploy staging --project-name=ww3-risk-model; then
+                echo "Deployment succeeded on attempt $attempt"
+                exit 0
+              else
+                echo "Attempt $attempt failed"
+                if [ $attempt -lt $MAX_ATTEMPTS ]; then
+                  echo "Waiting $DELAY_SECONDS seconds before retry..."
+                  sleep $DELAY_SECONDS
+                fi
+              fi
+            done
+            echo "All $MAX_ATTEMPTS attempts failed"
+            exit 1
           else
             echo "::notice ::Skipping Pages deployment: CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID secret is not set."
           fi
+
+      - name: Validate deployment (post-deploy checks)
+        id: validate
+        if: always() && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
+        run: |
+          API_BASE="${WW3_API_BASE:-https://ww3-risk-api.whymeymmy.workers.dev}"
+          echo "Validating deployment at $API_BASE"
+
+          # Check /api/risk/latest
+          echo "Checking $API_BASE/api/risk/latest..."
+          LATEST_RESPONSE=$(curl -s -w "\n%{http_code}" "$API_BASE/api/risk/latest" || echo -e "\n000")
+          LATEST_HTTP_CODE=$(echo "$LATEST_RESPONSE" | tail -n1)
+          LATEST_BODY=$(echo "$LATEST_RESPONSE" | head -n -1)
+
+          if [ "$LATEST_HTTP_CODE" != "200" ]; then
+            echo "::error ::/api/risk/latest returned HTTP $LATEST_HTTP_CODE"
+            exit 1
+          fi
+
+          python3 -c "import json, sys, datetime; data=json.loads('''$LATEST_BODY'''); computed_at=data.get('computed_at'); assert computed_at, 'computed_at missing'; dt=datetime.datetime.fromisoformat(computed_at.replace('Z', '+00:00')); now=datetime.datetime.now(datetime.timezone.utc); diff_hours=(now-dt).total_seconds()/3600; assert diff_hours<=2, f'computed_at too old: {diff_hours:.1f}h'; print(f'computed_at OK: {diff_hours:.1f}h')"
+
+          # Check /api/data-status
+          echo "Checking $API_BASE/api/data-status..."
+          STATUS_RESPONSE=$(curl -s -w "\n%{http_code}" "$API_BASE/api/data-status" || echo -e "\n000")
+          STATUS_HTTP_CODE=$(echo "$STATUS_RESPONSE" | tail -n1)
+          STATUS_BODY=$(echo "$STATUS_RESPONSE" | head -n -1)
+
+          if [ "$STATUS_HTTP_CODE" != "200" ]; then
+            echo "::error ::/api/data-status returned HTTP $STATUS_HTTP_CODE"
+            exit 1
+          fi
+
+          python3 -c "import json, sys; data=json.loads('''$STATUS_BODY'''); total=data.get('total'); assert total==36, f'total != 36 (got {total})'; print(f'data-status total OK: {total}')"
+
+          echo "All post-deploy validation checks passed"
+
+      - name: Alert on failure (create Issue)
+        if: failure()
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          TRIGGER="${{ github.event_name }}"
+          JOB_NAME="update-and-deploy"
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+          
+          # Determine which stage failed
+          FAILED_STAGE="unknown"
+          if [ "${{ steps.deploy.outcome }}" == "failure" ]; then
+            FAILED_STAGE="部署"
+          elif [ "${{ steps.validate.outcome }}" == "failure" ]; then
+            FAILED_STAGE="驗證"
+          elif [ "${{ steps['Run test suite'].outcome }}" == "failure" ] || [ "${{ steps['Run real-time pulse fetcher'].outcome }}" == "failure" ] || [ "${{ steps['Generate D1 snapshot JSON'].outcome }}" == "failure" ] || [ "${{ steps['Push snapshot to Cloudflare D1'].outcome }}" == "failure" ] || [ "${{ steps['Run World Bank fetcher and Publication checker'].outcome }}" == "failure" ]; then
+            FAILED_STAGE="數據"
+          fi
+          
+          TITLE="[ww3-pipeline] update.yml failed $TIMESTAMP"
+          BODY="Workflow run: $RUN_URL\nTrigger: $TRIGGER\nFailed job: $JOB_NAME\nFailed stage: $FAILED_STAGE (數據／部署／驗證三段中哪段失敗)\n===\nSee run for details: $RUN_URL"
+
+          gh issue create --title "$TITLE" --body "$BODY" --label "pipeline-failure"
+        env:
+          GH_TOKEN: ${{ github.token }}
