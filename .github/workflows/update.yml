@@ -158,7 +158,7 @@ jobs:
             exit 1
           fi
 
-          python3 -c "import json, sys; data=json.loads('''$STATUS_BODY'''); total=data.get('total'); assert total==36, f'total != 36 (got {total})'; print(f'data-status total OK: {total}')"
+          python3 -c "import json, sys; data=json.loads('''$STATUS_BODY'''); total=data.get('total_indicators'); assert total==36, f'total_indicators != 36 (got {total})'; print(f'data-status total_indicators OK: {total}')"
 
           echo "All post-deploy validation checks passed"
 
