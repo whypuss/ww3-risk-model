@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-11-10T01:27:22Z",
-  "pulse_adjustment": -0.86,
+  "computed_at": "2026-11-10T01:45:13Z",
+  "pulse_adjustment": -0.89,
   "range": [
     -10.0,
     10.0
@@ -37,11 +37,11 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-11-10T01:27:22Z",
-      "raw_value": 2.87,
+      "fetched_at": "2026-11-10T01:45:13Z",
+      "raw_value": 2.92,
       "raw_unit": "% (Yes 隱含機率)",
-      "normalized_score": -0.2133,
-      "contribution": -0.75,
+      "normalized_score": -0.2083,
+      "contribution": -0.73,
       "details": {
         "monitored_markets": [
           {
@@ -49,7 +49,7 @@
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
             "yes_price": 0.0345,
-            "volume": 1088178.8274330003
+            "volume": 1088178.8274330006
           },
           {
             "id": "2749367",
@@ -62,8 +62,8 @@
             "id": "2749382",
             "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
             "short": "NATO Troops in UA",
-            "yes_price": 0.034,
-            "volume": 159722.41743300002
+            "yes_price": 0.0355,
+            "volume": 159722.417433
           }
         ],
         "baseline_anchor": 0.05,
@@ -78,13 +78,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-11-10T01:27:22Z",
-      "raw_value": -0.42,
+      "fetched_at": "2026-11-10T01:45:13Z",
+      "raw_value": -0.64,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": -0.0421,
-      "contribution": -0.11,
+      "normalized_score": -0.0637,
+      "contribution": -0.16,
       "details": {
-        "price_usd": 92.18,
+        "price_usd": 91.98,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
