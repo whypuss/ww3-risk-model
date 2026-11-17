@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-11-16T20:39:18Z",
-  "pulse_adjustment": -1.72,
+  "computed_at": "2026-11-17T04:08:15Z",
+  "pulse_adjustment": -1.06,
   "range": [
     -10.0,
     10.0
@@ -37,10 +37,10 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-11-16T20:39:17Z",
-      "raw_value": 2.63,
+      "fetched_at": "2026-11-17T04:08:14Z",
+      "raw_value": 2.62,
       "raw_unit": "% (Yes 隱含機率)",
-      "normalized_score": -0.2367,
+      "normalized_score": -0.2383,
       "contribution": -0.83,
       "details": {
         "monitored_markets": [
@@ -48,7 +48,7 @@
             "id": "1124834",
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
-            "yes_price": 0.0315,
+            "yes_price": 0.031,
             "volume": 1088656.6848160003
           },
           {
@@ -56,14 +56,14 @@
             "question": "Will Russia invade a NATO country by December 31, 2026?",
             "short": "RU-NATO Invasion",
             "yes_price": 0.017,
-            "volume": 527190.9178729999
+            "volume": 527265.6378729999
           },
           {
             "id": "2749382",
             "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
             "short": "NATO Troops in UA",
             "yes_price": 0.0305,
-            "volume": 159805.729338
+            "volume": 159885.56437100001
           }
         ],
         "baseline_anchor": 0.05,
@@ -78,13 +78,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-11-16T20:39:18Z",
-      "raw_value": -3.58,
+      "fetched_at": "2026-11-17T04:08:15Z",
+      "raw_value": -0.92,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": -0.3579,
-      "contribution": -0.89,
+      "normalized_score": -0.092,
+      "contribution": -0.23,
       "details": {
-        "price_usd": 92.41,
+        "price_usd": 91.59,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
