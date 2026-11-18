@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-11-17T22:36:04Z",
-  "pulse_adjustment": -0.58,
+  "computed_at": "2026-11-18T03:50:39Z",
+  "pulse_adjustment": -0.89,
   "range": [
     -10.0,
     10.0
@@ -28,7 +28,7 @@
       "normalized_score": 0.0,
       "contribution": 0.0,
       "details": {},
-      "error": "<urlopen error _ssl.c:994: The handshake operation timed out>"
+      "error": "HTTP Error 429: Too Many Requests"
     },
     "polymarket_war_risk": {
       "signal_id": "polymarket_war_risk",
@@ -37,10 +37,10 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-11-17T22:36:03Z",
-      "raw_value": 2.85,
+      "fetched_at": "2026-11-18T03:50:38Z",
+      "raw_value": 2.87,
       "raw_unit": "% (Yes 隱含機率)",
-      "normalized_score": -0.215,
+      "normalized_score": -0.2133,
       "contribution": -0.75,
       "details": {
         "monitored_markets": [
@@ -62,8 +62,8 @@
             "id": "2749382",
             "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
             "short": "NATO Troops in UA",
-            "yes_price": 0.038,
-            "volume": 159885.56437100004
+            "yes_price": 0.0385,
+            "volume": 159897.744371
           }
         ],
         "baseline_anchor": 0.05,
@@ -78,13 +78,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-11-17T22:36:04Z",
-      "raw_value": 0.68,
+      "fetched_at": "2026-11-18T03:50:39Z",
+      "raw_value": -0.58,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": 0.0682,
-      "contribution": 0.17,
+      "normalized_score": -0.058,
+      "contribution": -0.14,
       "details": {
-        "price_usd": 93.07,
+        "price_usd": 92.6,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
