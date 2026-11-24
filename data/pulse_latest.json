@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-11-24T09:43:39Z",
-  "pulse_adjustment": -4.41,
+  "computed_at": "2026-11-24T16:14:35Z",
+  "pulse_adjustment": -4.29,
   "range": [
     -10.0,
     10.0
@@ -22,7 +22,7 @@
       "source_url": "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json",
       "weight": 0.4,
       "status": "live",
-      "fetched_at": "2026-11-24T09:43:38Z",
+      "fetched_at": "2026-11-24T16:14:34Z",
       "raw_value": 13.3079,
       "raw_unit": "% (全球新聞總量佔比)",
       "normalized_score": -0.9038,
@@ -42,33 +42,33 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-11-24T09:43:38Z",
-      "raw_value": 2.72,
+      "fetched_at": "2026-11-24T16:14:34Z",
+      "raw_value": 2.77,
       "raw_unit": "% (Yes 隱含機率)",
-      "normalized_score": -0.2283,
-      "contribution": -0.8,
+      "normalized_score": -0.2233,
+      "contribution": -0.78,
       "details": {
         "monitored_markets": [
           {
             "id": "1124834",
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
-            "yes_price": 0.034,
+            "yes_price": 0.035,
             "volume": 1088972.5446830003
           },
           {
             "id": "2749367",
             "question": "Will Russia invade a NATO country by December 31, 2026?",
             "short": "RU-NATO Invasion",
-            "yes_price": 0.017,
-            "volume": 561057.029631
+            "yes_price": 0.0175,
+            "volume": 561342.0296309999
           },
           {
             "id": "2749382",
             "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
             "short": "NATO Troops in UA",
             "yes_price": 0.0305,
-            "volume": 159971.640637
+            "volume": 160074.733403
           }
         ],
         "baseline_anchor": 0.05,
@@ -83,13 +83,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-11-24T09:43:39Z",
-      "raw_value": 0.05,
+      "fetched_at": "2026-11-24T16:14:35Z",
+      "raw_value": 0.44,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": 0.0046,
-      "contribution": 0.01,
+      "normalized_score": 0.0438,
+      "contribution": 0.11,
       "details": {
-        "price_usd": 86.72,
+        "price_usd": 87.06,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
