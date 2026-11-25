@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-11-24T22:19:33Z",
-  "pulse_adjustment": -4.17,
+  "computed_at": "2026-11-25T01:00:14Z",
+  "pulse_adjustment": -4.73,
   "range": [
     -10.0,
     10.0
@@ -22,16 +22,16 @@
       "source_url": "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json",
       "weight": 0.4,
       "status": "live",
-      "fetched_at": "2026-11-24T22:19:32Z",
-      "raw_value": 12.8468,
+      "fetched_at": "2026-11-25T01:00:13Z",
+      "raw_value": 10.9115,
       "raw_unit": "% (全球新聞總量佔比)",
       "normalized_score": -1.0,
       "contribution": -4.0,
       "details": {
-        "latest_date": "20261124T000000Z",
+        "latest_date": "20261125T000000Z",
         "history_points": 62,
-        "baseline_30d": 14.8895,
-        "formula": "clamp((raw - 14.89) / 1.75, -1.0, 1.0)"
+        "baseline_30d": 14.7209,
+        "formula": "clamp((raw - 14.72) / 1.75, -1.0, 1.0)"
       },
       "error": null
     },
@@ -42,18 +42,18 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-11-24T22:19:32Z",
-      "raw_value": 3.0,
+      "fetched_at": "2026-11-25T01:00:13Z",
+      "raw_value": 3.05,
       "raw_unit": "% (Yes 隱含機率)",
-      "normalized_score": -0.2,
-      "contribution": -0.7,
+      "normalized_score": -0.195,
+      "contribution": -0.68,
       "details": {
         "monitored_markets": [
           {
             "id": "1124834",
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
-            "yes_price": 0.0355,
+            "yes_price": 0.035,
             "volume": 1088972.5446830003
           },
           {
@@ -61,14 +61,14 @@
             "question": "Will Russia invade a NATO country by December 31, 2026?",
             "short": "RU-NATO Invasion",
             "yes_price": 0.0165,
-            "volume": 561342.029631
+            "volume": 561342.0296309999
           },
           {
             "id": "2749382",
             "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
             "short": "NATO Troops in UA",
-            "yes_price": 0.038,
-            "volume": 160109.71340300003
+            "yes_price": 0.04,
+            "volume": 160258.253403
           }
         ],
         "baseline_anchor": 0.05,
@@ -83,13 +83,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-11-24T22:19:33Z",
-      "raw_value": 2.1,
+      "fetched_at": "2026-11-25T01:00:14Z",
+      "raw_value": -0.21,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": 0.21,
-      "contribution": 0.53,
+      "normalized_score": -0.0214,
+      "contribution": -0.05,
       "details": {
-        "price_usd": 88.5,
+        "price_usd": 88.59,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
