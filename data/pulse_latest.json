@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-11-27T14:12:34Z",
-  "pulse_adjustment": 0.47,
+  "computed_at": "2026-11-27T15:40:25Z",
+  "pulse_adjustment": -2.07,
   "range": [
     -10.0,
     10.0
@@ -19,19 +19,19 @@
       "signal_id": "gdelt_conflict",
       "name": "GDELT 全球衝突與動盪新聞聲量強度",
       "source": "GDELT 2.0 Events 15-min Feed",
-      "source_url": "https://storage.googleapis.com/data.gdeltproject.org/gdeltv2/20261127141500.export.CSV.zip",
+      "source_url": "https://storage.googleapis.com/data.gdeltproject.org/gdeltv2/20261127154500.export.CSV.zip",
       "weight": 0.4,
       "status": "live",
-      "fetched_at": "2026-11-27T14:12:32Z",
-      "raw_value": 14.8265,
+      "fetched_at": "2026-11-27T15:40:22Z",
+      "raw_value": 11.1663,
       "raw_unit": "% (15分鐘衝突/抗議事件佔比)",
-      "normalized_score": 0.2211,
-      "contribution": 0.88,
+      "normalized_score": -0.389,
+      "contribution": -1.56,
       "details": {
-        "latest_date": "2026-11-27T14:15:00Z",
-        "export_file": "20261127141500.export.CSV",
-        "total_events": 951,
-        "conflict_events": 141,
+        "latest_date": "2026-11-27T15:45:00Z",
+        "export_file": "20261127154500.export.CSV",
+        "total_events": 1209,
+        "conflict_events": 135,
         "baseline_anchor": 13.5,
         "fallback_reason": "<urlopen error _ssl.c:994: The handshake operation timed out>",
         "formula": "clamp((raw - 13.50) / 6.00, -1.0, 1.0)"
@@ -45,7 +45,7 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-11-27T14:12:33Z",
+      "fetched_at": "2026-11-27T15:40:24Z",
       "raw_value": 3.03,
       "raw_unit": "% (Yes 隱含機率)",
       "normalized_score": -0.1967,
@@ -57,7 +57,7 @@
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
             "yes_price": 0.036,
-            "volume": 1089027.9835159997
+            "volume": 1089027.9835160004
           },
           {
             "id": "2749367",
@@ -86,13 +86,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-11-27T14:12:34Z",
-      "raw_value": 1.14,
+      "fetched_at": "2026-11-27T15:40:25Z",
+      "raw_value": 0.74,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": 0.1136,
-      "contribution": 0.28,
+      "normalized_score": 0.0739,
+      "contribution": 0.18,
       "details": {
-        "price_usd": 91.67,
+        "price_usd": 91.31,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
