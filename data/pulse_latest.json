@@ -1,13 +1,13 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-11-26T22:31:52Z",
-  "pulse_adjustment": -0.42,
+  "computed_at": "2026-11-27T03:50:39Z",
+  "pulse_adjustment": -1.23,
   "range": [
     -10.0,
     10.0
   ],
   "status": "operational",
-  "active_signals_count": 2,
+  "active_signals_count": 3,
   "total_signals_count": 3,
   "weights": {
     "gdelt_conflict": 0.4,
@@ -18,17 +18,25 @@
     "gdelt_conflict": {
       "signal_id": "gdelt_conflict",
       "name": "GDELT 全球衝突與動盪新聞聲量強度",
-      "source": "GDELT 2.0 Doc TimelineVol API",
-      "source_url": "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json",
+      "source": "GDELT 2.0 Events 15-min Feed",
+      "source_url": "https://storage.googleapis.com/data.gdeltproject.org/gdeltv2/20261127040000.export.CSV.zip",
       "weight": 0.4,
-      "status": "unavailable",
-      "fetched_at": null,
-      "raw_value": null,
-      "raw_unit": "% (全球新聞總量佔比)",
-      "normalized_score": 0.0,
-      "contribution": 0.0,
-      "details": {},
-      "error": "<urlopen error _ssl.c:994: The handshake operation timed out>"
+      "status": "live",
+      "fetched_at": "2026-11-27T03:50:38Z",
+      "raw_value": 12.0614,
+      "raw_unit": "% (15分鐘衝突/抗議事件佔比)",
+      "normalized_score": -0.2398,
+      "contribution": -0.96,
+      "details": {
+        "latest_date": "2026-11-27T04:00:00Z",
+        "export_file": "20261127040000.export.CSV",
+        "total_events": 912,
+        "conflict_events": 110,
+        "baseline_anchor": 13.5,
+        "fallback_reason": "<urlopen error _ssl.c:994: The handshake operation timed out>",
+        "formula": "clamp((raw - 13.50) / 6.00, -1.0, 1.0)"
+      },
+      "error": null
     },
     "polymarket_war_risk": {
       "signal_id": "polymarket_war_risk",
@@ -37,18 +45,18 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-11-26T22:31:52Z",
-      "raw_value": 2.95,
+      "fetched_at": "2026-11-27T03:50:38Z",
+      "raw_value": 2.97,
       "raw_unit": "% (Yes 隱含機率)",
-      "normalized_score": -0.205,
-      "contribution": -0.72,
+      "normalized_score": -0.2033,
+      "contribution": -0.71,
       "details": {
         "monitored_markets": [
           {
             "id": "1124834",
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
-            "yes_price": 0.033,
+            "yes_price": 0.0335,
             "volume": 1088993.3735160006
           },
           {
@@ -56,7 +64,7 @@
             "question": "Will Russia invade a NATO country by December 31, 2026?",
             "short": "RU-NATO Invasion",
             "yes_price": 0.02,
-            "volume": 561342.0296309999
+            "volume": 561344.0596309999
           },
           {
             "id": "2749382",
@@ -78,13 +86,13 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-11-26T22:31:52Z",
-      "raw_value": 1.2,
+      "fetched_at": "2026-11-27T03:50:39Z",
+      "raw_value": 1.76,
       "raw_unit": "% (24h 漲跌幅)",
-      "normalized_score": 0.1203,
-      "contribution": 0.3,
+      "normalized_score": 0.1765,
+      "contribution": 0.44,
       "details": {
-        "price_usd": 91.73,
+        "price_usd": 92.24,
         "scale_anchor_pct": 10.0,
         "formula": "clamp(change_pct / 10.0, -1.0, 1.0)"
       },
