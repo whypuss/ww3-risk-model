@@ -199,3 +199,29 @@ def test_partial_outage_graceful_degradation():
     assert result["signals"]["gdelt_conflict"]["contribution"] == pytest.approx(2.00, abs=0.01)
     assert result["signals"]["brent_oil_24h"]["contribution"] == pytest.approx(1.25, abs=0.01)
     assert result["pulse_adjustment"] == pytest.approx(3.25, abs=0.02)
+
+
+def test_gdelt_v2_events_csv_fallback():
+    """Verify GDELT v2 15-min events CSV fallback calculates conflict share & score deterministically."""
+    # Build 20 synthetic GDELT v2 event rows (31+ tab-separated columns):
+    # 4 rows with QuadClass=4 (Material Conflict) -> 4/20 = 20.0%
+    # Expected norm = (20.0 - 13.5) / 6.0 = 1.0833 -> clamped to 1.0 -> contribution = +4.00
+    rows = []
+    for i in range(20):
+        cols = [""] * 35
+        cols[0] = str(1000 + i)
+        cols[1] = "20261127"
+        cols[28] = "19" if i < 4 else "04"
+        cols[29] = "4" if i < 4 else "1"
+        cols[30] = "-8.0" if i < 4 else "2.0"
+        rows.append("\t".join(cols))
+
+    sig = fetch_gdelt_conflict(mock_data={"events_csv_text": "\n".join(rows), "doc_error": "HTTP 429"})
+    assert sig["status"] == "live"
+    assert sig["source"] == "GDELT 2.0 Events 15-min Feed"
+    assert sig["raw_value"] == pytest.approx(20.0, abs=0.01)
+    assert sig["normalized_score"] == 1.0
+    assert sig["contribution"] == pytest.approx(4.0, abs=0.01)
+    assert sig["details"]["total_events"] == 20
+    assert sig["details"]["conflict_events"] == 4
+    assert sig["details"]["fallback_reason"] == "HTTP 429"

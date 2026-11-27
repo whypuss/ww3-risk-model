@@ -797,3 +797,136 @@ describe("fetchOpenSky", () => {
     global.fetch = originalFetch;
   });
 });
+
+describe("GDELT fallback & Worker automation safety net", () => {
+  it("parseGdeltEventsCsvText accurately counts conflict and protest events", () => {
+    const rows = [];
+    for (let i = 0; i < 10; i++) {
+      const cols = new Array(35).fill("");
+      cols[0] = String(100 + i);
+      cols[1] = "20261127";
+      cols[28] = i < 2 ? "14" : "04";
+      cols[29] = i === 2 ? "4" : "1";
+      rows.push(cols.join("\t"));
+    }
+    const parsed = worker.parseGdeltEventsCsvText(rows.join("\n"));
+    assert.equal(parsed.totalEvents, 10);
+    assert.equal(parsed.conflictEvents, 3);
+    assert.equal(parsed.latestSqldate, "20261127");
+  });
+
+  it("maybeDispatchGitHubUpdate triggers workflow_dispatch when snapshot is stale and token present", async () => {
+    const staleSnapshot = { computed_at: "2026-11-27T00:00:00Z" };
+    const upserts = [];
+    const mockDb = {
+      prepare(sql) {
+        let bound = [];
+        return {
+          bind(...args) { bound = args; return this; },
+          async first() {
+            if (sql.includes("FROM index_snapshots")) return staleSnapshot;
+            if (sql.includes("FROM live_feed_snapshots")) return null;
+            return null;
+          },
+          async run() {
+            upserts.push({ sql, bound });
+            return { success: true };
+          },
+        };
+      },
+    };
+    const originalFetch = global.fetch;
+    let calledUrl = "";
+    global.fetch = async (url, opts) => {
+      calledUrl = url;
+      assert.equal(opts.method, "POST");
+      assert.ok(opts.headers.Authorization.includes("test_pat"));
+      return { ok: true, status: 204, text: async () => "" };
+    };
+
+    const res = await worker.maybeDispatchGitHubUpdate(
+      mockDb,
+      { GITHUB_DISPATCH_TOKEN: "test_pat" },
+      new Date("2026-11-27T01:30:00Z")
+    );
+    global.fetch = originalFetch;
+
+    assert.equal(res.dispatched, true);
+    assert.ok(calledUrl.includes("/repos/whypuss/ww3-risk-model/actions/workflows/update.yml/dispatches"));
+    assert.equal(upserts.length, 1);
+  });
+
+  it("maybeBackfillHourlySnapshot inserts worker fallback snapshot when stale > 70 min", async () => {
+    const inserted = [];
+    const staleSnap = { ...MOCK_SNAPSHOT, computed_at: "2026-11-27T00:00:00Z" };
+    const mockDb = {
+      prepare(sql) {
+        let bound = [];
+        return {
+          bind(...args) { bound = args; return this; },
+          async first() {
+            if (sql.includes("FROM index_snapshots")) return staleSnap;
+            return null;
+          },
+          async run() {
+            inserted.push({ sql, bound });
+            return { success: true };
+          },
+        };
+      },
+    };
+    const originalFetch = global.fetch;
+    global.fetch = async (url) => {
+      if (url.includes("gamma-api.polymarket.com")) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ question: "War?", outcomePrices: '["0.05","0.95"]', volume: "50000" }),
+        };
+      }
+      if (url.includes("finance.yahoo.com")) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({ chart: { result: [{ meta: { regularMarketChangePercent: 2.0, regularMarketPrice: 90.0 } }] } }),
+        };
+      }
+      return { ok: false, status: 404 };
+    };
+
+    const res = await worker.maybeBackfillHourlySnapshot(
+      mockDb,
+      new Date("2026-11-27T01:30:00Z"),
+      { value: 13.5, date: "20261127", history_points: 500, source: "gdelt_v2_events_15m" }
+    );
+    global.fetch = originalFetch;
+
+    assert.equal(res.backfilled, true);
+    assert.ok(res.snapshot_id.endsWith("_worker"));
+    assert.equal(res.active_signals_count, 3);
+    assert.equal(inserted.length, 2); // index_snapshots + indicator_observations clone
+  });
+
+  it("GET /api/automation/status reports freshness and 24h snapshot count", async () => {
+    const recentSnap = { ...MOCK_SNAPSHOT, computed_at: new Date().toISOString() };
+    const mockDb = {
+      prepare(sql) {
+        return {
+          bind() { return this; },
+          async first() {
+            if (sql.includes("COUNT(*)")) return { cnt: 18 };
+            if (sql.includes("FROM index_snapshots")) return recentSnap;
+            return null;
+          },
+        };
+      },
+    };
+    const req = new Request("https://api.ww3risk.org/api/automation/status");
+    const res = await worker.fetch(req, { DB: mockDb }, {});
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.snapshots_last_24h, 18);
+    assert.equal(data.is_fresh_90m, true);
+    assert.equal(data.latest_snapshot.source, "github-actions");
+  });
+});

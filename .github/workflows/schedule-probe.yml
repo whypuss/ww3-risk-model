@@ -1,8 +1,9 @@
 name: Schedule Probe
 
+# 2026-11-27: Probe experiment concluded (136 samples from 2026-10-22 to 2026-11-26 proved
+# native hourly GitHub schedule drops to ~8.2h average interval). Disabled recurring cron to
+# stop unnecessary [skip ci] commit churn and git push races with update.yml.
 on:
-  schedule:
-    - cron: '17 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -33,5 +34,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/probe_log.jsonl
           git commit -m "chore(probe): schedule probe tick [skip ci]"
-          git pull --rebase
-          git push
+          git pull --rebase origin main
+          git push origin HEAD:main

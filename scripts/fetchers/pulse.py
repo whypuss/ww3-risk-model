@@ -23,17 +23,23 @@ import os
 import sys
 import urllib.error
 import urllib.request
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
-# Signal 1: GDELT 2.0
+# Signal 1: GDELT 2.0 (Doc API primary + GDELT v2 15-min Events Export fallback)
 GDELT_URL = "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json"
+GDELT_V2_LASTUPDATE_URL = "https://storage.googleapis.com/data.gdeltproject.org/gdeltv2/lastupdate.txt"
+GDELT_V2_GCS_PREFIX = "https://storage.googleapis.com/data.gdeltproject.org/"
 GDELT_WEIGHT = 0.40
-GDELT_BASELINE_ANCHOR = 3.50  # 3.50% normal conflict volume intensity baseline
-GDELT_SCALE_ANCHOR = 1.75     # +/- 1.75% deviation maps to +/- 1.0
+GDELT_BASELINE_ANCHOR = 3.50  # 3.50% normal conflict volume intensity baseline (Doc API)
+GDELT_SCALE_ANCHOR = 1.75     # +/- 1.75% deviation maps to +/- 1.0 (Doc API)
+GDELT_EVENTS_BASELINE_ANCHOR = 13.50  # 13.50% normal material-conflict/protest share in GDELT v2 15m export
+GDELT_EVENTS_SCALE_ANCHOR = 6.00      # +/- 6.00% deviation maps to +/- 1.0 (Events 15m feed)
+GDELT_CONFLICT_ROOT_CODES = {"14", "18", "19", "20"}  # Protest, Assault, Fight, Unconventional Mass Violence
 
 # Signal 2: Polymarket War Risk Basket
 POLYMARKET_MARKETS = [
@@ -67,11 +73,107 @@ def http_get(url: str, timeout: int = 10, headers: Optional[Dict[str, str]] = No
         return resp.read()
 
 
+def _parse_gdelt_events_csv(csv_text: str) -> Tuple[int, int, str]:
+    """Parse tab-delimited GDELT v2 events CSV and count material-conflict / protest events."""
+    total_events = 0
+    conflict_events = 0
+    latest_sqldate = ""
+    reader = csv.reader(io.StringIO(csv_text), delimiter="\t")
+    for row in reader:
+        if len(row) <= 30:
+            continue
+        total_events += 1
+        if not latest_sqldate and row[1]:
+            latest_sqldate = row[1]
+        quad_class = row[29].strip()
+        root_code = row[28].strip()
+        if quad_class == "4" or root_code in GDELT_CONFLICT_ROOT_CODES:
+            conflict_events += 1
+    return total_events, conflict_events, latest_sqldate
+
+
+def fetch_gdelt_v2_events_fallback(
+    mock_csv_text: Optional[str] = None,
+    doc_error: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Fallback fetcher using GDELT v2 15-min static export ZIP (no HTTP 429 rate limit)."""
+    export_url = GDELT_V2_LASTUPDATE_URL
+    export_filename = "mock_export.CSV"
+
+    if mock_csv_text is not None:
+        csv_text = mock_csv_text
+    else:
+        lastupdate_raw = http_get(GDELT_V2_LASTUPDATE_URL, timeout=10).decode("utf-8", errors="replace")
+        found_url = ""
+        for line in lastupdate_raw.splitlines():
+            parts = line.strip().split()
+            if len(parts) >= 3 and parts[2].endswith(".export.CSV.zip"):
+                found_url = parts[2]
+                break
+        if not found_url:
+            raise ValueError("GDELT v2 lastupdate.txt did not contain an export.CSV.zip URL.")
+        export_url = (
+            found_url
+            .replace("http://data.gdeltproject.org/", GDELT_V2_GCS_PREFIX)
+            .replace("https://data.gdeltproject.org/", GDELT_V2_GCS_PREFIX)
+        )
+        zip_bytes = http_get(export_url, timeout=15)
+        with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
+            names = zf.namelist()
+            if not names:
+                raise ValueError("GDELT v2 export ZIP was empty.")
+            export_filename = names[0]
+            csv_text = zf.read(export_filename).decode("utf-8", errors="replace")
+
+    total_events, conflict_events, latest_sqldate = _parse_gdelt_events_csv(csv_text)
+    if total_events == 0:
+        raise ValueError("GDELT v2 export CSV contained zero valid event rows.")
+
+    raw_pct = (conflict_events / total_events) * 100.0
+    norm_score = clamp(
+        (raw_pct - GDELT_EVENTS_BASELINE_ANCHOR) / GDELT_EVENTS_SCALE_ANCHOR,
+        -1.0,
+        1.0,
+    )
+    contrib = round(norm_score * GDELT_WEIGHT * 10.0, 2)
+
+    export_ts = export_filename[:14] if len(export_filename) >= 14 and export_filename[:14].isdigit() else ""
+    if export_ts:
+        latest_date_label = f"{export_ts[0:4]}-{export_ts[4:6]}-{export_ts[6:8]}T{export_ts[8:10]}:{export_ts[10:12]}:{export_ts[12:14]}Z"
+    else:
+        latest_date_label = latest_sqldate or export_filename[:14]
+
+    return {
+        "signal_id": "gdelt_conflict",
+        "name": "GDELT 全球衝突與動盪新聞聲量強度",
+        "source": "GDELT 2.0 Events 15-min Feed",
+        "source_url": export_url,
+        "weight": GDELT_WEIGHT,
+        "status": "live",
+        "fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "raw_value": round(raw_pct, 4),
+        "raw_unit": "% (15分鐘衝突/抗議事件佔比)",
+        "normalized_score": round(norm_score, 4),
+        "contribution": contrib,
+        "details": {
+            "latest_date": latest_date_label,
+            "export_file": export_filename,
+            "total_events": total_events,
+            "conflict_events": conflict_events,
+            "baseline_anchor": GDELT_EVENTS_BASELINE_ANCHOR,
+            "fallback_reason": doc_error,
+            "formula": f"clamp((raw - {GDELT_EVENTS_BASELINE_ANCHOR:.2f}) / {GDELT_EVENTS_SCALE_ANCHOR:.2f}, -1.0, 1.0)",
+        },
+        "error": None,
+    }
+
+
 def fetch_gdelt_conflict(mock_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Fetch global conflict volume intensity from GDELT 2.0 API.
 
-    Returns raw volume intensity percentage, calculates 30-day baseline if available,
-    and normalizes deviation into [-1.0, 1.0].
+    Tries GDELT 2.0 Doc TimelineVol API first; when rate-limited (HTTP 429) or
+    timed out in live mode, transparently falls back to GDELT 2.0 15-min static
+    events export feed (no 429 limit).
     """
     signal_info = {
         "signal_id": "gdelt_conflict",
@@ -89,11 +191,21 @@ def fetch_gdelt_conflict(mock_data: Optional[Dict[str, Any]] = None) -> Dict[str
         "error": None,
     }
 
+    if mock_data is not None and "events_csv_text" in mock_data:
+        try:
+            return fetch_gdelt_v2_events_fallback(
+                mock_csv_text=mock_data["events_csv_text"],
+                doc_error=mock_data.get("doc_error", "mock_fallback"),
+            )
+        except Exception as fb_err:
+            signal_info["error"] = str(fb_err)
+            return signal_info
+
     try:
         if mock_data is not None:
             data = mock_data
         else:
-            raw_bytes = http_get(GDELT_URL, timeout=12)
+            raw_bytes = http_get(GDELT_URL, timeout=8)
             data = json.loads(raw_bytes.decode("utf-8"))
 
         timeline_entries = []
@@ -136,7 +248,14 @@ def fetch_gdelt_conflict(mock_data: Optional[Dict[str, Any]] = None) -> Dict[str
             },
         })
     except Exception as e:
-        signal_info["error"] = str(e)
+        doc_err = str(e)
+        if mock_data is None:
+            try:
+                return fetch_gdelt_v2_events_fallback(doc_error=doc_err)
+            except Exception as fb_err:
+                signal_info["error"] = f"Doc API: {doc_err} | Events fallback: {fb_err}"
+        else:
+            signal_info["error"] = doc_err
 
     return signal_info
 

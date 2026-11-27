@@ -1,11 +1,47 @@
 name: Daily Update & Model Recalculation Pipeline
 
 on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "data/pulse_latest.json"
+      - "data/candidates/**"
+      - "data/probe_log.jsonl"
+      - "README.md"
+      - "docs/**"
   schedule:
-    # 2026-11-06 Phase 2: 用戶批准恢復 GitHub 原生排程（每小時 37 分 off-peak）。
-    # 外部觸發（assistant cron）須同步停用，否則重複跑；停用外部觸發由我負責，不在本次 commit 做。
+    # Off-peak hourly native GitHub schedule (backed up by watchdog.yml & Cloudflare Worker cron)
     - cron: "37 * * * *"
   workflow_dispatch:
+    inputs:
+      deploy_pages:
+        description: "Cloudflare Pages deploy mode (auto=on push or once/day UTC, always, never)"
+        required: false
+        default: "auto"
+        type: choice
+        options:
+          - auto
+          - always
+          - never
+      deploy_worker:
+        description: "Cloudflare Worker deploy mode (auto=when worker/ changed on push, always, never)"
+        required: false
+        default: "auto"
+        type: choice
+        options:
+          - auto
+          - always
+          - never
+      run_slow_fetchers:
+        description: "Run World Bank & Publication checker (auto=once/day UTC, always, never)"
+        required: false
+        default: "auto"
+        type: choice
+        options:
+          - auto
+          - always
+          - never
 
 concurrency:
   group: ww3-update
@@ -24,37 +60,112 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_D1_DATABASE_ID: "614ee93b-e679-4b1b-a874-7a8b7260d6d6"
       WW3_API_BASE: ${{ vars.WW3_API_BASE || 'https://ww3-risk-api.whymeymmy.workers.dev' }}
+      WW3_PAGES_URL: "https://ww3-risk-model.pages.dev"
       PYTHONPATH: "src"
 
     steps:
       - name: Checkout repository
+        id: checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Set up Python 3.12
+        id: setup_python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: "pip"
 
+      - name: Set up Node.js 22
+        id: setup_node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Install dependencies
+        id: install
         run: |
           python -m pip install --upgrade pip
           pip install pytest
 
-      - name: Run test suite
+      - name: Run full test suite (Python + Dashboard JS + Worker)
+        id: tests
         run: |
-          python -m pytest
+          python -m pytest -q
+          node --test tests/dashboard_pure.test.js
+          node --test worker/tests/index.test.js
+
+      - name: Plan pipeline stages (Pages quota guard & change detection)
+        id: plan
+        run: |
+          EVENT_NAME="${{ github.event_name }}"
+          INPUT_PAGES="${{ inputs.deploy_pages || 'auto' }}"
+          INPUT_WORKER="${{ inputs.deploy_worker || 'auto' }}"
+          INPUT_SLOW="${{ inputs.run_slow_fetchers || 'auto' }}"
+          TODAY_UTC=$(date -u +"%Y-%m-%d")
+
+          echo "TODAY_UTC=$TODAY_UTC" >> "$GITHUB_OUTPUT"
+          echo "Event: $EVENT_NAME | Today UTC: $TODAY_UTC | Inputs: pages=$INPUT_PAGES worker=$INPUT_WORKER slow=$INPUT_SLOW"
+
+          # 1. Decide slow fetchers (World Bank + Publication checker: once/day UTC in auto mode)
+          SHOULD_RUN_SLOW="false"
+          if [ "$INPUT_SLOW" = "always" ]; then
+            SHOULD_RUN_SLOW="true"
+          elif [ "$INPUT_SLOW" = "auto" ]; then
+            LAST_WB_DATE=$(python3 -c "import json, pathlib; p=pathlib.Path('data/candidates/worldbank_candidates.json'); print(json.loads(p.read_text()).get('generated_at','')[:10] if p.exists() else '')" 2>/dev/null || echo "")
+            if [ "$LAST_WB_DATE" != "$TODAY_UTC" ]; then
+              SHOULD_RUN_SLOW="true"
+            fi
+          fi
+
+          # 2. Decide Cloudflare Pages deploy (protects 500 deploys/month free tier)
+          #    - Always deploy on code push or explicit always
+          #    - In auto mode (schedule/dispatch), deploy once per UTC day to refresh embedded fallback
+          SHOULD_DEPLOY_PAGES="false"
+          if [ "$INPUT_PAGES" = "always" ] || [ "$EVENT_NAME" = "push" ]; then
+            SHOULD_DEPLOY_PAGES="true"
+          elif [ "$INPUT_PAGES" = "auto" ]; then
+            LIVE_DATE=$(curl -sS --max-time 10 "$WW3_PAGES_URL/" | grep -oE 'id="top-date-display"[^>]*>[0-9]{4}-[0-9]{2}-[0-9]{2}' | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -n1 || echo "")
+            echo "Live Pages embedded date: '${LIVE_DATE}' vs today '${TODAY_UTC}'"
+            if [ "$LIVE_DATE" != "$TODAY_UTC" ]; then
+              SHOULD_DEPLOY_PAGES="true"
+            fi
+          fi
+
+          # 3. Decide Cloudflare Worker deploy (on push touching worker/ or explicit always)
+          SHOULD_DEPLOY_WORKER="false"
+          if [ "$INPUT_WORKER" = "always" ]; then
+            SHOULD_DEPLOY_WORKER="true"
+          elif [ "$INPUT_WORKER" = "auto" ] && [ "$EVENT_NAME" = "push" ]; then
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
+            if echo "$CHANGED_FILES" | grep -q '^worker/'; then
+              SHOULD_DEPLOY_WORKER="true"
+            fi
+          fi
+
+          echo "SHOULD_RUN_SLOW_FETCHERS=$SHOULD_RUN_SLOW" >> "$GITHUB_OUTPUT"
+          echo "SHOULD_DEPLOY_PAGES=$SHOULD_DEPLOY_PAGES" >> "$GITHUB_OUTPUT"
+          echo "SHOULD_DEPLOY_WORKER=$SHOULD_DEPLOY_WORKER" >> "$GITHUB_OUTPUT"
+          echo "Plan => slow_fetchers=$SHOULD_RUN_SLOW | deploy_pages=$SHOULD_DEPLOY_PAGES | deploy_worker=$SHOULD_DEPLOY_WORKER"
 
       - name: Run real-time pulse fetcher
+        id: pulse
         run: |
           echo "Running real-time pulse fetcher..."
           python scripts/fetchers/pulse.py --output data/pulse_latest.json
 
       - name: Generate D1 snapshot JSON
+        id: snapshot
         run: |
-          python -m ww3_risk.cli --scenario scenarios/baseline_2026.json --export-snapshot current_snapshot.json
+          TODAY_UTC="${{ steps.plan.outputs.TODAY_UTC }}"
+          python -m ww3_risk.cli \
+            --scenario scenarios/baseline_2026.json \
+            --as-of-date "$TODAY_UTC" \
+            --export-snapshot current_snapshot.json
 
       - name: Push snapshot to Cloudflare D1
+        id: d1_push
         run: |
           if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
             echo "Pushing snapshot to Cloudflare D1..."
@@ -63,7 +174,9 @@ jobs:
             echo "::notice ::Skipping D1 push: CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID secret is not set."
           fi
 
-      - name: Run World Bank fetcher and Publication checker
+      - name: Run World Bank fetcher and Publication checker (daily)
+        id: fetchers
+        if: steps.plan.outputs.SHOULD_RUN_SLOW_FETCHERS == 'true'
         run: |
           echo "Running World Bank fetcher..."
           python scripts/fetchers/worldbank.py --baseline data/baseline_2026.json --output data/candidates/worldbank_candidates.json
@@ -71,6 +184,7 @@ jobs:
           python scripts/fetchers/publication_checker.py --output data/candidates/publication-check.json
 
       - name: Commit updated pulse and candidates if changed
+        id: commit_data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -78,18 +192,52 @@ jobs:
             echo "Detected changes in pulse or candidates, committing..."
             git add data/candidates data/pulse_latest.json
             git commit -m "chore(data): update pulse signals and candidate observations [skip ci]"
-            git push
+            for attempt in 1 2 3; do
+              if git pull --rebase origin main && git push origin HEAD:main; then
+                echo "Git push succeeded on attempt $attempt"
+                exit 0
+              fi
+              echo "Git push attempt $attempt failed, retrying after rebase..."
+              sleep 3
+            done
+            echo "::error ::Failed to push updated data after 3 attempts"
+            exit 1
           else
             echo "No changes in pulse or candidate observations."
           fi
 
+      - name: Deploy Cloudflare Worker (ww3-risk-api) when changed
+        id: deploy_worker
+        if: steps.plan.outputs.SHOULD_DEPLOY_WORKER == 'true'
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "Deploying Cloudflare Worker 'ww3-risk-api'..."
+            cd worker
+            for attempt in 1 2; do
+              if npx --yes wrangler@4 deploy; then
+                echo "Worker deployment succeeded on attempt $attempt"
+                exit 0
+              fi
+              echo "Worker deploy attempt $attempt failed"
+              sleep 15
+            done
+            echo "::error ::Worker deployment failed"
+            exit 1
+          else
+            echo "::notice ::Skipping Worker deployment: Cloudflare secrets not set."
+          fi
+
       - name: Build dynamic dashboard HTML with API base
+        id: build_dashboard
+        if: steps.plan.outputs.SHOULD_DEPLOY_PAGES == 'true'
         run: |
           API_BASE="${WW3_API_BASE:-https://ww3-risk-api.whymeymmy.workers.dev}"
           echo "Building dashboard with api-base: $API_BASE"
           python -m ww3_risk.cli --scenario scenarios/baseline_2026.json --dashboard ui/dashboard.html --api-base "$API_BASE"
 
       - name: Prepare Pages staging deployment directory
+        id: stage_pages
+        if: steps.plan.outputs.SHOULD_DEPLOY_PAGES == 'true'
         run: |
           mkdir -p staging
           cp ui/dashboard.html staging/index.html
@@ -102,15 +250,16 @@ jobs:
           fi
 
       - name: Deploy dynamic dashboard to Cloudflare Pages (with retry)
-        id: deploy
+        id: deploy_pages
+        if: steps.plan.outputs.SHOULD_DEPLOY_PAGES == 'true'
         run: |
           if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
             echo "Deploying staging/ directory to Cloudflare Pages project 'ww3-risk-model'..."
             MAX_ATTEMPTS=3
-            DELAY_SECONDS=60
+            DELAY_SECONDS=30
             for attempt in $(seq 1 $MAX_ATTEMPTS); do
-              echo "Attempt $attempt/$MAX_ATTEMPTS: npx wrangler pages deploy staging --project-name=ww3-risk-model"
-              if npx wrangler pages deploy staging --project-name=ww3-risk-model; then
+              echo "Attempt $attempt/$MAX_ATTEMPTS: npx --yes wrangler@4 pages deploy staging --project-name=ww3-risk-model --branch=main --commit-dirty=true"
+              if npx --yes wrangler@4 pages deploy staging --project-name=ww3-risk-model --branch=main --commit-dirty=true; then
                 echo "Deployment succeeded on attempt $attempt"
                 exit 0
               else
@@ -129,60 +278,105 @@ jobs:
 
       - name: Validate deployment (post-deploy checks)
         id: validate
-        if: always() && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
+        if: always() && steps.d1_push.outcome == 'success' && env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
         run: |
+          set -euo pipefail
           API_BASE="${WW3_API_BASE:-https://ww3-risk-api.whymeymmy.workers.dev}"
-          echo "Validating deployment at $API_BASE"
+          echo "Validating API at $API_BASE and Pages at $WW3_PAGES_URL"
 
-          # Check /api/risk/latest
-          echo "Checking $API_BASE/api/risk/latest..."
-          LATEST_RESPONSE=$(curl -s -w "\n%{http_code}" "$API_BASE/api/risk/latest" || echo -e "\n000")
-          LATEST_HTTP_CODE=$(echo "$LATEST_RESPONSE" | tail -n1)
-          LATEST_BODY=$(echo "$LATEST_RESPONSE" | head -n -1)
-
+          # 1. Check /api/risk/latest
+          LATEST_HTTP_CODE=$(curl -sS -o /tmp/latest.json -w "%{http_code}" "$API_BASE/api/risk/latest" || echo "000")
           if [ "$LATEST_HTTP_CODE" != "200" ]; then
             echo "::error ::/api/risk/latest returned HTTP $LATEST_HTTP_CODE"
             exit 1
           fi
 
-          python3 -c "import json, sys, datetime; data=json.loads('''$LATEST_BODY'''); computed_at=data.get('computed_at'); assert computed_at, 'computed_at missing'; dt=datetime.datetime.fromisoformat(computed_at.replace('Z', '+00:00')); now=datetime.datetime.now(datetime.timezone.utc); diff_hours=(now-dt).total_seconds()/3600; assert diff_hours<=2, f'computed_at too old: {diff_hours:.1f}h'; print(f'computed_at OK: {diff_hours:.1f}h')"
+          python3 - <<'PY'
+          import datetime, json, pathlib
+          data = json.loads(pathlib.Path("/tmp/latest.json").read_text(encoding="utf-8"))
+          computed_at = data.get("computed_at")
+          assert computed_at, "computed_at missing"
+          dt = datetime.datetime.fromisoformat(computed_at.replace("Z", "+00:00"))
+          now = datetime.datetime.now(datetime.timezone.utc)
+          diff_min = (now - dt).total_seconds() / 60.0
+          assert diff_min <= 90, f"computed_at too old: {diff_min:.1f} min"
+          pulse = data.get("pulse") or {}
+          print(f"API /api/risk/latest OK: computed_at={computed_at} (age={diff_min:.1f}m), composite={data.get('composite_index')}, active_signals={pulse.get('active_signals_count')}/{pulse.get('total_signals_count')}")
+          PY
 
-          # Check /api/data-status
-          echo "Checking $API_BASE/api/data-status..."
-          STATUS_RESPONSE=$(curl -s -w "\n%{http_code}" "$API_BASE/api/data-status" || echo -e "\n000")
-          STATUS_HTTP_CODE=$(echo "$STATUS_RESPONSE" | tail -n1)
-          STATUS_BODY=$(echo "$STATUS_RESPONSE" | head -n -1)
-
+          # 2. Check /api/data-status
+          STATUS_HTTP_CODE=$(curl -sS -o /tmp/data_status.json -w "%{http_code}" "$API_BASE/api/data-status" || echo "000")
           if [ "$STATUS_HTTP_CODE" != "200" ]; then
             echo "::error ::/api/data-status returned HTTP $STATUS_HTTP_CODE"
             exit 1
           fi
 
-          python3 -c "import json, sys; data=json.loads('''$STATUS_BODY'''); total=data.get('total_indicators'); assert total==36, f'total_indicators != 36 (got {total})'; print(f'data-status total_indicators OK: {total}')"
+          python3 - <<'PY'
+          import json, pathlib
+          data = json.loads(pathlib.Path("/tmp/data_status.json").read_text(encoding="utf-8"))
+          total = data.get("total_indicators")
+          assert total == 36, f"total_indicators != 36 (got {total})"
+          print(f"API /api/data-status OK: total_indicators={total}, last_computed={data.get('last_computed')}")
+          PY
+
+          # 3. Check Cloudflare Pages live site
+          PAGES_HTTP_CODE=$(curl -sS -o /tmp/pages.html -w "%{http_code}" "$WW3_PAGES_URL/" || echo "000")
+          if [ "$PAGES_HTTP_CODE" != "200" ]; then
+            echo "::error ::$WW3_PAGES_URL/ returned HTTP $PAGES_HTTP_CODE"
+            exit 1
+          fi
+          grep -q "WW3" /tmp/pages.html
+          echo "Pages $WW3_PAGES_URL/ OK (HTTP 200)"
 
           echo "All post-deploy validation checks passed"
 
+      - name: Auto-close resolved failure/watchdog alert issues
+        id: close_resolved_alerts
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+          for LABEL in "pipeline-failure" "watchdog"; do
+            OPEN_NUMS=$(gh issue list --state open --label "$LABEL" --json number --jq '.[].number' 2>/dev/null || echo "")
+            for NUM in $OPEN_NUMS; do
+              echo "Closing resolved [$LABEL] issue #$NUM"
+              gh issue close "$NUM" --comment "Auto-resolved at $TIMESTAMP by successful pipeline run: $RUN_URL" || true
+            done
+          done
+
       - name: Alert on failure (create Issue)
+        id: alert_failure
         if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           TRIGGER="${{ github.event_name }}"
           JOB_NAME="update-and-deploy"
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
-          
-          # Determine which stage failed
-          FAILED_STAGE="unknown"
-          if [ "${{ steps.deploy.outcome }}" == "failure" ]; then
-            FAILED_STAGE="部署"
-          elif [ "${{ steps.validate.outcome }}" == "failure" ]; then
-            FAILED_STAGE="驗證"
-          elif [ "${{ steps['Run test suite'].outcome }}" == "failure" ] || [ "${{ steps['Run real-time pulse fetcher'].outcome }}" == "failure" ] || [ "${{ steps['Generate D1 snapshot JSON'].outcome }}" == "failure" ] || [ "${{ steps['Push snapshot to Cloudflare D1'].outcome }}" == "failure" ] || [ "${{ steps['Run World Bank fetcher and Publication checker'].outcome }}" == "failure" ]; then
-            FAILED_STAGE="數據"
-          fi
-          
-          TITLE="[ww3-pipeline] update.yml failed $TIMESTAMP"
-          BODY="Workflow run: $RUN_URL\nTrigger: $TRIGGER\nFailed job: $JOB_NAME\nFailed stage: $FAILED_STAGE (數據／部署／驗證三段中哪段失敗)\n===\nSee run for details: $RUN_URL"
 
-          gh issue create --title "$TITLE" --body "$BODY" --label "pipeline-failure"
-        env:
-          GH_TOKEN: ${{ github.token }}
+          FAILED_STAGE="unknown"
+          if [ "${{ steps.tests.outcome }}" = "failure" ]; then
+            FAILED_STAGE="測試"
+          elif [ "${{ steps.pulse.outcome }}" = "failure" ] || [ "${{ steps.snapshot.outcome }}" = "failure" ] || [ "${{ steps.d1_push.outcome }}" = "failure" ] || [ "${{ steps.fetchers.outcome }}" = "failure" ] || [ "${{ steps.commit_data.outcome }}" = "failure" ]; then
+            FAILED_STAGE="數據"
+          elif [ "${{ steps.deploy_worker.outcome }}" = "failure" ] || [ "${{ steps.build_dashboard.outcome }}" = "failure" ] || [ "${{ steps.deploy_pages.outcome }}" = "failure" ]; then
+            FAILED_STAGE="部署"
+          elif [ "${{ steps.validate.outcome }}" = "failure" ]; then
+            FAILED_STAGE="驗證"
+          fi
+
+          EXISTING_NUM=$(gh issue list --state open --label "pipeline-failure" --limit 1 --json number --jq '.[0].number // ""' 2>/dev/null || echo "")
+          BODY="Workflow run: $RUN_URL
+          Trigger: $TRIGGER
+          Failed job: $JOB_NAME
+          Failed stage: $FAILED_STAGE
+          Timestamp: $TIMESTAMP"
+
+          if [ -n "$EXISTING_NUM" ]; then
+            gh issue comment "$EXISTING_NUM" --body "$BODY" || true
+          else
+            gh issue create --title "[ww3-pipeline] update.yml failed ($FAILED_STAGE) $TIMESTAMP" --body "$BODY" --label "pipeline-failure" || true
+          fi

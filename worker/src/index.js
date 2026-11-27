@@ -492,23 +492,227 @@ async function upsertFeedSnapshot(db, feedId, status, payload, error = null) {
     .run();
 }
 
-async function fetchGdelt() {
-  const url = "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json";
-  const response = await fetch(url, { headers: { "User-Agent": "WW3-Risk-Worker/1.0" } });
-  if (response.status !== 200) {
-    throw new Error(`GDELT HTTP ${response.status}`);
+const GDELT_DOC_URL =
+  "https://api.gdeltproject.org/api/v2/doc/doc?query=(conflict%20OR%20war%20OR%20military%20OR%20protest)&mode=timelinevol&format=json";
+const GDELT_V2_LASTUPDATE_URL = "https://storage.googleapis.com/data.gdeltproject.org/gdeltv2/lastupdate.txt";
+const GDELT_V2_GCS_PREFIX = "https://storage.googleapis.com/data.gdeltproject.org/";
+const GDELT_CONFLICT_ROOT_CODES = new Set(["14", "18", "19", "20"]);
+const POLYMARKET_DEFAULT_MARKETS = [
+  { id: "1124834", name: "US x Russia military clash by Dec 31, 2026", short: "US-RU Clash" },
+  { id: "2749367", name: "Russia invades NATO country by Dec 31, 2026", short: "RU-NATO Invasion" },
+  { id: "2749382", name: "NATO/EU troops fighting in Ukraine by Dec 31, 2026", short: "NATO Troops in UA" },
+];
+const YAHOO_BRENT_URL = "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d";
+
+function clamp(val, minVal, maxVal) {
+  return Math.max(minVal, Math.min(maxVal, val));
+}
+
+async function extractFirstFileFromZip(arrayBuffer) {
+  const bytes = new Uint8Array(arrayBuffer);
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+
+  // Locate End of Central Directory (PK\x05\x06) to handle both normal and data-descriptor ZIPs
+  let eocdOffset = -1;
+  const minSearch = Math.max(0, bytes.length - 65557);
+  for (let i = bytes.length - 22; i >= minSearch; i--) {
+    if (
+      bytes[i] === 0x50 &&
+      bytes[i + 1] === 0x4b &&
+      bytes[i + 2] === 0x05 &&
+      bytes[i + 3] === 0x06
+    ) {
+      eocdOffset = i;
+      break;
+    }
   }
-  const data = await response.json();
-  const timeline = data?.timeline?.[0]?.data || [];
-  if (!timeline.length) {
-    throw new Error("GDELT response missing timeline data");
+
+  let compressionMethod = 0;
+  let compressedSize = 0;
+  let localHeaderOffset = 0;
+  let fileName = "";
+
+  if (eocdOffset >= 0) {
+    const cdOffset = view.getUint32(eocdOffset + 16, true);
+    if (cdOffset + 46 <= bytes.length && view.getUint32(cdOffset, true) === 0x02014b50) {
+      compressionMethod = view.getUint16(cdOffset + 10, true);
+      compressedSize = view.getUint32(cdOffset + 20, true);
+      const nameLen = view.getUint16(cdOffset + 28, true);
+      localHeaderOffset = view.getUint32(cdOffset + 42, true);
+      fileName = new TextDecoder().decode(bytes.subarray(cdOffset + 46, cdOffset + 46 + nameLen));
+    }
   }
-  const latest = timeline[timeline.length - 1];
+
+  if (localHeaderOffset + 30 > bytes.length || view.getUint32(localHeaderOffset, true) !== 0x04034b50) {
+    throw new Error("Invalid ZIP local file header");
+  }
+
+  if (!compressedSize) {
+    compressionMethod = view.getUint16(localHeaderOffset + 8, true);
+    compressedSize = view.getUint32(localHeaderOffset + 18, true);
+  }
+  const localNameLen = view.getUint16(localHeaderOffset + 26, true);
+  const localExtraLen = view.getUint16(localHeaderOffset + 28, true);
+  if (!fileName) {
+    fileName = new TextDecoder().decode(
+      bytes.subarray(localHeaderOffset + 30, localHeaderOffset + 30 + localNameLen)
+    );
+  }
+  const dataStart = localHeaderOffset + 30 + localNameLen + localExtraLen;
+  const compressedSlice = bytes.subarray(dataStart, dataStart + compressedSize);
+
+  let text = "";
+  if (compressionMethod === 0) {
+    text = new TextDecoder().decode(compressedSlice);
+  } else if (compressionMethod === 8) {
+    const ds = new DecompressionStream("deflate-raw");
+    const writer = ds.writable.getWriter();
+    const writePromise = writer.write(compressedSlice).then(() => writer.close());
+    const resp = new Response(ds.readable);
+    const [decodedText] = await Promise.all([resp.text(), writePromise]);
+    text = decodedText;
+  } else {
+    throw new Error(`Unsupported ZIP compression method: ${compressionMethod}`);
+  }
+
+  return { fileName, text };
+}
+
+function parseGdeltEventsCsvText(csvText) {
+  const lines = csvText.split(/\r?\n/);
+  let totalEvents = 0;
+  let conflictEvents = 0;
+  let latestSqldate = "";
+
+  for (const line of lines) {
+    if (!line) continue;
+    const cols = line.split("\t");
+    if (cols.length <= 30) continue;
+    totalEvents += 1;
+    if (!latestSqldate && cols[1]) {
+      latestSqldate = cols[1].trim();
+    }
+    const rootCode = cols[28].trim();
+    const quadClass = cols[29].trim();
+    if (quadClass === "4" || GDELT_CONFLICT_ROOT_CODES.has(rootCode)) {
+      conflictEvents += 1;
+    }
+  }
+  return { totalEvents, conflictEvents, latestSqldate };
+}
+
+async function fetchGdeltV2EventsFallback(docError = null) {
+  const luController = new AbortController();
+  const luTimer = setTimeout(() => luController.abort(), 8000);
+  let lastUpdateText = "";
+  try {
+    const luResp = await fetch(GDELT_V2_LASTUPDATE_URL, {
+      headers: { "User-Agent": "WW3-Risk-Worker/1.0" },
+      signal: luController.signal,
+    });
+    if (luResp.status !== 200) {
+      throw new Error(`GDELT lastupdate HTTP ${luResp.status}`);
+    }
+    lastUpdateText = await luResp.text();
+  } finally {
+    clearTimeout(luTimer);
+  }
+
+  let exportUrl = "";
+  for (const line of lastUpdateText.split(/\r?\n/)) {
+    const parts = line.trim().split(/\s+/);
+    if (parts.length >= 3 && parts[2].endsWith(".export.CSV.zip")) {
+      exportUrl = parts[2];
+      break;
+    }
+  }
+  if (!exportUrl) {
+    throw new Error("GDELT lastupdate missing export.CSV.zip URL");
+  }
+  exportUrl = exportUrl
+    .replace("http://data.gdeltproject.org/", GDELT_V2_GCS_PREFIX)
+    .replace("https://data.gdeltproject.org/", GDELT_V2_GCS_PREFIX);
+
+  const zipController = new AbortController();
+  const zipTimer = setTimeout(() => zipController.abort(), 12000);
+  let zipBuf;
+  try {
+    const zipResp = await fetch(exportUrl, {
+      headers: { "User-Agent": "WW3-Risk-Worker/1.0" },
+      signal: zipController.signal,
+    });
+    if (zipResp.status !== 200) {
+      throw new Error(`GDELT export ZIP HTTP ${zipResp.status}`);
+    }
+    zipBuf = await zipResp.arrayBuffer();
+  } finally {
+    clearTimeout(zipTimer);
+  }
+
+  const { fileName, text } = await extractFirstFileFromZip(zipBuf);
+  const { totalEvents, conflictEvents, latestSqldate } = parseGdeltEventsCsvText(text);
+  if (totalEvents === 0) {
+    throw new Error("GDELT export CSV contained zero events");
+  }
+
+  const conflictPct = Number(((conflictEvents / totalEvents) * 100).toFixed(4));
+  const tsMatch = /^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/.exec(fileName);
+  const dateLabel = tsMatch
+    ? `${tsMatch[1]}-${tsMatch[2]}-${tsMatch[3]}T${tsMatch[4]}:${tsMatch[5]}:${tsMatch[6]}Z`
+    : (latestSqldate || fileName.slice(0, 14));
   return {
-    value: latest.value,
-    date: latest.date,
-    history_points: timeline.length,
+    value: conflictPct,
+    date: dateLabel,
+    history_points: totalEvents,
+    conflict_events: conflictEvents,
+    source: "gdelt_v2_events_15m",
+    source_url: exportUrl,
+    export_file: fileName,
+    fallback_reason: docError,
   };
+}
+
+async function fetchGdelt() {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 6000);
+  let docErr = null;
+  try {
+    const response = await fetch(GDELT_DOC_URL, {
+      headers: { "User-Agent": "WW3-Risk-Worker/1.0" },
+      signal: controller.signal,
+    });
+    if (response.status !== 200) {
+      throw new Error(`GDELT HTTP ${response.status}`);
+    }
+    const data = await response.json();
+    const timeline = data?.timeline?.[0]?.data || [];
+    if (!timeline.length) {
+      throw new Error("GDELT response missing timeline data");
+    }
+    const latest = timeline[timeline.length - 1];
+    const prior = timeline.slice(0, -1).slice(-30);
+    const baseline30d = prior.length
+      ? Number((prior.reduce((acc, item) => acc + Number(item.value || 0), 0) / prior.length).toFixed(4))
+      : 3.5;
+    return {
+      value: Number(latest.value),
+      date: latest.date,
+      history_points: timeline.length,
+      baseline_30d: baseline30d,
+      source: "gdelt_doc_timelinevol",
+      source_url: GDELT_DOC_URL,
+    };
+  } catch (e) {
+    docErr = e.name === "AbortError" ? "GDELT Doc API timeout" : (e.message || String(e));
+  } finally {
+    clearTimeout(timer);
+  }
+
+  try {
+    return await fetchGdeltV2EventsFallback(docErr);
+  } catch (fbErr) {
+    throw new Error(`${docErr}; fallback failed: ${fbErr.message || String(fbErr)}`);
+  }
 }
 
 async function fetchOpenSky() {
@@ -519,42 +723,48 @@ async function fetchOpenSky() {
     { name: "taiwan_strait", lamin: 22, lamax: 27, lomin: 117, lomax: 121 },
   ];
 
-  const results = {};
-  let totalVisible = 0;
-  let hasSuccess = false;
-
-  for (const box of boxes) {
+  const boxPromises = boxes.map(async (box) => {
     const url = `https://opensky-network.org/api/states/all?lamin=${box.lamin}&lamax=${box.lamax}&lomin=${box.lomin}&lomax=${box.lomax}`;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
     try {
       const response = await fetch(url, {
         headers: { "User-Agent": "WW3-Risk-Worker/1.0" },
         signal: controller.signal,
       });
       if (response.status === 429) {
-        throw new Error("OPENSKY_429");
+        return { name: box.name, rateLimited: true };
       }
       if (response.status !== 200) {
-        results[box.name] = { error: `HTTP ${response.status}`, visible: 0 };
-        continue;
+        return { name: box.name, ok: false, result: { error: `HTTP ${response.status}`, visible: 0 } };
       }
       const data = await response.json();
       const states = data?.states || [];
       const visible = states.filter((s) => s[5] !== null && s[6] !== null).length;
-      results[box.name] = { visible };
-      totalVisible += visible;
-      hasSuccess = true;
+      return { name: box.name, ok: true, result: { visible } };
     } catch (e) {
       if (e.name === "AbortError" || e.message?.includes("timeout")) {
-        results[box.name] = { error: "timeout", visible: 0 };
-      } else if (e.message === "OPENSKY_429") {
-        throw e;
-      } else {
-        results[box.name] = { error: e.message || String(e), visible: 0 };
+        return { name: box.name, ok: false, result: { error: "timeout", visible: 0 } };
       }
+      return { name: box.name, ok: false, result: { error: e.message || String(e), visible: 0 } };
     } finally {
       clearTimeout(timeoutId);
+    }
+  });
+
+  const settled = await Promise.all(boxPromises);
+  if (settled.some((item) => item.rateLimited)) {
+    throw new Error("OPENSKY_429");
+  }
+
+  const results = {};
+  let totalVisible = 0;
+  let hasSuccess = false;
+  for (const item of settled) {
+    results[item.name] = item.result;
+    if (item.ok) {
+      totalVisible += item.result.visible;
+      hasSuccess = true;
     }
   }
 
@@ -700,6 +910,432 @@ function shouldFetchOpenSky(row, now) {
   return ageMinutes > 50;
 }
 
+async function fetchBrentOilForPulse() {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    const resp = await fetch(YAHOO_BRENT_URL, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
+      signal: controller.signal,
+    });
+    if (resp.status !== 200) {
+      throw new Error(`Yahoo Finance HTTP ${resp.status}`);
+    }
+    const yfData = await resp.json();
+    const result = yfData?.chart?.result || [];
+    if (!result.length) {
+      throw new Error("Yahoo Finance chart response has no result");
+    }
+    const meta = result[0]?.meta || {};
+    let chgPct = meta.regularMarketChangePercent ?? meta.fulldayChangePercent;
+    if (chgPct === undefined || chgPct === null) {
+      const prev = meta.chartPreviousClose ?? meta.previousClose;
+      const cur = meta.regularMarketPrice;
+      if (prev && cur) {
+        chgPct = ((cur - prev) / prev) * 100.0;
+      }
+    }
+    if (chgPct === undefined || chgPct === null) {
+      throw new Error("Missing Brent change percentage");
+    }
+    return {
+      change_pct: Number(chgPct),
+      price_usd: Number(meta.regularMarketPrice || 0),
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function fetchPolymarketForPulse() {
+  const results = [];
+  await Promise.all(
+    POLYMARKET_DEFAULT_MARKETS.map(async (item) => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      try {
+        const resp = await fetch(`https://gamma-api.polymarket.com/markets/${item.id}`, {
+          headers: { "User-Agent": "WW3-Risk-Worker/1.0" },
+          signal: controller.signal,
+        });
+        if (resp.status !== 200) return;
+        const mData = await resp.json();
+        const prices = parseJsonField(mData?.outcomePrices);
+        const yesPrice = prices.length > 0 ? Number(prices[0]) : null;
+        if (yesPrice !== null && !Number.isNaN(yesPrice)) {
+          results.push({
+            id: item.id,
+            question: mData?.question || item.name,
+            short: item.short,
+            yes_price: yesPrice,
+            volume: Number(mData?.volume || 0),
+          });
+        }
+      } catch (e) {
+        // Individual market failure does not stop basket
+      } finally {
+        clearTimeout(timer);
+      }
+    })
+  );
+  return results;
+}
+
+async function buildWorkerPulse(nowIso, gdeltData = null) {
+  const signals = {};
+
+  // 1. GDELT (weight 0.40)
+  if (gdeltData && typeof gdeltData.value === "number") {
+    const isEventsFeed = gdeltData.source === "gdelt_v2_events_15m";
+    const baseline = isEventsFeed ? 13.5 : (Number(gdeltData.baseline_30d) || 3.5);
+    const scale = isEventsFeed ? 6.0 : 1.75;
+    const normScore = clamp((gdeltData.value - baseline) / scale, -1.0, 1.0);
+    const contrib = Number((normScore * 0.4 * 10.0).toFixed(2));
+    signals.gdelt_conflict = {
+      signal_id: "gdelt_conflict",
+      name: "GDELT 全球衝突與動盪新聞聲量強度",
+      source: isEventsFeed ? "GDELT 2.0 Events 15-min Feed" : "GDELT 2.0 Doc TimelineVol API",
+      source_url: gdeltData.source_url || GDELT_DOC_URL,
+      weight: 0.4,
+      status: "live",
+      fetched_at: nowIso,
+      raw_value: Number(gdeltData.value.toFixed(4)),
+      raw_unit: isEventsFeed ? "% (15分鐘衝突/抗議事件佔比)" : "% (全球新聞總量佔比)",
+      normalized_score: Number(normScore.toFixed(4)),
+      contribution: contrib,
+      details: {
+        latest_date: gdeltData.date || "",
+        history_points: gdeltData.history_points || 0,
+        baseline_anchor: baseline,
+        formula: `clamp((raw - ${baseline.toFixed(2)}) / ${scale.toFixed(2)}, -1.0, 1.0)`,
+      },
+      error: null,
+    };
+  } else {
+    signals.gdelt_conflict = {
+      signal_id: "gdelt_conflict",
+      name: "GDELT 全球衝突與動盪新聞聲量強度",
+      source: "GDELT 2.0 Doc TimelineVol API",
+      source_url: GDELT_DOC_URL,
+      weight: 0.4,
+      status: "unavailable",
+      fetched_at: null,
+      raw_value: null,
+      raw_unit: "% (全球新聞總量佔比)",
+      normalized_score: 0.0,
+      contribution: 0.0,
+      details: {},
+      error: "GDELT unavailable in worker scheduled tick",
+    };
+  }
+
+  // 2. Polymarket (weight 0.35)
+  try {
+    const markets = await fetchPolymarketForPulse();
+    if (!markets.length) {
+      throw new Error("No Polymarket war risk markets returned");
+    }
+    const avgYes = markets.reduce((sum, m) => sum + m.yes_price, 0) / markets.length;
+    const rawPct = avgYes * 100.0;
+    const normScore = clamp((avgYes - 0.05) / 0.1, -1.0, 1.0);
+    const contrib = Number((normScore * 0.35 * 10.0).toFixed(2));
+    signals.polymarket_war_risk = {
+      signal_id: "polymarket_war_risk",
+      name: "Polymarket 戰爭地緣預測市場綜合機率",
+      source: "Polymarket Gamma API",
+      source_url: "https://gamma-api.polymarket.com/markets",
+      weight: 0.35,
+      status: "live",
+      fetched_at: nowIso,
+      raw_value: Number(rawPct.toFixed(2)),
+      raw_unit: "% (Yes 隱含機率)",
+      normalized_score: Number(normScore.toFixed(4)),
+      contribution: contrib,
+      details: {
+        monitored_markets: markets,
+        baseline_anchor: 0.05,
+        formula: "clamp((P_yes - 0.05) / 0.10, -1.0, 1.0)",
+      },
+      error: null,
+    };
+  } catch (e) {
+    signals.polymarket_war_risk = {
+      signal_id: "polymarket_war_risk",
+      name: "Polymarket 戰爭地緣預測市場綜合機率",
+      source: "Polymarket Gamma API",
+      source_url: "https://gamma-api.polymarket.com/markets",
+      weight: 0.35,
+      status: "unavailable",
+      fetched_at: null,
+      raw_value: null,
+      raw_unit: "% (Yes 隱含機率)",
+      normalized_score: 0.0,
+      contribution: 0.0,
+      details: {},
+      error: e.message || String(e),
+    };
+  }
+
+  // 3. Brent Crude 24h Change (weight 0.25)
+  try {
+    const oil = await fetchBrentOilForPulse();
+    const normScore = clamp(oil.change_pct / 10.0, -1.0, 1.0);
+    const contrib = Number((normScore * 0.25 * 10.0).toFixed(2));
+    signals.brent_oil_24h = {
+      signal_id: "brent_oil_24h",
+      name: "Brent 原油近月 24 小時價格變動",
+      source: "Yahoo Finance (BZ=F)",
+      source_url: YAHOO_BRENT_URL,
+      weight: 0.25,
+      status: "live",
+      fetched_at: nowIso,
+      raw_value: Number(oil.change_pct.toFixed(2)),
+      raw_unit: "% (24h 漲跌幅)",
+      normalized_score: Number(normScore.toFixed(4)),
+      contribution: contrib,
+      details: {
+        price_usd: oil.price_usd,
+        scale_anchor_pct: 10.0,
+        formula: "clamp(change_pct / 10.0, -1.0, 1.0)",
+      },
+      error: null,
+    };
+  } catch (e) {
+    signals.brent_oil_24h = {
+      signal_id: "brent_oil_24h",
+      name: "Brent 原油近月 24 小時價格變動",
+      source: "Yahoo Finance (BZ=F)",
+      source_url: YAHOO_BRENT_URL,
+      weight: 0.25,
+      status: "unavailable",
+      fetched_at: null,
+      raw_value: null,
+      raw_unit: "% (24h 漲跌幅)",
+      normalized_score: 0.0,
+      contribution: 0.0,
+      details: {},
+      error: e.message || String(e),
+    };
+  }
+
+  const totalContrib = Object.values(signals).reduce((sum, s) => sum + Number(s.contribution || 0), 0);
+  const pulseAdjustment = Number(clamp(totalContrib, -10.0, 10.0).toFixed(2));
+  const activeCount = Object.values(signals).filter((s) => s.status === "live").length;
+
+  return {
+    version: "0.6.0",
+    computed_at: nowIso,
+    pulse_adjustment: pulseAdjustment,
+    range: [-10.0, 10.0],
+    status: activeCount > 0 ? "operational" : "degraded",
+    active_signals_count: activeCount,
+    total_signals_count: 3,
+    source_engine: "cloudflare-worker-fallback",
+    weights: {
+      gdelt_conflict: 0.4,
+      polymarket_war_risk: 0.35,
+      brent_oil_24h: 0.25,
+    },
+    signals,
+  };
+}
+
+async function maybeDispatchGitHubUpdate(db, env, now) {
+  const token = env?.GITHUB_DISPATCH_TOKEN;
+  if (!token) {
+    return { dispatched: false, reason: "no_token" };
+  }
+
+  const latest = await db
+    .prepare("SELECT computed_at FROM index_snapshots ORDER BY computed_at DESC LIMIT 1")
+    .first();
+  if (latest?.computed_at) {
+    const ageMinutes = (now - new Date(latest.computed_at)) / 60000;
+    if (ageMinutes < 55) {
+      return { dispatched: false, reason: "fresh", age_minutes: Math.round(ageMinutes) };
+    }
+  }
+
+  const prevDispatch = await db
+    .prepare("SELECT fetched_at, status FROM live_feed_snapshots WHERE feed_id = ?")
+    .bind("github_dispatch")
+    .first();
+  if (prevDispatch?.fetched_at && prevDispatch.status === "ok") {
+    const sinceDispatchMin = (now - new Date(prevDispatch.fetched_at)) / 60000;
+    if (sinceDispatchMin < 25) {
+      return { dispatched: false, reason: "cooldown", since_dispatch_minutes: Math.round(sinceDispatchMin) };
+    }
+  }
+
+  const repo = env.GITHUB_REPO || "whypuss/ww3-risk-model";
+  const workflow = env.GITHUB_WORKFLOW || "update.yml";
+  const url = `https://api.github.com/repos/${repo}/actions/workflows/${workflow}/dispatches`;
+
+  try {
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "WW3-Risk-Worker/1.0",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ref: "main",
+        inputs: { deploy_pages: "auto", deploy_worker: "never", run_slow_fetchers: "auto" },
+      }),
+    });
+    if (resp.status === 204 || resp.status === 200) {
+      await upsertFeedSnapshot(db, "github_dispatch", "ok", { repo, workflow, http_status: resp.status });
+      return { dispatched: true, http_status: resp.status };
+    }
+    const errText = await resp.text().catch(() => "");
+    const errMsg = `GitHub dispatch HTTP ${resp.status}: ${errText.slice(0, 160)}`;
+    await upsertFeedSnapshot(db, "github_dispatch", "error", { repo, workflow, http_status: resp.status }, errMsg);
+    return { dispatched: false, reason: "http_error", error: errMsg };
+  } catch (e) {
+    const errMsg = e.message || String(e);
+    await upsertFeedSnapshot(db, "github_dispatch", "error", { repo, workflow }, errMsg);
+    return { dispatched: false, reason: "network_error", error: errMsg };
+  }
+}
+
+async function maybeBackfillHourlySnapshot(db, now, gdeltData = null) {
+  const latest = await db
+    .prepare("SELECT * FROM index_snapshots ORDER BY computed_at DESC LIMIT 1")
+    .first();
+  if (!latest || !latest.computed_at) {
+    return { backfilled: false, reason: "no_base_snapshot" };
+  }
+
+  const ageMinutes = (now - new Date(latest.computed_at)) / 60000;
+  if (ageMinutes < 70) {
+    return { backfilled: false, reason: "fresh", age_minutes: Math.round(ageMinutes) };
+  }
+
+  const nowIso = now.toISOString().replace(/\.\d{3}Z$/, "Z");
+  const pulse = await buildWorkerPulse(nowIso, gdeltData);
+  if (pulse.active_signals_count === 0) {
+    return { backfilled: false, reason: "all_pulse_sources_unavailable" };
+  }
+
+  const structuralIdx =
+    latest.structural_index !== null && latest.structural_index !== undefined
+      ? Number(latest.structural_index)
+      : Number(latest.total_index);
+  const compositeIdx = Number(clamp(structuralIdx + pulse.pulse_adjustment, 0.0, 100.0).toFixed(2));
+  const cleanTs = nowIso.replace(/[^0-9a-zA-Z]/g, "");
+  const scenarioId = latest.scenario_id || "baseline_2026";
+  const newSnapshotId = `snapshot_${scenarioId}_${cleanTs}_worker`;
+
+  await db
+    .prepare(
+      "INSERT OR REPLACE INTO index_snapshots (" +
+        "id, computed_at, model_version, scenario_id, total_index, stage, " +
+        "base_score, interaction_bonus, gate_multiplier, peace_capacity, " +
+        "band_1y, band_5y, band_10y, layers_json, drivers_json, " +
+        "structural_index, pulse_adjustment, composite_index, pulse_json" +
+      ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    )
+    .bind(
+      newSnapshotId,
+      nowIso,
+      latest.model_version,
+      scenarioId,
+      compositeIdx,
+      Number(latest.stage),
+      Number(latest.base_score),
+      Number(latest.interaction_bonus),
+      Number(latest.gate_multiplier),
+      Number(latest.peace_capacity),
+      Number(latest.band_1y),
+      Number(latest.band_5y),
+      Number(latest.band_10y),
+      latest.layers_json,
+      latest.drivers_json,
+      structuralIdx,
+      pulse.pulse_adjustment,
+      compositeIdx,
+      JSON.stringify(pulse)
+    )
+    .run();
+
+  await db
+    .prepare(
+      "INSERT INTO indicator_observations (" +
+        "snapshot_id, indicator_id, layer, raw_value, raw_unit, " +
+        "normalized_score, evidence_level, source_name, source_url, " +
+        "observation_date, publication_date, last_checked, stale_after_days, is_stale" +
+      ") SELECT ?, indicator_id, layer, raw_value, raw_unit, " +
+        "normalized_score, evidence_level, source_name, source_url, " +
+        "observation_date, publication_date, last_checked, stale_after_days, is_stale " +
+      "FROM indicator_observations WHERE snapshot_id = ?"
+    )
+    .bind(newSnapshotId, latest.id)
+    .run();
+
+  return {
+    backfilled: true,
+    snapshot_id: newSnapshotId,
+    computed_at: nowIso,
+    composite_index: compositeIdx,
+    pulse_adjustment: pulse.pulse_adjustment,
+    active_signals_count: pulse.active_signals_count,
+  };
+}
+
+async function handleAutomationStatus(db) {
+  const latest = await db
+    .prepare("SELECT id, computed_at, model_version, composite_index, pulse_adjustment FROM index_snapshots ORDER BY computed_at DESC LIMIT 1")
+    .first();
+
+  if (!latest) {
+    return errorUnavailable();
+  }
+
+  const now = new Date();
+  const ageMinutes = Number(((now - new Date(latest.computed_at)) / 60000).toFixed(1));
+  const cutoffIso = new Date(now.getTime() - 24 * 3600 * 1000).toISOString();
+  const countRow = await db
+    .prepare("SELECT COUNT(*) AS cnt FROM index_snapshots WHERE computed_at >= ?")
+    .bind(cutoffIso)
+    .first();
+
+  let dispatchRow = null;
+  try {
+    dispatchRow = await db
+      .prepare("SELECT fetched_at, status, payload_json, error FROM live_feed_snapshots WHERE feed_id = ?")
+      .bind("github_dispatch")
+      .first();
+  } catch (e) {
+    dispatchRow = null;
+  }
+
+  return jsonResponse({
+    now_utc: now.toISOString(),
+    latest_snapshot: {
+      id: latest.id,
+      computed_at: latest.computed_at,
+      age_minutes: ageMinutes,
+      source: String(latest.id || "").endsWith("_worker") ? "cloudflare-worker-fallback" : "github-actions",
+      composite_index: Number(latest.composite_index),
+      pulse_adjustment: Number(latest.pulse_adjustment),
+    },
+    snapshots_last_24h: Number(countRow?.cnt || 0),
+    is_fresh_90m: ageMinutes <= 90,
+    github_dispatch: dispatchRow
+      ? {
+          fetched_at: dispatchRow.fetched_at,
+          status: dispatchRow.status,
+          error: dispatchRow.error,
+        }
+      : { fetched_at: null, status: "not_configured", error: null },
+  });
+}
+
 async function scheduledHandler(event, env, ctx) {
   const db = env.DB;
   if (!db) return;
@@ -713,8 +1349,9 @@ async function scheduledHandler(event, env, ctx) {
   const now = new Date();
 
   // Every tick: GDELT + Hormuz
+  let gdeltData = null;
   try {
-    const gdeltData = await fetchGdelt();
+    gdeltData = await fetchGdelt();
     await upsertFeedSnapshot(db, "gdelt", "ok", gdeltData);
   } catch (e) {
     await upsertFeedSnapshot(db, "gdelt", "error", null, e.message);
@@ -744,6 +1381,20 @@ async function scheduledHandler(event, env, ctx) {
         await upsertFeedSnapshot(db, "opensky", "error", null, e.message);
       }
     }
+  }
+
+  // Optional Cloudflare-driven GitHub workflow_dispatch trigger (when GITHUB_DISPATCH_TOKEN secret is set)
+  try {
+    await maybeDispatchGitHubUpdate(db, env, now);
+  } catch (e) {
+    // Never abort cron on dispatch errors
+  }
+
+  // Serverless D1 hourly backfill safety net: if GitHub Actions schedule missed > 70 min, keep D1 fresh
+  try {
+    await maybeBackfillHourlySnapshot(db, now, gdeltData);
+  } catch (e) {
+    // Never abort cron on backfill errors
   }
 }
 
@@ -799,12 +1450,14 @@ export default {
           return await handleFeedsLatest(db);
         case "/api/feeds/polymarket":
           return await handleFeedsPolymarket(db);
+        case "/api/automation/status":
+          return await handleAutomationStatus(db);
         default:
           return jsonResponse(
             {
               error: "Not Found",
               status: 404,
-              message: `Endpoint '${pathname}' not found. Available: /api/risk/latest, /api/pulse/latest, /api/risk/history, /api/risk/layers, /api/data-status, /api/feeds/latest, /api/feeds/polymarket`,
+              message: `Endpoint '${pathname}' not found. Available: /api/risk/latest, /api/pulse/latest, /api/risk/history, /api/risk/layers, /api/data-status, /api/feeds/latest, /api/feeds/polymarket, /api/automation/status`,
             },
             404
           );
@@ -828,4 +1481,9 @@ export default {
   // Exported for unit testing
   shouldFetchOpenSky,
   fetchOpenSky,
+  fetchGdelt,
+  extractFirstFileFromZip,
+  parseGdeltEventsCsvText,
+  maybeDispatchGitHubUpdate,
+  maybeBackfillHourlySnapshot,
 };
