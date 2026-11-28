@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-11-28T15:40:25Z",
-  "pulse_adjustment": -1.69,
+  "computed_at": "2026-11-28T16:40:24Z",
+  "pulse_adjustment": -0.82,
   "range": [
     -10.0,
     10.0
@@ -19,18 +19,18 @@
       "signal_id": "gdelt_conflict",
       "name": "GDELT 全球衝突與動盪新聞聲量強度",
       "source": "GDELT 2.0 Events 15-min Feed",
-      "source_url": "https://storage.googleapis.com/data.gdeltproject.org/gdeltv2/20261128154500.export.CSV.zip",
+      "source_url": "https://storage.googleapis.com/data.gdeltproject.org/gdeltv2/20261128164500.export.CSV.zip",
       "weight": 0.4,
       "status": "live",
-      "fetched_at": "2026-11-28T15:40:24Z",
-      "raw_value": 12.2156,
+      "fetched_at": "2026-11-28T16:40:23Z",
+      "raw_value": 13.5279,
       "raw_unit": "% (15分鐘衝突/抗議事件佔比)",
-      "normalized_score": -0.2141,
-      "contribution": -0.86,
+      "normalized_score": 0.0046,
+      "contribution": 0.02,
       "details": {
-        "latest_date": "2026-11-28T15:45:00Z",
-        "export_file": "20261128154500.export.CSV",
-        "total_events": 835,
+        "latest_date": "2026-11-28T16:45:00Z",
+        "export_file": "20261128164500.export.CSV",
+        "total_events": 754,
         "conflict_events": 102,
         "baseline_anchor": 13.5,
         "fallback_reason": "<urlopen error _ssl.c:994: The handshake operation timed out>",
@@ -45,25 +45,25 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-11-28T15:40:24Z",
-      "raw_value": 2.47,
+      "fetched_at": "2026-11-28T16:40:23Z",
+      "raw_value": 2.42,
       "raw_unit": "% (Yes 隱含機率)",
-      "normalized_score": -0.2533,
-      "contribution": -0.89,
+      "normalized_score": -0.2583,
+      "contribution": -0.9,
       "details": {
         "monitored_markets": [
           {
             "id": "1124834",
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
-            "yes_price": 0.0325,
+            "yes_price": 0.0315,
             "volume": 1089458.0935160003
           },
           {
             "id": "2749367",
             "question": "Will Russia invade a NATO country by December 31, 2026?",
             "short": "RU-NATO Invasion",
-            "yes_price": 0.0185,
+            "yes_price": 0.018,
             "volume": 561444.0596309999
           },
           {
@@ -86,7 +86,7 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-11-28T15:40:25Z",
+      "fetched_at": "2026-11-28T16:40:24Z",
       "raw_value": 0.22,
       "raw_unit": "% (24h 漲跌幅)",
       "normalized_score": 0.0221,
