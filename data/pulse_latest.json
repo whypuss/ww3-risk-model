@@ -1,7 +1,7 @@
 {
   "version": "0.6.0",
-  "computed_at": "2026-11-28T06:40:33Z",
-  "pulse_adjustment": -0.46,
+  "computed_at": "2026-11-28T07:40:26Z",
+  "pulse_adjustment": 0.3,
   "range": [
     -10.0,
     10.0
@@ -19,19 +19,19 @@
       "signal_id": "gdelt_conflict",
       "name": "GDELT 全球衝突與動盪新聞聲量強度",
       "source": "GDELT 2.0 Events 15-min Feed",
-      "source_url": "https://storage.googleapis.com/data.gdeltproject.org/gdeltv2/20261128064500.export.CSV.zip",
+      "source_url": "https://storage.googleapis.com/data.gdeltproject.org/gdeltv2/20261128074500.export.CSV.zip",
       "weight": 0.4,
       "status": "live",
-      "fetched_at": "2026-11-28T06:40:31Z",
-      "raw_value": 13.7809,
+      "fetched_at": "2026-11-28T07:40:25Z",
+      "raw_value": 15.1177,
       "raw_unit": "% (15分鐘衝突/抗議事件佔比)",
-      "normalized_score": 0.0468,
-      "contribution": 0.19,
+      "normalized_score": 0.2696,
+      "contribution": 1.08,
       "details": {
-        "latest_date": "2026-11-28T06:45:00Z",
-        "export_file": "20261128064500.export.CSV",
-        "total_events": 566,
-        "conflict_events": 78,
+        "latest_date": "2026-11-28T07:45:00Z",
+        "export_file": "20261128074500.export.CSV",
+        "total_events": 807,
+        "conflict_events": 122,
         "baseline_anchor": 13.5,
         "fallback_reason": "<urlopen error _ssl.c:994: The handshake operation timed out>",
         "formula": "clamp((raw - 13.50) / 6.00, -1.0, 1.0)"
@@ -45,18 +45,18 @@
       "source_url": "https://gamma-api.polymarket.com/markets",
       "weight": 0.35,
       "status": "live",
-      "fetched_at": "2026-11-28T06:40:32Z",
-      "raw_value": 2.98,
+      "fetched_at": "2026-11-28T07:40:25Z",
+      "raw_value": 2.6,
       "raw_unit": "% (Yes 隱含機率)",
-      "normalized_score": -0.2017,
-      "contribution": -0.71,
+      "normalized_score": -0.24,
+      "contribution": -0.84,
       "details": {
         "monitored_markets": [
           {
             "id": "1124834",
             "question": "US x Russia military clash by December 31, 2026?",
             "short": "US-RU Clash",
-            "yes_price": 0.0345,
+            "yes_price": 0.035,
             "volume": 1089045.7735160005
           },
           {
@@ -64,14 +64,14 @@
             "question": "Will Russia invade a NATO country by December 31, 2026?",
             "short": "RU-NATO Invasion",
             "yes_price": 0.0185,
-            "volume": 561444.0596309999
+            "volume": 561444.0596309998
           },
           {
             "id": "2749382",
             "question": "NATO/EU troops fighting in Ukraine by December 31, 2026?",
             "short": "NATO Troops in UA",
-            "yes_price": 0.0365,
-            "volume": 161446.74355400004
+            "yes_price": 0.0245,
+            "volume": 161446.74355400002
           }
         ],
         "baseline_anchor": 0.05,
@@ -86,7 +86,7 @@
       "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/BZ=F?interval=1d&range=5d",
       "weight": 0.25,
       "status": "live",
-      "fetched_at": "2026-11-28T06:40:33Z",
+      "fetched_at": "2026-11-28T07:40:26Z",
       "raw_value": 0.22,
       "raw_unit": "% (24h 漲跌幅)",
       "normalized_score": 0.0221,
